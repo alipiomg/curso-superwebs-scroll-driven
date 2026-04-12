@@ -187,6 +187,12 @@ img{max-width:100%}
 .glosario-term{color:var(--cyan);font-weight:600;white-space:nowrap;width:30%}
 .glosario-def{color:var(--text-muted);line-height:1.5}
 
+/* Infografia image (generated) */
+.infografia-img-wrap{margin-bottom:1rem}
+.infografia-img{width:100%;border-radius:var(--radius);border:1px solid var(--card-border);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.infografia-img:hover{transform:scale(1.01);box-shadow:0 8px 32px rgba(0,255,136,.08)}
+.infografia-img-caption{font-size:.7rem;color:var(--text-dim);text-align:center;margin-top:.5rem}
+
 /* Prompt infografia */
 .prompt-section{background:#111;border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden}
 .prompt-toggle{width:100%;background:none;border:none;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;color:var(--text-muted);font-size:.82rem;cursor:pointer;transition:background .2s}
@@ -527,6 +533,11 @@ const INFOGRAFIA_MAP = {
   'skill-video2website': 'infografias/12-skill-video2website.html'
 };
 
+// Images generated with NanoBananaPro/Higgsfield — add entries as you generate them
+const INFOGRAFIA_IMG_MAP = {
+  'generacion-imagenes-ia': 'infografias-img/02-generacion-imagenes-ia.png'
+};
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -848,9 +859,16 @@ function buildGlosario(c) {
 }
 
 function buildPrompt(c) {
-  return `<div class="prompt-section">
+  const imgSrc = INFOGRAFIA_IMG_MAP[c.id];
+  const imageHtml = imgSrc ? `<div class="infografia-img-wrap">
+    <img src="${imgSrc}" alt="Infografia: ${escapeHtml(c.titulo)}" class="infografia-img" loading="lazy" onclick="window.open('${imgSrc}','_blank')">
+    <p class="infografia-img-caption">Generada con NanoBananaPro &mdash; Click para ampliar</p>
+  </div>` : '';
+
+  return `${imageHtml}
+  <div class="prompt-section">
     <button class="prompt-toggle" onclick="togglePrompt(this)">
-      <span>&#127912; Ver prompt para infografia</span>
+      <span>&#127912; ${imgSrc ? 'Ver prompt original' : 'Ver prompt para infografia'}</span>
       <span class="prompt-toggle__icon">&#9660;</span>
     </button>
     <div class="prompt-content">
