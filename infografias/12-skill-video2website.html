@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 12 — video2website Skill Pipeline</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Pipeline */
+.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:.5rem}
+.pipe-step{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem .6rem;text-align:center;position:relative}
+.pipe-step .step-num{position:absolute;top:6px;left:8px;font-size:.55rem;font-weight:700;font-family:'JetBrains Mono',monospace;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.pipe-step:nth-child(1) .step-num{background:rgba(0,255,136,.15);color:var(--accent)}
+.pipe-step:nth-child(2) .step-num{background:rgba(0,212,255,.15);color:var(--cyan)}
+.pipe-step:nth-child(3) .step-num{background:rgba(168,85,247,.15);color:var(--purple)}
+.pipe-step:nth-child(4) .step-num{background:rgba(251,191,36,.15);color:#fbbf24}
+.pipe-step:nth-child(5) .step-num{background:rgba(0,255,136,.15);color:var(--accent)}
+.pipe-step:nth-child(6) .step-num{background:rgba(0,212,255,.15);color:var(--cyan)}
+.pipe-step:nth-child(7) .step-num{background:rgba(168,85,247,.15);color:var(--purple)}
+.pipe-step:nth-child(8) .step-num{background:rgba(0,255,136,.15);color:var(--accent)}
+.pipe-icon{font-size:1.3rem;margin-bottom:.3rem;margin-top:.2rem}
+.pipe-name{font-size:.65rem;font-weight:700;margin-bottom:.2rem;line-height:1.2}
+.pipe-desc{font-size:.55rem;color:var(--muted);line-height:1.3}
+
+/* Connection arrows row */
+.arrow-row{display:flex;justify-content:center;gap:0;margin-bottom:.5rem;padding:0 .25rem}
+.arrow-segment{flex:1;text-align:center;color:var(--accent);font-size:.8rem;opacity:.5}
+
+/* Time estimate */
+.time-card{background:var(--card);border:2px solid rgba(0,255,136,.15);border-radius:12px;padding:1.2rem;display:flex;align-items:center;justify-content:center;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.time-total{text-align:center}
+.time-total .time-big{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.time-total .time-label{font-size:.7rem;color:var(--muted);margin-top:.2rem}
+.time-breakdown{display:flex;gap:1rem;flex-wrap:wrap}
+.time-item{text-align:center}
+.time-item .t-val{font-size:.85rem;font-weight:700;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.time-item .t-name{font-size:.55rem;color:var(--muted);margin-top:.1rem}
+
+/* Step detail */
+.step-detail{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.5rem}
+.detail-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.8rem 1rem;display:flex;align-items:flex-start;gap:.6rem}
+.detail-num{width:22px;height:22px;border-radius:50%;background:rgba(0,255,136,.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.detail-info h4{font-size:.7rem;font-weight:600;margin-bottom:.15rem}
+.detail-info p{font-size:.6rem;color:var(--muted);line-height:1.3}
+.detail-info code{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--cyan);background:rgba(0,212,255,.08);padding:.1rem .3rem;border-radius:3px}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .pipeline{grid-template-columns:repeat(2,1fr)}
+  .step-detail{grid-template-columns:1fr}
+  .time-card{flex-direction:column;gap:1rem}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">12</div>
+    <h1><span>video2website</span> Skill Pipeline</h1>
+    <p>El pipeline completo que transforma un video en una superweb scroll-driven en minutos</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Pipeline de 8 pasos</div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="step-num">1</div>
+        <div class="pipe-icon">&#128196;</div>
+        <div class="pipe-name">SKILL.md</div>
+        <div class="pipe-desc">Definicion del skill</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">2</div>
+        <div class="pipe-icon">&#9889;</div>
+        <div class="pipe-name">/video2website</div>
+        <div class="pipe-desc">Invocacion del comando</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">3</div>
+        <div class="pipe-icon">&#128172;</div>
+        <div class="pipe-name">Claude pregunta</div>
+        <div class="pipe-desc">Producto + sector + video</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">4</div>
+        <div class="pipe-icon">&#128270;</div>
+        <div class="pipe-name">ffprobe</div>
+        <div class="pipe-desc">Analiza el video</div>
+      </div>
+    </div>
+    <div class="arrow-row">
+      <div class="arrow-segment">&#10132;</div>
+      <div class="arrow-segment">&#10132;</div>
+      <div class="arrow-segment">&#10132;</div>
+      <div class="arrow-segment">&#10132;</div>
+    </div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="step-num">5</div>
+        <div class="pipe-icon">&#127916;</div>
+        <div class="pipe-name">ffmpeg</div>
+        <div class="pipe-desc">Extrae 120 frames</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">6</div>
+        <div class="pipe-icon">&#128187;</div>
+        <div class="pipe-name">HTML/CSS/JS</div>
+        <div class="pipe-desc">Genera el codigo</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">7</div>
+        <div class="pipe-icon">&#9989;</div>
+        <div class="pipe-name">Quality gate</div>
+        <div class="pipe-desc">Valida estructura</div>
+      </div>
+      <div class="pipe-step">
+        <div class="step-num">8</div>
+        <div class="pipe-icon">&#127760;</div>
+        <div class="pipe-name">npx serve</div>
+        <div class="pipe-desc">Preview local</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Tiempo estimado</div>
+    <div class="time-card">
+      <div class="time-total">
+        <div class="time-big">~3 min</div>
+        <div class="time-label">Tiempo total</div>
+      </div>
+      <div class="time-breakdown">
+        <div class="time-item">
+          <div class="t-val">5s</div>
+          <div class="t-name">ffprobe</div>
+        </div>
+        <div class="time-item">
+          <div class="t-val">30s</div>
+          <div class="t-name">ffmpeg</div>
+        </div>
+        <div class="time-item">
+          <div class="t-val">90s</div>
+          <div class="t-name">Generacion</div>
+        </div>
+        <div class="time-item">
+          <div class="t-val">15s</div>
+          <div class="t-name">Quality gate</div>
+        </div>
+        <div class="time-item">
+          <div class="t-val">10s</div>
+          <div class="t-name">Serve</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Detalle de cada paso</div>
+    <div class="step-detail">
+      <div class="detail-card">
+        <div class="detail-num">1</div>
+        <div class="detail-info">
+          <h4>SKILL.md</h4>
+          <p>Archivo de instrucciones que define el comportamiento del skill</p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">2</div>
+        <div class="detail-info">
+          <h4>/video2website</h4>
+          <p>Comando slash que activa el pipeline en Claude Code</p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">3</div>
+        <div class="detail-info">
+          <h4>Input del usuario</h4>
+          <p>Claude pide: producto, sector y <code>ruta/al/video.mp4</code></p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">4</div>
+        <div class="detail-info">
+          <h4>ffprobe</h4>
+          <p>Detecta duracion, FPS y resolucion del video</p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">5</div>
+        <div class="detail-info">
+          <h4>ffmpeg</h4>
+          <p>Extrae frames como <code>frame-001.png</code> hasta <code>frame-120.png</code></p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">6</div>
+        <div class="detail-info">
+          <h4>HTML / CSS / JS</h4>
+          <p>Genera la superweb completa con GSAP + ScrollTrigger</p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">7</div>
+        <div class="detail-info">
+          <h4>Quality gate</h4>
+          <p>Verifica responsive, accesibilidad y rendimiento</p>
+        </div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-num">8</div>
+        <div class="detail-info">
+          <h4>npx serve</h4>
+          <p>Levanta servidor local para preview inmediato</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 12 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

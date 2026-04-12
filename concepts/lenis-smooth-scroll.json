@@ -1,0 +1,55 @@
+{
+  "id": "lenis-smooth-scroll",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "Lenis: smooth scroll profesional",
+  "numero": 6,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\n**Lenis** es una librería de smooth scroll ligera (~3KB) que intercepta el scroll nativo del navegador y lo suaviza con interpolación. En vez del scroll brusco por defecto (especialmente con rueda del ratón), Lenis crea un desplazamiento fluido y predecible que se siente premium.\n\n## ¿Por qué importa?\n\nEl scroll nativo del navegador es irregular: la rueda del ratón envía saltos discretos (100-120px por step), el trackpad envía eventos inerciales, y el táctil tiene su propia física. Esta irregularidad hace que las animaciones scroll-driven se vean entrecortadas. Lenis normaliza todo esto: independientemente del dispositivo, el scroll se mueve suavemente con una curva de easing configurable. Además, Lenis se integra nativamente con GSAP ScrollTrigger, lo que es esencial para nuestro sistema.\n\n## ¿Cómo funciona?\n\n1. **Intercepta el scroll**: Lenis escucha los eventos de scroll del navegador y los reemplaza con su propio sistema de interpolación.\n2. **Lerp (linear interpolation)**: en cada frame, Lenis mueve la posición actual hacia la posición objetivo usando una interpolación: `current += (target - current) * lerp`. Un lerp de 0.1 es suave, 0.2 es más ágil.\n3. **RAF loop**: Lenis necesita un `requestAnimationFrame` loop para actualizar la posición. Se conecta con GSAP vía `gsap.ticker` para compartir el mismo loop de rendering.\n4. **ScrollTrigger sync**: `ScrollTrigger.scrollerProxy` o la integración directa permite que ScrollTrigger lea la posición de Lenis en vez del scroll nativo.\n5. **Touch & wheel**: Lenis maneja ambos inputs. En móvil usa `touch-action: none` y gestiona el gesto directamente. En desktop suaviza los events de wheel.",
+    "metafora": "Lenis es como la suspensión hidráulica de un coche de lujo: la carretera (el scroll nativo) tiene baches y grietas, pero tú dentro del coche sientes un deslizamiento suave y continuo. Sin Lenis, vas en un carro de madera sintiendo cada piedra. Con Lenis, vas en un Mercedes sintiendo seda.",
+    "ejemplo_codigo": {
+      "lenguaje": "javascript",
+      "titulo": "Lenis + GSAP ScrollTrigger: setup completo con sincronización",
+      "codigo": "import Lenis from 'lenis';\nimport { gsap } from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\n\ngsap.registerPlugin(ScrollTrigger);\n\n// === Initialize Lenis ===\nconst lenis = new Lenis({\n  duration: 1.2,       // Duration of the smooth scroll (seconds)\n  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential easing\n  orientation: 'vertical',\n  gestureOrientation: 'vertical',\n  smoothWheel: true,\n  wheelMultiplier: 1,   // Adjust scroll speed (lower = slower)\n  touchMultiplier: 2,   // Touch sensitivity\n  infinite: false        // No infinite scroll\n});\n\n// === Connect Lenis to GSAP ticker ===\n// This ensures both systems share the same animation frame\nlenis.on('scroll', ScrollTrigger.update);\n\ngsap.ticker.add((time) => {\n  lenis.raf(time * 1000); // Lenis expects ms, GSAP gives seconds\n});\n\n// Disable GSAP's internal lag smoothing to avoid conflicts\ngsap.ticker.lagSmoothing(0);\n\n// === Optional: Pause Lenis during modals or loading ===\nfunction pauseScroll() {\n  lenis.stop();\n}\n\nfunction resumeScroll() {\n  lenis.start();\n}\n\n// === Optional: Scroll to a section programmatically ===\nfunction scrollToSection(selector) {\n  lenis.scrollTo(selector, {\n    offset: 0,\n    duration: 1.5,\n    easing: (t) => 1 - Math.pow(1 - t, 3) // Cubic ease-out\n  });\n}\n\n// === Debug: Log scroll progress ===\nlenis.on('scroll', ({ scroll, limit, velocity, direction, progress }) => {\n  console.log(`Scroll: ${Math.round(scroll)}px | Progress: ${(progress * 100).toFixed(1)}% | Velocity: ${velocity.toFixed(2)}`);\n});\n\nconsole.log('Lenis initialized ✓');\nconsole.log('Scroll to test: scrollToSection(\".section-2\")');"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Smooth scroll con Lenis + ScrollTrigger sincronizados",
+    "descripcion": "Crea una página con 5 secciones a pantalla completa (100vh cada una) con colores diferentes. Inicializa Lenis para smooth scroll y conéctalo con GSAP ScrollTrigger. Cada sección debe tener un título que haga fade-in cuando entra en el viewport usando ScrollTrigger. Añade un botón en el header que haga scroll programático a la sección 3 usando lenis.scrollTo().",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "Lenis está inicializado con duration y easing configurados",
+      "Lenis está conectado a gsap.ticker correctamente",
+      "ScrollTrigger.update se llama en el evento scroll de Lenis",
+      "lagSmoothing(0) está configurado",
+      "Las 5 secciones tienen 100vh y colores distintos",
+      "Cada título hace fade-in con ScrollTrigger al entrar en viewport",
+      "El botón ejecuta lenis.scrollTo('.section-3') correctamente",
+      "El scroll se siente suave y continuo"
+    ],
+    "respuesta_esperada": "Lenis() con duration 1.2, lenis.on('scroll', ScrollTrigger.update), gsap.ticker.add con lenis.raf(time*1000), lagSmoothing(0), ScrollTrigger.create por sección con fade animation, botón con lenis.scrollTo.",
+    "xp_extra": 20
+  },
+  "glosario": {
+    "Lenis": "Librería de smooth scroll (~3KB) que intercepta y suaviza el scroll nativo del navegador mediante interpolación lineal (lerp). Se integra con GSAP ScrollTrigger para animaciones scroll-driven fluidas.",
+    "lerp (linear interpolation)": "Técnica matemática que mueve un valor hacia un objetivo proporcionalmente en cada frame: `current += (target - current) * factor`. Un factor bajo (0.05) da movimiento lento y suave; uno alto (0.2) es más rápido y directo.",
+    "gsap.ticker": "El loop de animación interno de GSAP que se ejecuta en cada requestAnimationFrame. Al conectar Lenis al ticker de GSAP, ambos comparten el mismo ciclo de rendering, evitando desincronización.",
+    "lagSmoothing": "Función de GSAP que compensa frames perdidos. Con Lenis, se desactiva (lagSmoothing(0)) porque Lenis ya gestiona su propia interpolación temporal y la compensación de GSAP puede causar saltos.",
+    "wheelMultiplier": "Configuración de Lenis que escala la velocidad del scroll por rueda del ratón. Un valor de 1 es la velocidad normal, 0.5 la reduce a la mitad (más lento, más premium), 2 la duplica.",
+    "scrollTo": "Método de Lenis para hacer scroll programático a una posición o selector CSS. Acepta opciones de duración, easing y offset. Más suave que window.scrollTo porque usa la interpolación de Lenis."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía que compare: 1) Scroll nativo (gráfica escalonada con saltos discretos) vs Lenis (curva suave continua). 2) Diagrama del lerp con current, target y factor. 3) Flujo de integración: Lenis → scroll event → ScrollTrigger.update + gsap.ticker → lenis.raf. 4) Tabla de configuraciones clave (duration, wheelMultiplier, easing) con efecto visual de cada una.",
+    "plataforma_recomendada": "Figma",
+    "estilo": "Gráficas comparativas lado a lado, dark mode, curvas de easing visuales con gradientes suaves"
+  },
+  "conexiones": {
+    "prerequisitos": ["scroll-driven-intro"],
+    "siguiente_recomendado": ["gsap-scrolltrigger"],
+    "conceptos_relacionados": ["requestAnimationFrame", "easing-functions", "touch-events"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno inicializa Lenis, lo conecta correctamente con GSAP ticker y ScrollTrigger, y demuestra que el scroll se siente suave y las animaciones responden fluidamente",
+    "instincts_que_aplican": ["aprender-haciendo", "sentir-la-diferencia", "integracion-de-herramientas"],
+    "confidence_pedagogica": 0.85
+  }
+}

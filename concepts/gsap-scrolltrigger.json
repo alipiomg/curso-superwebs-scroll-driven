@@ -1,0 +1,54 @@
+{
+  "id": "gsap-scrolltrigger",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "GSAP + ScrollTrigger: el cerebro del scroll",
+  "numero": 7,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\n**ScrollTrigger** es el plugin de GSAP que conecta animaciones con la posición del scroll. Sin él, GSAP anima por tiempo; con él, anima por *scroll*. Es el cerebro que decide cuándo empieza, cuándo termina y cómo progresa cada animación mientras el usuario hace scroll.\n\n## ¿Por qué importa?\n\nLas webs premium que ves en Awwwards no usan CSS scroll-snap ni IntersectionObserver crudo. Usan ScrollTrigger porque ofrece control quirúrgico: defines un **trigger** (el elemento que activa la animación), un **start** (cuándo arranca, ej. `\"top center\"`), un **end** (cuándo termina), y un **scrub** que mapea el progreso del scroll (0 a 1) al progreso de la animación. Además, **pin** fija un elemento en pantalla mientras dura la animación, creando el efecto de \"scroll que transforma\" en vez de \"scroll que desplaza\".\n\n## ¿Cómo funciona?\n\n1. **Trigger**: el elemento HTML que ScrollTrigger vigila.\n2. **Start/End**: puntos de scroll donde la animación comienza y termina. Se definen como `\"posición-del-trigger posición-del-viewport\"`.\n3. **Scrub**: con `scrub: true`, la animación sigue al scroll 1:1. Con `scrub: 0.5`, hay un suavizado de 0.5 segundos.\n4. **Pin**: fija el trigger en su posición mientras el scroll avanza, creando espacio virtual.\n5. **Timeline**: encadena múltiples animaciones en secuencia dentro del mismo ScrollTrigger.\n\nEl flujo es: el usuario hace scroll → ScrollTrigger calcula el progreso (0-1) → GSAP interpola las propiedades CSS al valor correspondiente.",
+    "metafora": "Como la claqueta de un director de cine: ScrollTrigger marca exactamente cuándo empieza y termina cada escena (animación). Y el modo scrub convierte tu dedo en un mando de rebobinado: scrolleas hacia abajo y la película avanza, scrolleas hacia arriba y rebobinas. Tú controlas el tiempo de la película con tu scroll.",
+    "ejemplo_codigo": {
+      "lenguaje": "javascript",
+      "titulo": "Timeline con ScrollTrigger: pin + animaciones vinculadas al scroll",
+      "codigo": "import { gsap } from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\n\ngsap.registerPlugin(ScrollTrigger);\n\n// Create a timeline pinned to the hero section\nconst tl = gsap.timeline({\n  scrollTrigger: {\n    trigger: '.hero',\n    start: 'top top',\n    end: '+=200%',\n    scrub: true,\n    pin: true,\n    markers: true // Remove in production\n  }\n});\n\n// Phase 1: fade in the heading\ntl.fromTo('.hero__heading', {\n  opacity: 0,\n  y: 60\n}, {\n  opacity: 1,\n  y: 0,\n  duration: 1\n});\n\n// Phase 2: slide in the subtext from the left\ntl.fromTo('.hero__subtext', {\n  opacity: 0,\n  x: -100\n}, {\n  opacity: 1,\n  x: 0,\n  duration: 1\n});\n\n// Phase 3: scale up the CTA button\ntl.fromTo('.hero__cta', {\n  scale: 0.5,\n  opacity: 0\n}, {\n  scale: 1,\n  opacity: 1,\n  duration: 0.5\n});\n\n// Phase 4: fade everything out as user scrolls past\ntl.to('.hero__content', {\n  opacity: 0,\n  y: -40,\n  duration: 1\n});\n\nconsole.log('ScrollTrigger active:', ScrollTrigger.getAll().length);"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Tres secciones, tres pins, tres animaciones",
+    "descripcion": "Crea una página con 3 secciones a pantalla completa. Cada sección debe estar pinneada durante el scroll y contener una animación diferente: la primera hace un fade de opacidad (0→1), la segunda una translación horizontal (x: -200 → 0), y la tercera un scale (0.3 → 1). Usa scrub: true en todas.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "Las 3 secciones ocupan 100vh cada una",
+      "Cada sección tiene pin: true con ScrollTrigger",
+      "La sección 1 anima opacity de 0 a 1",
+      "La sección 2 anima x de -200 a 0",
+      "La sección 3 anima scale de 0.3 a 1",
+      "Todas usan scrub: true",
+      "Las animaciones son reversibles al scrollear hacia arriba"
+    ],
+    "respuesta_esperada": "gsap.timeline({scrollTrigger:{trigger:'.section-1',start:'top top',end:'+=100%',scrub:true,pin:true}}).fromTo('.section-1 .content',{opacity:0},{opacity:1}); // Repetir patrón para sección 2 (x) y sección 3 (scale)",
+    "xp_extra": 25
+  },
+  "glosario": {
+    "ScrollTrigger": "Plugin de GSAP que vincula animaciones a la posición del scroll en vez del tiempo. Observa un elemento trigger y calcula el progreso (0-1) entre los puntos start y end definidos.",
+    "scrub": "Propiedad que sincroniza la animación con el scroll. Con `true` es 1:1 inmediato. Con un número (ej. 0.5) añade suavizado en segundos. Sin scrub, la animación se dispara una vez y corre por tiempo.",
+    "pin": "Fija el elemento trigger en su posición mientras el scroll avanza a través de la zona de animación. Crea un efecto de que el contenido se transforma en lugar de desplazarse.",
+    "timeline": "Secuencia de animaciones GSAP encadenadas. Dentro de un ScrollTrigger, todas las animaciones de la timeline se mapean proporcionalmente al progreso del scroll.",
+    "trigger point": "El elemento HTML que ScrollTrigger observa para determinar cuándo activar la animación. Se define con la propiedad `trigger` y su posición en el viewport determina el progreso.",
+    "start/end markers": "Los puntos de scroll donde la animación comienza y termina. Se definen como dos valores: posición del trigger y posición del viewport. Ejemplo: `'top center'` significa cuando el top del trigger llega al center del viewport."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía vertical que muestre: 1) Un viewport con un elemento trigger y líneas de start/end marcadas. 2) Una barra de progreso lateral (0% a 100%) conectada al scroll. 3) Tres paneles mostrando el efecto de scrub, pin y timeline. 4) Código mínimo de cada propiedad clave. Colores oscuros con acentos verde neón.",
+    "plataforma_recomendada": "Figma o Canva",
+    "estilo": "Técnico-visual, dark mode, con flechas de flujo y código inline"
+  },
+  "conexiones": {
+    "prerequisitos": ["html5-canvas-renderer", "lenis-smooth-scroll"],
+    "siguiente_recomendado": ["binding-scroll-frames", "animaciones-por-seccion"],
+    "conceptos_relacionados": ["canvas-api", "intersection-observer", "css-scroll-snap"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno configura un ScrollTrigger con trigger, start, end, scrub y pin, y la animación responde correctamente al scroll bidireccional",
+    "instincts_que_aplican": ["aprender-haciendo", "conexion-visual-codigo", "progresion-incremental"],
+    "confidence_pedagogica": 0.90
+  }
+}

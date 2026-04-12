@@ -1,0 +1,54 @@
+{
+  "id": "ffmpeg-extraccion-frames",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "FFmpeg: extraer y optimizar frames",
+  "numero": 4,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\n**FFmpeg** es la herramienta de línea de comandos más potente para manipular audio y vídeo. En nuestro caso, la usamos para dos tareas: analizar el vídeo generado con IA (con `ffprobe`) y extraer cada fotograma como imagen individual optimizada (con `ffmpeg`).\n\n## ¿Por qué importa?\n\nEl vídeo generado por IA (Runway, Kling, Sora) viene en un formato pensado para reproducirse linealmente. Pero nosotros no queremos reproducirlo: queremos *controlarlo con el scroll*. Para eso necesitamos descomponer el vídeo en frames individuales que podamos cargar como imágenes y dibujar en un canvas. FFmpeg convierte un archivo de vídeo en cientos de imágenes WebP ligeras, listas para la web.\n\n## ¿Cómo funciona?\n\n1. **Análisis con ffprobe**: primero inspeccionamos el vídeo para saber su resolución, duración, FPS y códec. Esto nos dice cuántos frames totales tiene y a qué calidad trabajar.\n2. **Extracción de frames**: `ffmpeg -i video.mp4 -vf fps=30 frame_%04d.webp` extrae un frame por cada 1/30 de segundo. El patrón `%04d` numera los frames con ceros: 0001, 0002, etc.\n3. **Optimización WebP**: el formato WebP con calidad 80-85 ofrece el mejor ratio calidad/peso para frames de scroll. Un frame de 1920×1080 pesa ~40-60KB en WebP vs ~150KB en JPEG.\n4. **Redimensionado**: si el vídeo es 4K pero la web se ve en 1080p, redimensionamos con `-vf scale=1920:-1` para ahorrar ancho de banda.\n5. **Control de FPS**: no siempre necesitamos todos los frames. Para scroll suave, 60-120 frames totales son suficientes. Ajustamos el `fps=` según la duración del vídeo.",
+    "metafora": "FFmpeg es como una máquina de cortar fiambre de alta precisión: le metes un salchichón entero (el vídeo) y te saca rodajas perfectas del grosor que quieras (frames). Puedes elegir cuántas rodajas, el grosor (calidad), y el tamaño de cada una (resolución). Al final tienes un plato de rodajas listas para servir individualmente.",
+    "ejemplo_codigo": {
+      "lenguaje": "bash",
+      "titulo": "Pipeline completo: analizar vídeo → extraer frames WebP optimizados",
+      "codigo": "#!/bin/bash\n# === Step 1: Analyze video with ffprobe ===\necho \"🔍 Analyzing video...\"\nffprobe -v quiet -print_format json -show_streams -show_format input.mp4\n\n# Key info we need:\n# - Duration: how long the video is\n# - FPS: frames per second (r_frame_rate)\n# - Resolution: width × height\n# - Total frames = duration × fps\n\n# Quick summary\nDURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 input.mp4)\nFPS=$(ffprobe -v error -select_streams v -show_entries stream=r_frame_rate -of csv=p=0 input.mp4)\nWIDTH=$(ffprobe -v error -select_streams v -show_entries stream=width -of csv=p=0 input.mp4)\nHEIGHT=$(ffprobe -v error -select_streams v -show_entries stream=height -of csv=p=0 input.mp4)\necho \"Duration: ${DURATION}s | FPS: ${FPS} | Resolution: ${WIDTH}×${HEIGHT}\"\n\n# === Step 2: Create output directory ===\nmkdir -p frames\n\n# === Step 3: Extract frames as optimized WebP ===\n# Option A: Extract ALL frames at original FPS\nffmpeg -i input.mp4 -vf \"fps=${FPS}\" -c:v libwebp -quality 82 frames/frame_%04d.webp\n\n# Option B: Extract exactly 120 frames (recommended for scroll)\n# Calculate target FPS: 120 frames / duration\nTARGET_FPS=$(echo \"120 / $DURATION\" | bc -l)\nffmpeg -i input.mp4 -vf \"fps=${TARGET_FPS},scale=1920:-1\" -c:v libwebp -quality 82 frames/frame_%04d.webp\n\n# === Step 4: Verify output ===\nFRAME_COUNT=$(ls frames/*.webp | wc -l)\nTOTAL_SIZE=$(du -sh frames/ | cut -f1)\nAVG_SIZE=$(echo \"$(du -sb frames/ | cut -f1) / $FRAME_COUNT / 1024\" | bc)\necho \"✅ Extracted ${FRAME_COUNT} frames | Total: ${TOTAL_SIZE} | Avg: ${AVG_SIZE}KB/frame\"\n\n# === Step 5: Optional - Generate a preview sprite sheet ===\nffmpeg -i input.mp4 -vf \"fps=1,scale=160:-1,tile=10x1\" -frames:v 1 preview_sprite.webp\necho \"📋 Preview sprite generated\""
+    }
+  },
+  "mini_reto": {
+    "titulo": "Extrae 120 frames optimizados de un vídeo",
+    "descripcion": "Dado un vídeo de entrada (puedes usar cualquier vídeo MP4 de 5-10 segundos), escribe un script bash que: 1) Analice el vídeo con ffprobe y muestre duración, FPS y resolución, 2) Calcule el FPS objetivo para obtener exactamente 120 frames, 3) Extraiga los frames en formato WebP con calidad 82 y resolución máxima 1920px de ancho, 4) Muestre un resumen con el número de frames, peso total y peso medio por frame.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "El script usa ffprobe para analizar el vídeo",
+      "Calcula el FPS objetivo como 120/duración",
+      "Usa ffmpeg con -c:v libwebp y -quality entre 80-85",
+      "Redimensiona a 1920px de ancho manteniendo proporción (-vf scale=1920:-1)",
+      "Los frames se nombran con padded numbers (frame_0001.webp)",
+      "Muestra un resumen con conteo y peso medio",
+      "Se obtienen aproximadamente 120 frames"
+    ],
+    "respuesta_esperada": "Script bash que encadena ffprobe → cálculo de TARGET_FPS=120/duration → ffmpeg -i input.mp4 -vf 'fps=$TARGET_FPS,scale=1920:-1' -c:v libwebp -quality 82 frames/frame_%04d.webp → resumen con ls | wc -l y du -sh",
+    "xp_extra": 25
+  },
+  "glosario": {
+    "ffprobe": "Herramienta de análisis de FFmpeg que inspecciona archivos multimedia sin modificarlos. Devuelve metadatos como duración, resolución, códec, FPS y bitrate en formato JSON o texto plano.",
+    "ffmpeg": "Herramienta de línea de comandos para convertir, extraer y manipular audio/vídeo. En nuestro contexto, la usamos para extraer frames individuales de un vídeo y convertirlos a WebP.",
+    "WebP": "Formato de imagen desarrollado por Google que ofrece compresión superior a JPEG y PNG. Con calidad 80-85, un frame 1080p pesa ~40-60KB vs ~150KB en JPEG, ideal para preloading de múltiples frames.",
+    "FPS (frames per second)": "Número de fotogramas por segundo en un vídeo. Un vídeo a 30fps tiene 30 imágenes por cada segundo de duración. Para extraer N frames totales, usamos fps=N/duración.",
+    "frame padding": "Numeración con ceros a la izquierda (%04d = 0001, 0002...). Garantiza que los archivos se ordenen correctamente en el sistema de archivos y en el código de preloading.",
+    "scale filter": "Filtro de FFmpeg (-vf scale=W:H) que redimensiona el vídeo. Usar -1 en un eje mantiene la proporción original. Ejemplo: scale=1920:-1 fija el ancho en 1920 y calcula el alto automáticamente."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía que muestre el pipeline FFmpeg: 1) Vídeo MP4 de IA (icono de archivo). 2) ffprobe analizando (duración, FPS, resolución). 3) ffmpeg procesando con los parámetros clave resaltados. 4) Carpeta de salida con frames WebP numerados. 5) Comparativa de peso JPEG vs WebP. 6) Comando completo con cada flag explicada con flechas.",
+    "plataforma_recomendada": "Figma o Canva",
+    "estilo": "Pipeline horizontal con iconos, fondo oscuro, código resaltado con syntax highlighting"
+  },
+  "conexiones": {
+    "prerequisitos": ["generacion-video-ia"],
+    "siguiente_recomendado": ["binding-scroll-frames"],
+    "conceptos_relacionados": ["webp-optimization", "image-compression", "video-codecs"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno ejecuta un pipeline ffprobe→ffmpeg que extrae frames WebP optimizados de un vídeo, controlando cantidad, calidad y resolución",
+    "instincts_que_aplican": ["aprender-haciendo", "herramienta-real", "optimizacion-rendimiento"],
+    "confidence_pedagogica": 0.90
+  }
+}

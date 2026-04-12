@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 10 — Branding Generativo con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Input flow */
+.input-flow{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.input-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;min-width:140px}
+.input-box .input-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem}
+.input-box .input-val{font-size:.8rem;font-weight:600;color:var(--text);padding:.4rem .6rem;background:rgba(255,255,255,.03);border-radius:6px;border:1px dashed var(--border);font-family:'JetBrains Mono',monospace}
+.flow-arrow{font-size:1.2rem;color:var(--muted);flex-shrink:0}
+.ai-box{background:linear-gradient(135deg,rgba(168,85,247,.1),rgba(0,212,255,.1));border:1px solid rgba(168,85,247,.3);border-radius:12px;padding:1rem 1.5rem;text-align:center}
+.ai-box .ai-icon{font-size:1.5rem;margin-bottom:.3rem}
+.ai-box h3{font-size:.85rem;font-weight:700;color:var(--purple)}
+.ai-box p{font-size:.6rem;color:var(--muted)}
+
+/* Output cards */
+.output-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+.output-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;text-align:center}
+.output-card .out-icon{font-size:1.3rem;margin-bottom:.5rem}
+.output-card h3{font-size:.8rem;font-weight:700;margin-bottom:.5rem}
+.output-card.name-card h3{color:var(--accent)}
+.output-card.palette-card h3{color:var(--cyan)}
+.output-card.type-card h3{color:var(--purple)}
+.brand-name{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.3rem;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand-tagline{font-size:.62rem;color:var(--muted);font-style:italic}
+.color-swatches{display:flex;justify-content:center;gap:4px;margin-bottom:.4rem}
+.swatch{width:28px;height:28px;border-radius:6px}
+.swatch-label{font-size:.55rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.type-preview{margin-bottom:.3rem}
+.type-heading{font-size:.9rem;font-weight:800;margin-bottom:.2rem}
+.type-body{font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+/* Code snippet */
+.code-box{background:#0d0d0d;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem}
+.code-header{padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.code-lang{color:var(--cyan)!important;text-transform:uppercase;letter-spacing:.08em}
+.code-body{padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.7}
+.code-body .kw{color:#c792ea}
+.code-body .prop{color:#82aaff}
+.code-body .val{color:#c3e88d}
+.code-body .fn{color:#82aaff}
+.code-body .cm{color:#546e7a}
+.code-body .hl{background:rgba(0,255,136,.08);display:inline;padding:.1rem .3rem;border-radius:3px;color:var(--accent)}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .input-flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+  .output-cards{grid-template-columns:1fr}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">10</div>
+    <h1>Branding <span>Generativo</span> con IA</h1>
+    <p>Genera nombre, paleta y tipografia para tu marca usando Claude como director creativo</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Input</div>
+    <div class="input-flow">
+      <div class="input-box">
+        <div class="input-label">Producto</div>
+        <div class="input-val">Cafe organico</div>
+      </div>
+      <div class="input-box">
+        <div class="input-label">Sector</div>
+        <div class="input-val">Alimentacion</div>
+      </div>
+      <div class="flow-arrow">&#10132;</div>
+      <div class="ai-box">
+        <div class="ai-icon">&#9670;</div>
+        <h3>Claude AI</h3>
+        <p>Genera identidad</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Output generado</div>
+    <div class="output-cards">
+      <div class="output-card name-card">
+        <div class="out-icon">&#9733;</div>
+        <h3>Nombre</h3>
+        <div class="brand-name">Tierra Viva</div>
+        <div class="brand-tagline">"Del origen a tu taza"</div>
+      </div>
+      <div class="output-card palette-card">
+        <div class="out-icon">&#127912;</div>
+        <h3>Paleta</h3>
+        <div class="color-swatches">
+          <div class="swatch" style="background:#1a1a2e" title="#1a1a2e"></div>
+          <div class="swatch" style="background:#16213e" title="#16213e"></div>
+          <div class="swatch" style="background:#0f3460" title="#0f3460"></div>
+          <div class="swatch" style="background:#e94560" title="#e94560"></div>
+          <div class="swatch" style="background:#f0f0f0" title="#f0f0f0"></div>
+        </div>
+        <div class="swatch-label">5 colores generados</div>
+      </div>
+      <div class="output-card type-card">
+        <div class="out-icon">Aa</div>
+        <h3>Tipografia</h3>
+        <div class="type-preview">
+          <div class="type-heading">Inter Bold</div>
+          <div class="type-body">JetBrains Mono</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">CSS custom properties</div>
+    <div class="code-box">
+      <div class="code-header">
+        <span>Variables generadas por IA</span>
+        <span class="code-lang">CSS</span>
+      </div>
+      <div class="code-body">
+        <span class="kw">:root</span> {<br>
+        &nbsp;&nbsp;<span class="cm">/* Generado por Claude */</span><br>
+        &nbsp;&nbsp;<span class="hl">--brand-primary: #0f3460;</span><br>
+        &nbsp;&nbsp;<span class="hl">--brand-accent: #e94560;</span><br>
+        &nbsp;&nbsp;<span class="prop">--brand-bg</span>: <span class="val">#1a1a2e</span>;<br>
+        &nbsp;&nbsp;<span class="prop">--brand-surface</span>: <span class="val">#16213e</span>;<br>
+        &nbsp;&nbsp;<span class="prop">--brand-text</span>: <span class="val">#f0f0f0</span>;<br>
+        &nbsp;&nbsp;<span class="prop">--font-heading</span>: <span class="val">'Inter', sans-serif</span>;<br>
+        &nbsp;&nbsp;<span class="prop">--font-mono</span>: <span class="val">'JetBrains Mono', monospace</span>;<br>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 10 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

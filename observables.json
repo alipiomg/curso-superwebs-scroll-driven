@@ -1,0 +1,238 @@
+{
+  "curso_id": "superwebs-scroll-driven",
+  "version": "1.0",
+  "descripcion": "Eventos observables del curso Superwebs Scroll-Driven con Video + IA. Cada evento alimenta el sistema de gamificacion y genera instincts para mejorar el contenido.",
+  "eventos": [
+    {
+      "evento_id": "leccion_completada",
+      "nombre": "Leccion completada",
+      "descripcion": "Se dispara cuando un alumno termina una leccion completa (teoria o practica).",
+      "campos": {
+        "curso_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del curso",
+          "ejemplo": "superwebs-scroll-driven"
+        },
+        "concepto_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del concepto o leccion completada",
+          "ejemplo": "scroll-timeline-basics"
+        },
+        "usuario_id": {
+          "tipo": "string",
+          "descripcion": "Identificador unico del alumno"
+        },
+        "tiempo_lectura_seg": {
+          "tipo": "number",
+          "descripcion": "Tiempo total en segundos que el alumno paso en la leccion",
+          "ejemplo": 320
+        },
+        "timestamp": {
+          "tipo": "string",
+          "formato": "ISO 8601",
+          "descripcion": "Fecha y hora del evento"
+        }
+      },
+      "trigger": {
+        "descripcion": "Patron de tiempo de lectura para ajustar longitud del contenido",
+        "condicion": "Analizar distribucion de tiempo_lectura_seg por leccion",
+        "instinct": "Si el tiempo medio es menor a 60 seg o mayor a 600 seg, la leccion necesita ajuste de longitud. Muy corto indica contenido insuficiente; muy largo indica contenido excesivo o confuso.",
+        "accion_sugerida": "ajustar_longitud_leccion"
+      }
+    },
+    {
+      "evento_id": "reto_intentado",
+      "nombre": "Reto intentado",
+      "descripcion": "Se dispara cada vez que un alumno intenta resolver un reto, sea exitoso o no.",
+      "campos": {
+        "curso_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del curso",
+          "ejemplo": "superwebs-scroll-driven"
+        },
+        "concepto_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del concepto asociado al reto",
+          "ejemplo": "animation-range"
+        },
+        "usuario_id": {
+          "tipo": "string",
+          "descripcion": "Identificador unico del alumno"
+        },
+        "intento_num": {
+          "tipo": "number",
+          "descripcion": "Numero de intento (1 = primer intento)",
+          "ejemplo": 2
+        },
+        "resultado": {
+          "tipo": "string",
+          "enum": ["correcto", "incorrecto", "parcial"],
+          "descripcion": "Resultado del intento"
+        },
+        "respuesta": {
+          "tipo": "string",
+          "descripcion": "Respuesta o codigo enviado por el alumno"
+        },
+        "timestamp": {
+          "tipo": "string",
+          "formato": "ISO 8601",
+          "descripcion": "Fecha y hora del evento"
+        }
+      },
+      "trigger": {
+        "descripcion": "Reto fallido 3 o mas veces genera instinct de rediseno",
+        "condicion": "intento_num >= 3 AND resultado === 'incorrecto'",
+        "instinct": "Si un reto es fallido 3 o mas veces por el mismo alumno, el reto puede ser demasiado dificil, ambiguo o mal explicado. Necesita revision de enunciado, pistas adicionales o rediseno completo.",
+        "accion_sugerida": "redisenar_reto"
+      }
+    },
+    {
+      "evento_id": "concepto_omitido",
+      "nombre": "Concepto omitido",
+      "descripcion": "Se dispara cuando un alumno salta o no completa un concepto disponible en su ruta.",
+      "campos": {
+        "curso_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del curso",
+          "ejemplo": "superwebs-scroll-driven"
+        },
+        "concepto_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del concepto que fue omitido",
+          "ejemplo": "view-timeline-deep"
+        },
+        "usuario_id": {
+          "tipo": "string",
+          "descripcion": "Identificador unico del alumno"
+        },
+        "concepto_anterior": {
+          "tipo": "string",
+          "descripcion": "Identificador del ultimo concepto completado antes de omitir",
+          "ejemplo": "scroll-timeline-basics"
+        },
+        "timestamp": {
+          "tipo": "string",
+          "formato": "ISO 8601",
+          "descripcion": "Fecha y hora del evento"
+        }
+      },
+      "trigger": {
+        "descripcion": "Concepto omitido por el 60% o mas de los alumnos genera instinct de revision",
+        "condicion": "porcentaje_omision(concepto_id) >= 0.60",
+        "instinct": "Si un concepto es omitido por el 60% o mas de los alumnos, puede indicar que el titulo no es atractivo, el contenido parece irrelevante, o esta mal posicionado en la secuencia del curso. Requiere revision completa.",
+        "accion_sugerida": "revisar_concepto"
+      }
+    },
+    {
+      "evento_id": "ruta_elegida",
+      "nombre": "Ruta elegida",
+      "descripcion": "Se dispara cuando un alumno selecciona o cambia su ruta pedagogica dentro del curso.",
+      "campos": {
+        "curso_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del curso",
+          "ejemplo": "superwebs-scroll-driven"
+        },
+        "usuario_id": {
+          "tipo": "string",
+          "descripcion": "Identificador unico del alumno"
+        },
+        "ruta_nombre": {
+          "tipo": "string",
+          "descripcion": "Nombre de la ruta seleccionada",
+          "ejemplo": "ruta-visual-first"
+        },
+        "timestamp": {
+          "tipo": "string",
+          "formato": "ISO 8601",
+          "descripcion": "Fecha y hora del evento"
+        }
+      },
+      "trigger": {
+        "descripcion": "La ruta mas popular se convierte en candidata a ruta predeterminada",
+        "condicion": "porcentaje_eleccion(ruta_nombre) > porcentaje de otras rutas",
+        "instinct": "Si una ruta es elegida significativamente mas que las demas, considerar establecerla como ruta predeterminada para nuevos alumnos. Esto reduce friccion en el onboarding.",
+        "accion_sugerida": "establecer_ruta_predeterminada"
+      }
+    },
+    {
+      "evento_id": "glosario_consultado",
+      "nombre": "Glosario consultado",
+      "descripcion": "Se dispara cada vez que un alumno consulta un termino en el glosario del curso.",
+      "campos": {
+        "curso_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del curso",
+          "ejemplo": "superwebs-scroll-driven"
+        },
+        "concepto_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del concepto desde donde se consulto el glosario",
+          "ejemplo": "animation-timeline"
+        },
+        "termino": {
+          "tipo": "string",
+          "descripcion": "Termino consultado en el glosario",
+          "ejemplo": "scroll-timeline"
+        },
+        "usuario_id": {
+          "tipo": "string",
+          "descripcion": "Identificador unico del alumno"
+        },
+        "timestamp": {
+          "tipo": "string",
+          "formato": "ISO 8601",
+          "descripcion": "Fecha y hora del evento"
+        }
+      },
+      "trigger": {
+        "descripcion": "Termino consultado 5 o mas veces indica necesidad de mejor explicacion",
+        "condicion": "count(termino) >= 5 agrupado por usuarios unicos",
+        "instinct": "Si un termino del glosario es consultado 5 o mas veces por diferentes alumnos, la explicacion en la leccion donde aparece no es suficientemente clara. Necesita mejor contextualizacion o un ejemplo adicional.",
+        "accion_sugerida": "mejorar_explicacion_termino"
+      }
+    },
+    {
+      "evento_id": "curso_completado",
+      "nombre": "Curso completado",
+      "descripcion": "Se dispara cuando un alumno completa el 100% de las lecciones y retos del curso.",
+      "campos": {
+        "curso_id": {
+          "tipo": "string",
+          "descripcion": "Identificador del curso",
+          "ejemplo": "superwebs-scroll-driven"
+        },
+        "usuario_id": {
+          "tipo": "string",
+          "descripcion": "Identificador unico del alumno"
+        },
+        "xp_total": {
+          "tipo": "number",
+          "descripcion": "XP total acumulado al completar el curso",
+          "ejemplo": 480
+        },
+        "tiempo_total_horas": {
+          "tipo": "number",
+          "descripcion": "Tiempo total invertido en horas",
+          "ejemplo": 6.5
+        },
+        "ruta_seguida": {
+          "tipo": "string",
+          "descripcion": "Nombre de la ruta pedagogica que siguio el alumno",
+          "ejemplo": "Ruta lineal"
+        },
+        "timestamp": {
+          "tipo": "string",
+          "formato": "ISO 8601",
+          "descripcion": "Fecha y hora del evento"
+        }
+      },
+      "trigger": {
+        "descripcion": "Curso completado genera analisis de ruta optima",
+        "condicion": "curso completado al 100%",
+        "instinct": "Al completar el curso, analizar la ruta seguida, tiempo total y XP para identificar si la ruta recomendada es realmente la mas eficiente o si los alumnos encuentran atajos mejores.",
+        "accion_sugerida": "analizar_ruta_optima"
+      }
+    }
+  ]
+}

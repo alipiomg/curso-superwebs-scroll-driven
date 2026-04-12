@@ -1,0 +1,53 @@
+{
+  "id": "identidad-marca-generativa",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "Branding generativo: paleta, tipo, naming",
+  "numero": 10,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\nEl **branding generativo** es el proceso por el cual Claude Code genera automáticamente la identidad visual completa de una marca: nombre, paleta de colores, tipografía y sistema de diseño. Todo parte de unas pocas decisiones iniciales (qué es el producto, qué sensación quiere transmitir) y se materializa en **design tokens** como CSS custom properties.\n\n## ¿Por qué importa?\n\nUn diseñador tarda horas en definir una identidad visual coherente. Claude Code lo hace en segundos, generando nombres cortos y memorables (tipo tech: 4-7 letras, pronunciable), paletas de colores con fondos oscuros y acentos vibrantes, y parejas tipográficas de Google Fonts. El resultado no es genérico: cada marca generada tiene personalidad propia y coherencia interna.\n\n## ¿Cómo funciona?\n\n1. **Naming**: Claude genera nombres cortos, tech-sounding, fáciles de recordar. Ejemplos: Volta, Neon, Prisma, Flux.\n2. **Paleta**: fondo oscuro (`#0a0a0a`–`#1a1a1a`), color primario de acento (vibrante), secundario (complementario), texto claro.\n3. **Tipografía**: pareja display + mono de Google Fonts. Ejemplo clásico: Space Grotesk (headings) + Space Mono (código/detalles). Los headings usan `12vw` para impacto.\n4. **Design tokens**: todo se define como `--custom-properties` en `:root`. Colores, tamaños, espaciados, radios.\n5. **Layout side-aligned**: el texto siempre va al lado (40% del viewport), nunca centrado sobre el canvas. Esto preserva la visibilidad del vídeo.",
+    "metafora": "Como el ADN de una persona: a partir de unos pocos 'genes' fundamentales (nombre de marca + 2 colores + 2 fuentes), Claude genera el 'cuerpo' visual completo del sitio web con una personalidad coherente. Igual que el ADN determina ojos, pelo y rasgos, los design tokens determinan cada elemento visual de la página.",
+    "ejemplo_codigo": {
+      "lenguaje": "css",
+      "titulo": "Design tokens completos: colores, tipografía, layout side-aligned",
+      "codigo": "/* Google Fonts import */\n@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');\n\n/* =====================\n   DESIGN TOKENS\n   ===================== */\n:root {\n  /* Brand colors */\n  --color-bg: #0a0a0a;\n  --color-bg-elevated: #141414;\n  --color-bg-overlay: rgba(10, 10, 10, 0.85);\n  --color-primary: #00ff88;\n  --color-primary-dim: #00cc6a;\n  --color-secondary: #7b61ff;\n  --color-text: #f5f5f5;\n  --color-text-muted: #888888;\n  --color-border: #2a2a2a;\n\n  /* Typography */\n  --font-display: 'Space Grotesk', sans-serif;\n  --font-mono: 'Space Mono', monospace;\n  --font-size-hero: clamp(3rem, 12vw, 10rem);\n  --font-size-heading: clamp(2rem, 5vw, 4rem);\n  --font-size-subheading: clamp(1.25rem, 2.5vw, 1.75rem);\n  --font-size-body: clamp(1rem, 1.2vw, 1.125rem);\n  --font-size-label: clamp(0.75rem, 1vw, 0.875rem);\n  --line-height-tight: 1.05;\n  --line-height-normal: 1.5;\n  --letter-spacing-tight: -0.03em;\n  --letter-spacing-wide: 0.15em;\n\n  /* Spacing */\n  --space-xs: 0.5rem;\n  --space-sm: 1rem;\n  --space-md: 2rem;\n  --space-lg: 4rem;\n  --space-xl: 8rem;\n  --space-section: clamp(6rem, 15vh, 12rem);\n\n  /* Layout */\n  --content-width: 40%;\n  --content-max-width: 560px;\n  --content-padding: clamp(1.5rem, 4vw, 3rem);\n  --border-radius: 0.5rem;\n}\n\n/* =====================\n   BASE STYLES\n   ===================== */\nbody {\n  margin: 0;\n  background: var(--color-bg);\n  color: var(--color-text);\n  font-family: var(--font-display);\n  font-size: var(--font-size-body);\n  line-height: var(--line-height-normal);\n  -webkit-font-smoothing: antialiased;\n}\n\n/* =====================\n   SIDE-ALIGNED LAYOUT\n   Text on the side, never centered over canvas\n   ===================== */\n.section {\n  position: relative;\n  min-height: 100vh;\n  display: flex;\n  align-items: center;\n  padding: var(--space-lg) var(--content-padding);\n}\n\n.section__content {\n  width: var(--content-width);\n  max-width: var(--content-max-width);\n}\n\n.section__label {\n  font-family: var(--font-mono);\n  font-size: var(--font-size-label);\n  color: var(--color-primary);\n  text-transform: uppercase;\n  letter-spacing: var(--letter-spacing-wide);\n  margin-bottom: var(--space-sm);\n}\n\n.section__heading {\n  font-size: var(--font-size-heading);\n  font-weight: 700;\n  line-height: var(--line-height-tight);\n  letter-spacing: var(--letter-spacing-tight);\n  margin-bottom: var(--space-md);\n}\n\n.section__body {\n  color: var(--color-text-muted);\n  font-size: var(--font-size-body);\n  line-height: var(--line-height-normal);\n  margin-bottom: var(--space-md);\n}"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Identidad de marca para un producto ficticio",
+    "descripcion": "Define la identidad visual completa para un producto ficticio: inventa un nombre (4-7 letras, tech-sounding), elige una paleta de 4 colores (fondo oscuro + primario + secundario + texto), selecciona 2 Google Fonts (display + mono), e impleméntalo todo como CSS custom properties en :root. Añade los estilos base para el layout side-aligned.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "El nombre de marca tiene 4-7 letras y suena tech",
+      "La paleta tiene al menos 4 colores definidos como custom properties",
+      "El fondo es oscuro (#0a0a0a a #1a1a1a)",
+      "Hay un color de acento vibrante",
+      "Se importan 2 Google Fonts: una display y una mono",
+      "Los tokens incluyen tipografía, espaciado y colores",
+      "El layout usa side-aligned (contenido al 40% del viewport)"
+    ],
+    "respuesta_esperada": "CSS con @import de Google Fonts, :root con custom properties para colores (bg oscuro, primario vibrante, secundario, texto claro), tipografía (display + mono), spacing, y reglas de layout con .section__content al 40% del viewport.",
+    "xp_extra": 20
+  },
+  "glosario": {
+    "design tokens": "Variables de diseño reutilizables que definen la identidad visual: colores, tipografía, espaciados, bordes. En CSS se implementan como custom properties (`--nombre: valor`) en `:root`, creando una única fuente de verdad para todo el diseño.",
+    "CSS custom properties": "Variables nativas de CSS declaradas con `--` y consumidas con `var()`. A diferencia de variables Sass, son dinámicas: se pueden cambiar en runtime, heredan por cascada, y se pueden modificar con JavaScript.",
+    "brand identity": "Conjunto de elementos visuales que hacen reconocible a una marca: nombre, colores, tipografía, tono. En branding generativo, Claude Code genera estos elementos automáticamente a partir de pocas directrices iniciales.",
+    "font pairing": "Combinación de dos tipografías complementarias. En superwebs scroll-driven se usa una fuente display (para headings, impactante) y una mono (para labels/código, técnica). La pareja debe contrastar pero armonizar.",
+    "side-aligned layout": "Patrón de diseño donde el texto ocupa el 40% del viewport y se posiciona al lado, nunca centrado sobre el canvas de vídeo. Esto preserva la visibilidad del contenido visual mientras el texto permanece legible."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía mostrando el proceso generativo: 1) Input: nombre del producto + sector. 2) Claude genera: nombre (ejemplos), paleta (muestras de color), tipografía (specimens). 3) Output: CSS custom properties. 4) Ejemplo visual del layout side-aligned con texto al 40% y canvas al fondo. Incluir muestras de 3 marcas generadas diferentes.",
+    "plataforma_recomendada": "Figma",
+    "estilo": "Showcase de marca, dark mode, con muestras de color grandes y specimens tipográficos"
+  },
+  "conexiones": {
+    "prerequisitos": ["scroll-driven-intro"],
+    "siguiente_recomendado": ["arquitectura-proyecto", "animaciones-por-seccion"],
+    "conceptos_relacionados": ["responsive-typography", "css-clamp", "color-theory"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno crea un sistema de design tokens completo con custom properties que define colores, tipografía y layout side-aligned coherentes",
+    "instincts_que_aplican": ["coherencia-visual", "tokens-first", "aprender-haciendo"],
+    "confidence_pedagogica": 0.80
+  }
+}

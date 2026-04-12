@@ -1,0 +1,53 @@
+{
+  "id": "skill-video2website",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "El skill video2website: automatizar todo",
+  "numero": 12,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\nEl **skill video2website** es un archivo `.md` que se instala en `~/.claude/skills/` y le enseña a Claude Code cómo transformar un archivo de vídeo en una landing page premium completa de forma automática. Es como un manual de instrucciones que Claude sigue paso a paso: analiza el vídeo, extrae frames, genera HTML/CSS/JS, crea la identidad de marca, aplica las 7 animaciones, y valida la calidad.\n\n## ¿Por qué importa?\n\nSin el skill, tendrías que dar instrucciones detalladas a Claude en cada proyecto. Con el skill, dices `/video2website` y Claude ya sabe todo: qué preguntar (ruta del vídeo, nombre de marca, contenido, paleta), qué herramientas usar (ffprobe para analizar, ffmpeg para extraer), y qué estándares cumplir (checklist de calidad). Es la diferencia entre enseñar a alguien desde cero cada vez y tener un empleado experto que ya sabe el proceso.\n\n## ¿Cómo funciona?\n\n1. **Instalación**: copiar el archivo `.md` a `~/.claude/skills/`.\n2. **Invocación**: el usuario escribe `/video2website` en Claude Code.\n3. **Claude pregunta**: ruta del vídeo, nombre de marca, secciones de contenido, colores preferidos.\n4. **Análisis**: `ffprobe` obtiene duración, FPS, resolución del vídeo.\n5. **Extracción**: `ffmpeg` extrae frames como WebP optimizado.\n6. **Generación**: Claude crea index.html, style.css, app.js con toda la arquitectura.\n7. **Validación**: checklist de calidad (loader funciona, scroll es fluido, sin anti-patterns, responsive).\n8. **Preview**: `npx serve .` para ver el resultado en el navegador.",
+    "metafora": "Como contratar a un equipo completo (fotógrafo, diseñador, maquetador, programador) que trabajan perfectamente coordinados y ya conocen tu estilo. Solo que el 'equipo' es un solo archivo de skill que orquesta todo el proceso. Tú entregas el vídeo y recibes la web terminada.",
+    "ejemplo_codigo": {
+      "lenguaje": "bash",
+      "titulo": "Instalación del skill y flujo completo de invocación",
+      "codigo": "#!/bin/bash\n# =============================================\n# INSTALL VIDEO2WEBSITE SKILL FOR CLAUDE CODE\n# =============================================\n\n# Step 1: Create the skills directory if it doesn't exist\nmkdir -p ~/.claude/skills\n\n# Step 2: Copy the skill file\ncp ./skills/video2website.md ~/.claude/skills/video2website.md\n\n# Step 3: Verify installation\necho \"Skills instalados:\"\nls -la ~/.claude/skills/*.md\n\n# =============================================\n# USAGE EXAMPLE (in Claude Code terminal)\n# =============================================\n\n# The user types in Claude Code:\n#   /video2website\n#\n# Claude asks:\n#   1. Ruta del vídeo: ./product-demo.mp4\n#   2. Nombre de marca: Volta\n#   3. Secciones: Innovación, Tecnología, Impacto, Diseño\n#   4. Color primario: #00ff88\n#\n# Claude executes automatically:\n\n# Analyze video\nffprobe -v quiet -print_format json -show_streams ./product-demo.mp4\n\n# Extract frames as optimized WebP\nmkdir -p ./frames\nffmpeg -i ./product-demo.mp4 \\\n  -vf \"fps=30,scale=1920:-1\" \\\n  -c:v libwebp \\\n  -quality 80 \\\n  -compression_level 6 \\\n  ./frames/frame_%04d.webp\n\n# Count extracted frames\nTOTAL_FRAMES=$(ls ./frames/*.webp | wc -l)\necho \"Frames extraídos: $TOTAL_FRAMES\"\n\n# Claude then generates:\n# - index.html (loader, header, hero, canvas, sections, marquee, stats, CTA)\n# - css/style.css (design tokens, layout, responsive, animations)\n# - js/app.js (Lenis, GSAP, preloader, frame renderer, section animations)\n\n# Preview the result\nnpx serve .\n\n# =============================================\n# QUALITY CHECKLIST (Claude validates automatically)\n# =============================================\n# [x] Loader shows progress and disappears after critical frames load\n# [x] Scroll is smooth (Lenis initialized)\n# [x] Canvas renders frames correctly on scroll\n# [x] No same animation on consecutive sections\n# [x] Text is side-aligned, never centered over canvas\n# [x] Hero is standalone with min 12rem height\n# [x] Marquee text is 12vw\n# [x] Stats section has dark overlay\n# [x] CTA is persistent (header + final section)\n# [x] No glassmorphism\n# [x] FRAME_SPEED >= 1.8\n# [x] Responsive on mobile (stacked layout)\n# [x] All design tokens in CSS custom properties"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Instala el skill, genera una landing page, documenta el proceso",
+    "descripcion": "Instala el skill video2website en Claude Code (copia el .md a ~/.claude/skills/). Luego invócalo con un vídeo de tu elección (puede ser corto, 5-10 segundos). Documenta todo el proceso: qué te preguntó Claude, qué comandos ejecutó automáticamente, cuánto tardó, y evalúa el resultado con el checklist de calidad.",
+    "tipo": "texto-libre",
+    "criterios_exito": [
+      "El skill está instalado en ~/.claude/skills/",
+      "Se invocó con /video2website o instrucción equivalente",
+      "Claude analizó el vídeo con ffprobe",
+      "Claude extrajo frames con ffmpeg",
+      "Se generó index.html, style.css y app.js",
+      "El resultado pasa al menos 10 de 13 puntos del checklist",
+      "El alumno documentó el proceso paso a paso"
+    ],
+    "respuesta_esperada": "Documento que describe: 1) Instalación del skill (mkdir + cp). 2) Invocación y preguntas de Claude. 3) Comandos automáticos (ffprobe, ffmpeg). 4) Archivos generados. 5) Evaluación con checklist (mínimo 10/13). 6) Screenshot o URL del resultado.",
+    "xp_extra": 40
+  },
+  "glosario": {
+    "skill (Claude Code)": "Archivo Markdown (.md) que se instala en `~/.claude/skills/` y le da a Claude Code conocimiento especializado sobre un proceso o dominio. Cuando el usuario invoca el skill, Claude sigue las instrucciones del archivo como un protocolo.",
+    "scaffold": "Estructura inicial de archivos y carpetas que el skill genera automáticamente. Incluye index.html, carpetas css/, js/, frames/, y todos los archivos base con el código boilerplate listo para funcionar.",
+    "quality gate": "Checklist de validación que Claude ejecuta al final del proceso. Verifica que el resultado cumple todos los estándares: loader funcional, scroll fluido, sin anti-patterns, responsive, tokens definidos. Si falla algún punto, Claude lo corrige automáticamente.",
+    "npx serve": "Comando que levanta un servidor HTTP local para previsualizar el resultado. `npx serve .` sirve los archivos del directorio actual en `localhost:3000`. No requiere instalación previa gracias a npx.",
+    "checklist de calidad": "Lista de 13 verificaciones que validan una superweb scroll-driven: loader, smooth scroll, frame rendering, variedad de animaciones, side-aligned text, hero standalone, marquee 12vw, dark overlay stats, CTA persistente, no glassmorphism, FRAME_SPEED >= 1.8, responsive, y tokens CSS."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía de flujo horizontal mostrando el pipeline completo: 1) Archivo .md del skill → 2) Usuario escribe /video2website → 3) Claude pregunta (4 inputs) → 4) ffprobe analiza → 5) ffmpeg extrae frames → 6) Claude genera HTML/CSS/JS → 7) Quality checklist (13 puntos) → 8) npx serve → web terminada. Cada paso con su icono y tiempo estimado.",
+    "plataforma_recomendada": "Figma o Whimsical",
+    "estilo": "Pipeline horizontal, dark mode, con iconos para cada fase y badges de tiempo estimado"
+  },
+  "conexiones": {
+    "prerequisitos": ["arquitectura-proyecto"],
+    "siguiente_recomendado": [],
+    "conceptos_relacionados": ["claude-code-basics", "gsap-scrolltrigger", "lenis-smooth-scroll"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno instala el skill, lo invoca con un vídeo real, obtiene una landing page funcional y valida el resultado con el checklist de calidad",
+    "instincts_que_aplican": ["automatizacion", "flujo-end-to-end", "validacion-sistematica"],
+    "confidence_pedagogica": 0.85
+  }
+}

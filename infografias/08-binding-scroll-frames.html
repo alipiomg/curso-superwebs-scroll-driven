@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 08 — Scroll → Frame Binding</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Pipeline */
+.pipeline{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:1.5rem;flex-wrap:wrap}
+.pipe-step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;text-align:center;min-width:100px}
+.pipe-step .pipe-icon{font-size:1.6rem;margin-bottom:.4rem}
+.pipe-step h3{font-size:.75rem;font-weight:700;margin-bottom:.2rem}
+.pipe-step p{font-size:.62rem;color:var(--muted)}
+.pipe-step.video{border-color:rgba(168,85,247,.2)}
+.pipe-step.video h3{color:var(--purple)}
+.pipe-step.ffmpeg{border-color:rgba(0,212,255,.2)}
+.pipe-step.ffmpeg h3{color:var(--cyan)}
+.pipe-step.frames{border-color:rgba(0,255,136,.2)}
+.pipe-step.frames h3{color:var(--accent)}
+.pipe-arrow{font-size:1.2rem;color:var(--muted);padding:0 .5rem;flex-shrink:0}
+
+/* Formula */
+.formula-card{background:var(--card);border:2px solid rgba(0,255,136,.2);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.5rem;position:relative}
+.formula-card::before{content:'FORMULA CORE';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 .75rem;font-size:.6rem;font-weight:700;color:var(--accent);letter-spacing:.1em}
+.formula{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:500;margin-bottom:.75rem;line-height:1.6}
+.formula .var-progress{color:var(--cyan)}
+.formula .var-total{color:var(--purple)}
+.formula .var-result{color:var(--accent)}
+.formula .op{color:var(--muted)}
+.formula-example{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap}
+.formula-ex{background:rgba(255,255,255,.03);border-radius:8px;padding:.6rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem}
+.formula-ex .val{color:var(--accent);font-weight:600}
+
+/* Canvas visualization */
+.canvas-viz{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.canvas-row{display:flex;align-items:center;gap:1rem;margin-bottom:.75rem}
+.canvas-row:last-child{margin-bottom:0}
+.canvas-label{width:90px;font-size:.7rem;font-weight:600;text-align:right;flex-shrink:0;color:var(--muted)}
+.frame-strip{display:flex;gap:3px;flex:1;overflow:hidden}
+.frame-cell{width:28px;height:20px;border-radius:3px;background:var(--border);position:relative;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+.frame-cell.active{background:rgba(0,255,136,.2);border:1px solid var(--accent);color:var(--accent)}
+.canvas-block{flex:1;height:80px;border:2px solid rgba(0,212,255,.3);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.3rem;background:rgba(0,212,255,.05)}
+.canvas-block span{font-size:.65rem;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.canvas-block .method{font-size:.75rem;font-weight:600;color:var(--text)}
+
+/* Code snippet */
+.code-box{background:#0d0d0d;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem}
+.code-header{padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.code-lang{color:var(--cyan)!important;text-transform:uppercase;letter-spacing:.08em}
+.code-body{padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.7}
+.code-body .kw{color:#c792ea}
+.code-body .prop{color:#82aaff}
+.code-body .val{color:#c3e88d}
+.code-body .fn{color:#82aaff}
+.code-body .cm{color:#546e7a}
+.code-body .hl{background:rgba(0,255,136,.08);display:inline;padding:.1rem .3rem;border-radius:3px;color:var(--accent)}
+.code-body .str{color:#c3e88d}
+.code-body .num-val{color:#f78c6c}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .pipeline{flex-direction:column;gap:.5rem}
+  .pipe-arrow{transform:rotate(90deg)}
+  .formula{font-size:.85rem}
+  .formula-example{flex-direction:column;gap:.5rem;align-items:center}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">08</div>
+    <h1>Scroll &#8594; <span>Frame Binding</span></h1>
+    <p>Convierte un video en frames y vincula cada frame a la posicion del scroll</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Pipeline de extraccion</div>
+    <div class="pipeline">
+      <div class="pipe-step video">
+        <div class="pipe-icon">&#127916;</div>
+        <h3>Video</h3>
+        <p>MP4 original</p>
+      </div>
+      <div class="pipe-arrow">&#10132;</div>
+      <div class="pipe-step ffmpeg">
+        <div class="pipe-icon">&#9881;</div>
+        <h3>FFmpeg</h3>
+        <p>Extrae frames</p>
+      </div>
+      <div class="pipe-arrow">&#10132;</div>
+      <div class="pipe-step frames">
+        <div class="pipe-icon">&#127912;</div>
+        <h3>120 Frames</h3>
+        <p>PNG secuenciales</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Formula core</div>
+    <div class="formula-card">
+      <div class="formula">
+        <span class="var-progress">progress</span> <span class="op">*</span> <span class="op">(</span><span class="var-total">totalFrames</span> <span class="op">-</span> 1<span class="op">)</span> <span class="op">=</span> <span class="var-result">frameIndex</span>
+      </div>
+      <div class="formula-example">
+        <div class="formula-ex"><span class="var-progress">0.0</span> &times; 119 = <span class="val">0</span></div>
+        <div class="formula-ex"><span class="var-progress">0.5</span> &times; 119 = <span class="val">59</span></div>
+        <div class="formula-ex"><span class="var-progress">1.0</span> &times; 119 = <span class="val">119</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Canvas drawImage</div>
+    <div class="canvas-viz">
+      <div class="canvas-row">
+        <div class="canvas-label">Frames</div>
+        <div class="frame-strip">
+          <div class="frame-cell">0</div>
+          <div class="frame-cell">1</div>
+          <div class="frame-cell">2</div>
+          <div class="frame-cell">..</div>
+          <div class="frame-cell active">59</div>
+          <div class="frame-cell">..</div>
+          <div class="frame-cell">117</div>
+          <div class="frame-cell">118</div>
+          <div class="frame-cell">119</div>
+        </div>
+      </div>
+      <div class="canvas-row">
+        <div class="canvas-label">Canvas</div>
+        <div class="canvas-block">
+          <span>ctx.drawImage(images[<span style="color:var(--accent)">59</span>], 0, 0)</span>
+          <span class="method">&#8592; Frame actual pintado en canvas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Implementacion</div>
+    <div class="code-box">
+      <div class="code-header">
+        <span>Scroll frame binding</span>
+        <span class="code-lang">JS</span>
+      </div>
+      <div class="code-body">
+        <span class="kw">const</span> <span class="prop">frameIndex</span> = <span class="fn">Math</span>.<span class="fn">round</span>(<br>
+        &nbsp;&nbsp;<span class="prop">progress</span> * (<span class="prop">totalFrames</span> - <span class="num-val">1</span>)<br>
+        );<br><br>
+        <span class="prop">ctx</span>.<span class="fn">clearRect</span>(<span class="num-val">0</span>, <span class="num-val">0</span>, <span class="prop">w</span>, <span class="prop">h</span>);<br>
+        <span class="hl">ctx.drawImage(images[frameIndex], 0, 0, w, h);</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 08 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

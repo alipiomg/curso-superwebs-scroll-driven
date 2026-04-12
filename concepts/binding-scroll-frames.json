@@ -1,0 +1,54 @@
+{
+  "id": "binding-scroll-frames",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "Vincular scroll → frame del canvas",
+  "numero": 8,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\n**Frame binding** es la técnica central de las superwebs scroll-driven: conectar la posición del scroll directamente con el frame que se dibuja en un `<canvas>`. Cuando el usuario scrollea, no se desplaza contenido sino que se cambia la imagen renderizada, creando la ilusión de un vídeo controlado por el dedo.\n\n## ¿Por qué importa?\n\nEste es el efecto que separa una web genérica de una web premium tipo Apple. El usuario siente que está *dentro* del producto, manipulándolo. No es un vídeo que se reproduce solo: es una experiencia interactiva donde el scroll controla el tiempo. Además, al ser frames estáticos (WebP/JPEG), tienes control total del rendimiento y compatibilidad.\n\n## ¿Cómo funciona?\n\n1. **Preloading en dos fases**: primero se cargan los frames críticos (cada 10º frame) para que la experiencia sea funcional rápido. Después, en segundo plano, se cargan los intermedios para suavizar la transición.\n2. **Mapeo de progreso**: ScrollTrigger devuelve un progreso de 0 a 1. Multiplicamos por `(totalFrames - 1)` y redondeamos para obtener el `frameIndex`.\n3. **Render loop**: en cada `onUpdate` de ScrollTrigger, dibujamos `frames[frameIndex]` en el canvas con `drawImage`.\n4. **Circle-wipe reveal**: usamos `clip-path: circle()` animado con GSAP para revelar el canvas con un efecto circular que crece desde el centro.\n5. **Optimización**: solo redibujamos si el frame cambió (`lastFrame !== currentFrame`).",
+    "metafora": "Como el plato de un DJ: tu dedo en el scroll es como la mano del DJ sobre el vinilo. Tú controlas exactamente qué 'frame' de la canción suena, hacia adelante o hacia atrás, rápido o lento. Si dejas de tocar, la música se congela en ese instante exacto.",
+    "ejemplo_codigo": {
+      "lenguaje": "javascript",
+      "titulo": "Sistema completo: preload de frames + scroll→canvas + circle-wipe",
+      "codigo": "const canvas = document.getElementById('hero-canvas');\nconst ctx = canvas.getContext('2d');\n\nconst TOTAL_FRAMES = 120;\nconst FRAME_PATH = './frames/frame_';\nconst frames = new Array(TOTAL_FRAMES);\nlet loadedCount = 0;\n\n// Set canvas to full viewport\nfunction resizeCanvas() {\n  canvas.width = window.innerWidth;\n  canvas.height = window.innerHeight;\n}\nresizeCanvas();\nwindow.addEventListener('resize', resizeCanvas);\n\n// Phase 1: Load critical frames (every 10th)\nfunction preloadCritical() {\n  return new Promise((resolve) => {\n    let criticalLoaded = 0;\n    const criticalIndices = [];\n    for (let i = 0; i < TOTAL_FRAMES; i += 10) criticalIndices.push(i);\n\n    criticalIndices.forEach((i) => {\n      const img = new Image();\n      img.src = `${FRAME_PATH}${String(i).padStart(4, '0')}.webp`;\n      img.onload = () => {\n        frames[i] = img;\n        criticalLoaded++;\n        loadedCount++;\n        updateLoader(loadedCount / TOTAL_FRAMES);\n        if (criticalLoaded === criticalIndices.length) resolve();\n      };\n    });\n  });\n}\n\n// Phase 2: Load remaining frames in background\nfunction preloadRemaining() {\n  for (let i = 0; i < TOTAL_FRAMES; i++) {\n    if (frames[i]) continue;\n    const img = new Image();\n    img.src = `${FRAME_PATH}${String(i).padStart(4, '0')}.webp`;\n    img.onload = () => {\n      frames[i] = img;\n      loadedCount++;\n      updateLoader(loadedCount / TOTAL_FRAMES);\n    };\n  }\n}\n\n// Progress indicator\nfunction updateLoader(progress) {\n  const bar = document.querySelector('.loader__bar');\n  const pct = document.querySelector('.loader__percent');\n  if (bar) bar.style.transform = `scaleX(${progress})`;\n  if (pct) pct.textContent = `${Math.round(progress * 100)}%`;\n}\n\n// Find nearest loaded frame\nfunction getNearestFrame(index) {\n  if (frames[index]) return frames[index];\n  for (let offset = 1; offset < TOTAL_FRAMES; offset++) {\n    if (frames[index - offset]) return frames[index - offset];\n    if (frames[index + offset]) return frames[index + offset];\n  }\n  return null;\n}\n\n// Render frame on canvas\nlet lastFrameIndex = -1;\nfunction renderFrame(index) {\n  if (index === lastFrameIndex) return;\n  const img = getNearestFrame(index);\n  if (!img) return;\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  // Cover-fit the image\n  const scale = Math.max(canvas.width / img.width, canvas.height / img.height);\n  const w = img.width * scale;\n  const h = img.height * scale;\n  const x = (canvas.width - w) / 2;\n  const y = (canvas.height - h) / 2;\n  ctx.drawImage(img, x, y, w, h);\n  lastFrameIndex = index;\n}\n\n// Initialize: preload then bind scroll\nasync function init() {\n  await preloadCritical();\n  renderFrame(0);\n\n  // Circle-wipe reveal\n  gsap.fromTo(canvas,\n    { clipPath: 'circle(0% at 50% 50%)' },\n    { clipPath: 'circle(75% at 50% 50%)', duration: 1.5, ease: 'power2.out' }\n  );\n\n  // Hide loader\n  gsap.to('.loader', { opacity: 0, duration: 0.5, onComplete: () => {\n    document.querySelector('.loader').style.display = 'none';\n  }});\n\n  // Bind scroll to frames\n  ScrollTrigger.create({\n    trigger: '.hero',\n    start: 'top top',\n    end: '+=300%',\n    scrub: true,\n    pin: true,\n    onUpdate: (self) => {\n      const frameIndex = Math.round(self.progress * (TOTAL_FRAMES - 1));\n      renderFrame(frameIndex);\n    }\n  });\n\n  // Load remaining frames in background\n  preloadRemaining();\n}\n\ninit();"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Renderer scroll→frame con preloader visual",
+    "descripcion": "Construye un sistema funcional de scroll-to-frame: crea un canvas a pantalla completa, precarga al menos 10 imágenes (pueden ser de placeholder), muestra un indicador de progreso de carga con porcentaje, y vincula el scroll al frame index usando ScrollTrigger. Añade un efecto circle-wipe al revelar el canvas.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "El canvas ocupa 100vw × 100vh",
+      "Las imágenes se precargan con objetos Image()",
+      "Hay un indicador de progreso visual (barra + porcentaje)",
+      "ScrollTrigger mapea progress (0-1) a frameIndex correctamente",
+      "Solo se redibuja si el frame cambió (optimización)",
+      "Hay un efecto circle-wipe con clip-path al iniciar",
+      "El preloading es en dos fases (crítico + resto)"
+    ],
+    "respuesta_esperada": "Sistema con preloadCritical() que carga frames cada N, preloadRemaining() que completa el resto, ScrollTrigger.create con onUpdate que calcula Math.round(self.progress * (TOTAL_FRAMES - 1)) y llama a renderFrame con drawImage en canvas.",
+    "xp_extra": 30
+  },
+  "glosario": {
+    "frame binding": "Técnica que conecta la posición del scroll con un índice de frame, dibujando la imagen correspondiente en un canvas. Es el núcleo de la animación scroll-driven con vídeo descompuesto.",
+    "preloading": "Proceso de cargar imágenes en memoria antes de necesitarlas. Se crean objetos `new Image()` y se asigna su `src`. El evento `onload` confirma que están listas para dibujarse en canvas.",
+    "progress mapping": "Conversión del progreso del scroll (número entre 0 y 1 que devuelve ScrollTrigger) a un índice de frame concreto. Fórmula: `Math.round(progress * (totalFrames - 1))`.",
+    "clip-path": "Propiedad CSS que recorta un elemento usando formas geométricas (circle, polygon, inset). Animada con GSAP, crea efectos de revelado como el circle-wipe.",
+    "circle-wipe reveal": "Efecto visual donde el contenido aparece desde un círculo que crece desde el centro. Se logra animando `clip-path: circle()` de 0% a 75% o más.",
+    "two-phase loading": "Estrategia de carga en dos fases: primero los frames críticos (cada N frames) para funcionalidad inmediata, luego los intermedios en segundo plano para suavizar la experiencia."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía que muestre el flujo completo: 1) Vídeo → FFmpeg → 120 frames WebP. 2) Fase 1 de carga (frames críticos cada 10) con barra de progreso. 3) ScrollTrigger progress 0→1 mapeado a frameIndex 0→119. 4) Canvas drawImage renderizando el frame correcto. 5) Circle-wipe reveal animado. Incluir el código de la fórmula de mapeo.",
+    "plataforma_recomendada": "Figma",
+    "estilo": "Diagrama de flujo horizontal, dark mode, con screenshots de canvas en cada paso y código inline"
+  },
+  "conexiones": {
+    "prerequisitos": ["ffmpeg-extraccion-frames", "gsap-scrolltrigger"],
+    "siguiente_recomendado": ["animaciones-por-seccion", "arquitectura-proyecto"],
+    "conceptos_relacionados": ["lenis-smooth-scroll", "webp-optimization", "intersection-observer"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno implementa un sistema completo de preloading + mapeo scroll→frame + renderizado canvas que responde fluidamente al scroll bidireccional",
+    "instincts_que_aplican": ["aprender-haciendo", "optimizacion-rendimiento", "conexion-visual-codigo"],
+    "confidence_pedagogica": 0.90
+  }
+}

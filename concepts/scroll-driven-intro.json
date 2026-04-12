@@ -1,0 +1,48 @@
+{
+  "id": "scroll-driven-intro",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "Qué son las animaciones Scroll-Driven",
+  "numero": 1,
+  "contenido": {
+    "explicacion": "## ¿Qué es una animación Scroll-Driven?\n\nUna animación **scroll-driven** es aquella cuyo progreso está controlado por la posición del scroll, no por el tiempo. En lugar de que una animación dure X segundos y se ejecute automáticamente, el usuario controla cuánto avanza la animación según cuánto hace scroll en la página.\n\n## ¿Por qué importa?\n\nEn 2026, las animaciones scroll-driven son el **estándar premium** del diseño web. Cada sitio ganador de Awwwards, FWA o CSS Design Awards las utiliza. Apple las popularizó con sus páginas de producto (iPhone, MacBook Pro) donde el dispositivo rota, se descompone o revela características mientras haces scroll. Agencias como Active Theory, Resn y Locomotive las implementan en cada proyecto. Si quieres crear webs que compitan al más alto nivel, dominar esta técnica es **obligatorio**.\n\n## ¿Cómo funciona?\n\nEl concepto es simple: se mapea la posición del scroll (0% arriba, 100% abajo) al progreso de una animación (0% inicio, 100% fin). CSS nativo ya soporta esto con `animation-timeline: scroll()`, que vincula cualquier `@keyframes` al scroll del contenedor. Para animaciones más complejas, librerías como GSAP con ScrollTrigger permiten vincular timelines completas al scroll con opciones de scrub, pin y triggers avanzados. El resultado: el usuario tiene control total sobre la experiencia visual.",
+    "metafora": "Imagina un **flipbook** (esos cuadernitos donde cada página tiene un dibujo ligeramente distinto). Si pasas las páginas rápido, la animación va rápido. Si vas despacio, va despacio. Si te detienes, la animación se congela. Tú controlas la velocidad con tus dedos. Exactamente así funciona una animación scroll-driven: tu dedo en el trackpad o la rueda del ratón es el que pasa las páginas.",
+    "ejemplo_codigo": {
+      "lenguaje": "html",
+      "titulo": "Animación CSS pura con scroll-driven animations",
+      "codigo": "<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Scroll-Driven Demo</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n\n  body {\n    height: 400vh;\n    background: #0a0a0a;\n    color: white;\n    font-family: system-ui, sans-serif;\n  }\n\n  .progress-bar {\n    position: fixed;\n    top: 0;\n    left: 0;\n    height: 4px;\n    background: linear-gradient(90deg, #6366f1, #ec4899);\n    width: 0%;\n    /* Link animation to scroll position */\n    animation: grow-progress linear;\n    animation-timeline: scroll();\n  }\n\n  @keyframes grow-progress {\n    from { width: 0%; }\n    to   { width: 100%; }\n  }\n\n  .hero {\n    height: 100vh;\n    display: grid;\n    place-items: center;\n  }\n\n  .hero h1 {\n    font-size: clamp(2rem, 6vw, 5rem);\n    opacity: 0;\n    transform: translateY(60px);\n    animation: fade-up linear;\n    animation-timeline: scroll();\n    animation-range: 0vh 50vh;\n  }\n\n  @keyframes fade-up {\n    to {\n      opacity: 1;\n      transform: translateY(0);\n    }\n  }\n</style>\n</head>\n<body>\n  <div class=\"progress-bar\"></div>\n  <section class=\"hero\">\n    <h1>Haz scroll para animar</h1>\n  </section>\n  <section class=\"hero\">\n    <h1>Sección 2</h1>\n  </section>\n  <section class=\"hero\">\n    <h1>Sección 3</h1>\n  </section>\n  <section class=\"hero\">\n    <h1>Sección 4</h1>\n  </section>\n</body>\n</html>"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Caza de animaciones scroll-driven",
+    "descripcion": "Encuentra 3 sitios web premiados (Awwwards, FWA, CSS Design Awards) que usen animaciones scroll-driven. Para cada uno, describe: (1) la URL, (2) qué elemento se anima con scroll, (3) qué técnica crees que usan (CSS nativo, GSAP ScrollTrigger, frames de video, etc.).",
+    "tipo": "texto-libre",
+    "criterios_exito": [
+      "Incluye 3 URLs reales de sitios premiados",
+      "Describe correctamente el elemento animado en cada sitio",
+      "Identifica o deduce razonablemente la técnica utilizada"
+    ],
+    "respuesta_esperada": "Ejemplo: (1) apple.com/iphone - El iPhone rota en 3D mientras haces scroll, usando frames de video extraídos y canvas. (2) linear.app - Los elementos de UI aparecen con parallax y fade, probablemente GSAP ScrollTrigger. (3) Cualquier sitio de Awwwards con scroll-driven verificable.",
+    "xp_extra": 15
+  },
+  "glosario": {
+    "scroll-driven animation": "Animación cuyo progreso está vinculado a la posición del scroll en lugar del tiempo. El usuario controla la velocidad y dirección al hacer scroll. CSS lo soporta nativamente con animation-timeline: scroll().",
+    "scroll-jacking": "Técnica (a menudo mal vista) donde el comportamiento natural del scroll se secuestra completamente para controlar la navegación. A diferencia de scroll-driven animations, el scroll-jacking reemplaza el scroll nativo.",
+    "scrub": "Parámetro en librerías como GSAP que vincula el progreso de una animación directamente al scroll. Un scrub: true hace que la animación siga el scroll en tiempo real. Un scrub: 0.5 añade medio segundo de suavizado.",
+    "frame-by-frame": "Técnica de animación donde se muestran imágenes individuales (frames) en secuencia rápida para crear la ilusión de movimiento. En scroll-driven, cada posición de scroll corresponde a un frame específico."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía vertical que muestre: (1) Comparativa visual tiempo-based vs scroll-driven - dos líneas de tiempo, una automática y otra controlada por scroll. (2) Diagrama de cómo scroll position (0-100%) se mapea a animation progress (0-100%). (3) 3 ejemplos icónicos: Apple product page, Linear.app, y un portfolio de Awwwards. (4) Snippet de CSS con animation-timeline: scroll() destacado.",
+    "plataforma_recomendada": "Figma o Canva",
+    "estilo": "Fondo oscuro (#0a0a0a), acentos en gradiente violeta-rosa, tipografía monospace para código, estilo tech premium"
+  },
+  "conexiones": {
+    "prerequisitos": [],
+    "siguiente_recomendado": ["generacion-imagenes-ia"],
+    "conceptos_relacionados": ["lenis-smooth-scroll", "html5-canvas-renderer"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno puede explicar la diferencia entre animación basada en tiempo y animación basada en scroll, y sabe identificar scroll-driven animations en sitios reales.",
+    "instincts_que_aplican": ["observación activa", "análisis de referentes", "pensamiento visual"],
+    "confidence_pedagogica": 0.90
+  }
+}

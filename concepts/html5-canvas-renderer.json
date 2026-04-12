@@ -1,0 +1,54 @@
+{
+  "id": "html5-canvas-renderer",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "Canvas como motor de rendering",
+  "numero": 5,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\nEl elemento `<canvas>` de HTML5 es una superficie de dibujo programable. A diferencia de un `<img>` o un `<video>`, el canvas no tiene contenido propio: tú decides qué dibujar y cuándo. Es una pizarra en blanco controlada por JavaScript donde podemos renderizar frames de vídeo a demanda.\n\n## ¿Por qué importa?\n\nPodríamos cambiar el `src` de un `<img>` en cada scroll, pero eso dispara reflows, eventos de carga y parpadeos. El canvas evita todo eso: `drawImage()` pinta directamente en memoria de GPU, sin reflow ni layout. Es la superficie más rápida y limpia para dibujar frames secuenciales. Por eso Apple, Tesla y las mejores agencias lo usan para sus webs scroll-driven.\n\n## ¿Cómo funciona?\n\n1. **Crear el canvas**: un `<canvas>` con dimensiones que cubran el viewport (`width = window.innerWidth`, `height = window.innerHeight`).\n2. **Obtener el contexto 2D**: `canvas.getContext('2d')` nos da acceso a la API de dibujo.\n3. **drawImage()**: el método clave. Acepta un objeto `Image` precargado y lo dibuja en las coordenadas y dimensiones que indiquemos.\n4. **Cover-fit**: para que la imagen cubra todo el canvas sin deformarse, calculamos el `scale` como `Math.max(canvasW/imgW, canvasH/imgH)` y centramos.\n5. **clearRect()**: antes de dibujar un nuevo frame, limpiamos el anterior. Aunque `drawImage` sobrescribe, `clearRect` evita artefactos en frames con transparencia.\n6. **Responsive**: en `resize`, actualizamos `canvas.width` y `canvas.height` y redibujamos el frame actual.",
+    "metafora": "El canvas es como una pantalla de cine en una sala privada: la pantalla en sí no tiene película propia, sino que proyectas sobre ella lo que quieras, cuando quieras. Tú eres el proyeccionista y decides qué fotograma mostrar en cada momento. La pantalla solo sabe mostrar lo que le envías, de forma instantánea y sin parpadeo.",
+    "ejemplo_codigo": {
+      "lenguaje": "javascript",
+      "titulo": "Canvas renderer con cover-fit y resize responsivo",
+      "codigo": "const canvas = document.getElementById('hero-canvas');\nconst ctx = canvas.getContext('2d');\n\n// === Resize canvas to fill viewport ===\nfunction resizeCanvas() {\n  canvas.width = window.innerWidth;\n  canvas.height = window.innerHeight;\n}\nresizeCanvas();\nwindow.addEventListener('resize', () => {\n  resizeCanvas();\n  // Redraw current frame after resize\n  if (currentImage) drawFrame(currentImage);\n});\n\nlet currentImage = null;\n\n// === Draw an image with cover-fit ===\nfunction drawFrame(img) {\n  // Clear previous frame\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n\n  // Calculate cover-fit dimensions\n  const imgRatio = img.width / img.height;\n  const canvasRatio = canvas.width / canvas.height;\n\n  let drawW, drawH, drawX, drawY;\n\n  if (canvasRatio > imgRatio) {\n    // Canvas is wider: fit to width, crop height\n    drawW = canvas.width;\n    drawH = canvas.width / imgRatio;\n    drawX = 0;\n    drawY = (canvas.height - drawH) / 2;\n  } else {\n    // Canvas is taller: fit to height, crop width\n    drawH = canvas.height;\n    drawW = canvas.height * imgRatio;\n    drawX = (canvas.width - drawW) / 2;\n    drawY = 0;\n  }\n\n  ctx.drawImage(img, drawX, drawY, drawW, drawH);\n  currentImage = img;\n}\n\n// === Load and display a test image ===\nconst testImg = new Image();\ntestImg.src = './frames/frame_0001.webp';\ntestImg.onload = () => {\n  drawFrame(testImg);\n  console.log(`Canvas: ${canvas.width}×${canvas.height}`);\n  console.log(`Image: ${testImg.width}×${testImg.height}`);\n  console.log('Cover-fit rendered ✓');\n};\n\n// === Bonus: performance-aware rendering ===\nlet rafId = null;\nfunction scheduleRender(img) {\n  if (rafId) cancelAnimationFrame(rafId);\n  rafId = requestAnimationFrame(() => {\n    drawFrame(img);\n    rafId = null;\n  });\n}"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Canvas a pantalla completa con cover-fit",
+    "descripcion": "Crea un canvas que ocupe todo el viewport (100vw × 100vh). Carga una imagen cualquiera y dibújala con efecto cover-fit (que cubra todo el canvas sin deformarse, recortando lo que sobre). El canvas debe ser responsivo: al redimensionar la ventana, debe actualizar sus dimensiones y redibujar la imagen manteniendo el cover-fit.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "El canvas ocupa exactamente el viewport completo",
+      "canvas.width y canvas.height se setean en JavaScript (no solo CSS)",
+      "La imagen se dibuja con cover-fit usando Math.max para el ratio",
+      "La imagen se centra (no se pega a una esquina)",
+      "Al redimensionar la ventana, el canvas se actualiza y redibuja",
+      "Se usa clearRect antes de dibujar",
+      "No hay deformación de la imagen (aspect ratio mantenido)"
+    ],
+    "respuesta_esperada": "Canvas con getContext('2d'), función drawFrame que calcula scale=Math.max(cW/iW,cH/iH), centra con (canvas-draw)/2, y resize listener que re-ejecuta resizeCanvas + drawFrame.",
+    "xp_extra": 20
+  },
+  "glosario": {
+    "canvas": "Elemento HTML5 (`<canvas>`) que proporciona una superficie de dibujo programable mediante JavaScript. No tiene contenido visual propio; todo se dibuja dinámicamente con la API de contexto 2D o WebGL.",
+    "getContext('2d')": "Método que devuelve el contexto de rendering 2D del canvas, con acceso a métodos como drawImage, clearRect, fillRect, arc, etc. Es la interfaz entre JavaScript y los píxeles del canvas.",
+    "drawImage()": "Método del contexto 2D que dibuja una imagen (Image, canvas, o video) en el canvas. Acepta coordenadas (x, y) y opcionalmente dimensiones (w, h) para escalar. Es la operación más usada en scroll-driven rendering.",
+    "cover-fit": "Técnica de escalado que hace que una imagen cubra completamente un contenedor sin deformarse. Se calcula con `Math.max(containerW/imgW, containerH/imgH)` y se centra el resultado.",
+    "clearRect()": "Método del contexto 2D que borra un área rectangular del canvas, dejándola transparente. Se usa antes de dibujar un nuevo frame para evitar que el anterior se acumule.",
+    "requestAnimationFrame": "API del navegador que programa una función para ejecutarse antes del siguiente repintado. Más eficiente que setTimeout para actualizaciones visuales, garantiza sincronización con el refresh rate del monitor."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía que muestre: 1) Comparativa img vs canvas (reflow vs GPU direct draw). 2) Diagrama del canvas con ejes de coordenadas y zona de dibujo. 3) Fórmula visual del cover-fit con un rectángulo de imagen dentro de un rectángulo de canvas. 4) El flujo resize → recalcular → clearRect → drawImage. 5) Código mínimo anotado de drawFrame.",
+    "plataforma_recomendada": "Figma",
+    "estilo": "Diagramas técnicos con cuadrículas, fondo oscuro, acentos en azul/cyan para canvas y verde para código"
+  },
+  "conexiones": {
+    "prerequisitos": ["scroll-driven-intro"],
+    "siguiente_recomendado": ["gsap-scrolltrigger", "binding-scroll-frames"],
+    "conceptos_relacionados": ["webgl", "offscreen-canvas", "image-bitmap"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno crea un canvas a pantalla completa y dibuja imágenes con cover-fit responsivo, entendiendo por qué canvas es superior a <img> para scroll-driven rendering",
+    "instincts_que_aplican": ["aprender-haciendo", "conexion-visual-codigo", "entender-antes-de-usar"],
+    "confidence_pedagogica": 0.90
+  }
+}

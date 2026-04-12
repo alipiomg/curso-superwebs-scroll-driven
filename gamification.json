@@ -1,0 +1,135 @@
+{
+  "curso_id": "superwebs-scroll-driven",
+  "version": "1.0",
+  "xp_config": {
+    "xp_por_leccion_teoria": 28,
+    "xp_por_leccion_practica": 40,
+    "xp_por_reto": 20,
+    "xp_bonus_primer_intento": 10
+  },
+  "niveles": [
+    {
+      "nivel": 1,
+      "nombre": "Espectador",
+      "xp_requerido": 0,
+      "descripcion": "Acabas de descubrir el scroll-driven. Todo es nuevo y fascinante.",
+      "icono": "eye"
+    },
+    {
+      "nivel": 2,
+      "nombre": "Aprendiz de Scroll",
+      "xp_requerido": 80,
+      "descripcion": "Ya entiendes los fundamentos del scroll-driven y las animaciones basadas en scroll.",
+      "icono": "scroll"
+    },
+    {
+      "nivel": 3,
+      "nombre": "Frame Master",
+      "xp_requerido": 200,
+      "descripcion": "Dominas frames y canvas. Controlas cada fotograma de tus animaciones.",
+      "icono": "film"
+    },
+    {
+      "nivel": 4,
+      "nombre": "Scroll Architect",
+      "xp_requerido": 350,
+      "descripcion": "Construyes webs completas con scroll-driven animations integradas.",
+      "icono": "blueprint"
+    },
+    {
+      "nivel": 5,
+      "nombre": "Superweb Creator",
+      "xp_requerido": 480,
+      "descripcion": "Automatizas todo con Claude Code. Creas superwebs de principio a fin.",
+      "icono": "rocket"
+    }
+  ],
+  "badges": [
+    {
+      "id": "primer-scroll",
+      "nombre": "Primer Scroll",
+      "categoria": "progreso",
+      "descripcion": "Has completado tus primeras 3 lecciones. El viaje del scroll-driven ha comenzado.",
+      "condicion": "Completar 3 lecciones",
+      "condicion_tecnica": {
+        "evento": "leccion_completada",
+        "umbral": 3
+      },
+      "icono": "badge-scroll-start"
+    },
+    {
+      "id": "medio-camino",
+      "nombre": "Medio Camino",
+      "categoria": "progreso",
+      "descripcion": "Ya llevas 6 lecciones completadas. Vas por la mitad del curso.",
+      "condicion": "Completar 6 lecciones",
+      "condicion_tecnica": {
+        "evento": "leccion_completada",
+        "umbral": 6
+      },
+      "icono": "badge-halfway"
+    },
+    {
+      "id": "retador",
+      "nombre": "Retador",
+      "categoria": "retos",
+      "descripcion": "Has superado 3 retos. Te gustan los desafios.",
+      "condicion": "Completar 3 retos",
+      "condicion_tecnica": {
+        "evento": "reto_intentado",
+        "filtro": "resultado === 'correcto'",
+        "umbral": 3
+      },
+      "icono": "badge-challenger"
+    },
+    {
+      "id": "imparable",
+      "nombre": "Imparable",
+      "categoria": "retos",
+      "descripcion": "Has completado todos los retos del curso. Nadie te frena.",
+      "condicion": "Completar todos los retos",
+      "condicion_tecnica": {
+        "evento": "reto_intentado",
+        "filtro": "resultado === 'correcto'",
+        "umbral": "todos"
+      },
+      "icono": "badge-unstoppable"
+    },
+    {
+      "id": "curioso",
+      "nombre": "Curioso",
+      "categoria": "exploracion",
+      "descripcion": "Has consultado 10 terminos del glosario. La curiosidad es tu superpoder.",
+      "condicion": "Consultar 10 terminos del glosario",
+      "condicion_tecnica": {
+        "evento": "glosario_consultado",
+        "umbral": 10
+      },
+      "icono": "badge-curious"
+    },
+    {
+      "id": "explorador-rutas",
+      "nombre": "Explorador de Rutas",
+      "categoria": "exploracion",
+      "descripcion": "Has cambiado de ruta pedagogica. Exploras diferentes formas de aprender.",
+      "condicion": "Cambiar de ruta pedagogica",
+      "condicion_tecnica": {
+        "evento": "ruta_elegida",
+        "umbral": 2
+      },
+      "icono": "badge-explorer"
+    },
+    {
+      "id": "superweb-completa",
+      "nombre": "Superweb Completa",
+      "categoria": "especial",
+      "descripcion": "Has completado el curso al 100%. Eres un verdadero Superweb Creator.",
+      "condicion": "Completar todo el curso al 100%",
+      "condicion_tecnica": {
+        "evento": "curso_completado",
+        "porcentaje": 100
+      },
+      "icono": "badge-superweb"
+    }
+  ]
+}

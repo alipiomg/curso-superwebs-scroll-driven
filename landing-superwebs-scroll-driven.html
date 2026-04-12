@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superwebs Scroll-Driven con Video + IA — Rural Makers</title>
+<meta name="description" content="Crea landing pages premium con video frame-a-frame sincronizado al scroll. 12 lecciones, 8 horas, nivel intermedio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0a0a;
+--text:#f5f5f5;
+--text-muted:#a0a0a0;
+--accent:#00ff88;
+--accent2:#00d4ff;
+--accent3:#a855f7;
+--gradient:linear-gradient(135deg,var(--accent),var(--accent2));
+--card-bg:rgba(17,17,17,.65);
+--card-border:rgba(255,255,255,.06);
+--card-glow:rgba(0,255,136,.04);
+--radius:12px;
+--radius-lg:20px;
+--nav-h:64px;
+--section-py:clamp(80px,12vw,140px);
+--max-w:1200px;
+--transition:0.3s cubic-bezier(.4,0,.2,1);
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+/* Noise texture overlay */
+body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;background-size:200px 200px}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+img{max-width:100%;display:block}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#555}
+
+/* Section separator */
+.section-sep{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.15) 30%,rgba(0,212,255,.15) 70%,transparent);margin:0}
+
+/* Utility */
+.container{width:90%;max-width:var(--max-w);margin:0 auto}
+.section-padding{padding:var(--section-py) 0}
+.gradient-text{background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed;top:0;left:0;width:100%;height:var(--nav-h);z-index:1000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(10,10,10,.75);border-bottom:1px solid rgba(255,255,255,.06);transition:background var(--transition)}
+.nav .container{display:flex;align-items:center;justify-content:space-between;height:100%}
+.nav-logo{font-weight:700;font-size:1.15rem;letter-spacing:-.02em}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:2rem;font-size:.875rem;font-weight:600}
+.nav-links a{position:relative;color:var(--text-muted);transition:color var(--transition)}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--gradient);transition:width var(--transition)}
+.nav-links a:hover::after{width:100%}
+.nav-cta{padding:.5rem 1.25rem;border-radius:50px;background:var(--gradient);color:var(--bg);font-weight:700;font-size:.8rem;letter-spacing:.02em;transition:transform var(--transition),box-shadow var(--transition)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,255,136,.3)}
+.nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:var(--transition)}
+
+@media(max-width:768px){
+.nav-links{display:none;position:absolute;top:var(--nav-h);left:0;width:100%;flex-direction:column;background:rgba(10,10,10,.97);padding:1.5rem 5%;gap:1.25rem;border-bottom:1px solid var(--card-border)}
+.nav-links.open{display:flex}
+.nav-toggle{display:flex}
+}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;width:100%;height:300vh}
+.hero-sticky{position:sticky;top:0;width:100%;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-canvas canvas{width:100%;height:100%;display:block}
+.hero-overlay{position:relative;z-index:2;text-align:center;padding:0 5%;max-width:800px}
+.hero-overlay .kicker{font-size:clamp(.75rem,1.2vw,.9rem);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:1rem;opacity:0}
+.hero-overlay h1{font-size:clamp(2rem,5.5vw,4rem);font-weight:800;line-height:1.08;letter-spacing:-.04em;margin-bottom:1.25rem;opacity:0}
+.hero-overlay .subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--text-muted);max-width:600px;margin:0 auto 2rem;opacity:0}
+.hero-ctas{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;opacity:0}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:50px;font-weight:700;font-size:.95rem;transition:all var(--transition);cursor:pointer;border:none}
+.btn-primary{background:var(--gradient);color:var(--bg)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,255,136,.25)}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid rgba(255,255,255,.2)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.hero-wipe{position:absolute;inset:0;z-index:5;background:var(--bg);pointer-events:none}
+
+/* ---------- PAIN POINTS ---------- */
+.pain{background:var(--bg)}
+.pain .section-header{text-align:center;margin-bottom:3.5rem}
+.pain .section-header h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:700;letter-spacing:-.02em}
+.pain .section-header p{color:var(--text-muted);margin-top:.5rem;font-size:1rem}
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
+.pain-card{background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:2rem;transition:border-color var(--transition),transform var(--transition),box-shadow var(--transition);opacity:0;transform:translateY(40px)}
+.pain-card:hover{border-color:rgba(0,255,136,.15);transform:translateY(-4px)!important;box-shadow:0 8px 40px rgba(0,255,136,.06)}
+.pain-card .icon{width:48px;height:48px;border-radius:12px;background:rgba(0,255,136,.08);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
+.pain-card .icon svg{width:24px;height:24px;stroke:var(--accent);stroke-width:1.5;fill:none}
+.pain-card h3{font-size:1.05rem;font-weight:700;margin-bottom:.5rem}
+.pain-card p{font-size:.9rem;color:var(--text-muted);line-height:1.55}
+
+/* ---------- METRICS ---------- */
+.metrics{background:linear-gradient(180deg,var(--bg) 0%,#0d0d0d 100%)}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2rem;text-align:center}
+.metric{opacity:0;transform:translateY(30px)}
+.metric .number{font-size:clamp(2.5rem,6vw,4rem);font-weight:700;line-height:1;margin-bottom:.35rem}
+.metric .label{font-size:.9rem;color:var(--text-muted)}
+
+/* ---------- SOLUTION CARDS ---------- */
+.solutions{background:var(--bg)}
+.solutions .section-header{text-align:center;margin-bottom:3.5rem}
+.solutions .section-header h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:700;letter-spacing:-.02em}
+.solutions .section-header p{color:var(--text-muted);margin-top:.5rem}
+.solutions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem}
+.solution-card{background:var(--card-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:2rem;display:flex;gap:1.25rem;align-items:flex-start;opacity:0;transition:border-color var(--transition),transform var(--transition),box-shadow var(--transition)}
+.solution-card:nth-child(odd){transform:translateX(-60px)}
+.solution-card:nth-child(even){transform:translateX(60px)}
+.solution-card:hover{border-color:rgba(0,212,255,.15);box-shadow:0 8px 40px rgba(0,212,255,.06)}
+.solution-card .num{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:var(--gradient);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:var(--bg)}
+.solution-card h3{font-size:1.05rem;font-weight:700;margin-bottom:.35rem}
+.solution-card p{font-size:.875rem;color:var(--text-muted);line-height:1.55}
+@media(max-width:400px){.solutions-grid{grid-template-columns:1fr}}
+@media(max-width:640px){
+.accordion-header{flex-wrap:wrap;gap:.5rem}
+.accordion-badges{width:calc(100% - 32px - 1rem - 20px);padding-left:calc(32px + 1rem);order:4}
+}
+
+/* ---------- BEFORE/AFTER ---------- */
+.comparison{background:#0d0d0d}
+.comparison .section-header{text-align:center;margin-bottom:3.5rem}
+.comparison .section-header h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:700}
+.comparison-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:900px;margin:0 auto}
+@media(max-width:640px){.comparison-wrap{grid-template-columns:1fr}}
+.comparison-col{border-radius:var(--radius-lg);padding:2rem;position:relative;overflow:hidden}
+.comparison-col.before{background:rgba(255,60,60,.04);border:1px solid rgba(255,60,60,.12)}
+.comparison-col.after{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.12)}
+.comparison-col .col-label{font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:1.25rem;padding:.35rem .85rem;display:inline-block;border-radius:50px}
+.before .col-label{background:rgba(255,60,60,.12);color:#ff6b6b}
+.after .col-label{background:rgba(0,255,136,.12);color:var(--accent)}
+.comparison-col ul{display:flex;flex-direction:column;gap:.75rem}
+.comparison-col li{font-size:.9rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:.6rem;line-height:1.45}
+.before li::before{content:'✕';color:#ff6b6b;font-weight:700;flex-shrink:0}
+.after li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0}
+.clip-left{clip-path:inset(0 100% 0 0);transition:none}
+.clip-right{clip-path:inset(0 0 0 100%);transition:none}
+
+/* ---------- HOW IT WORKS ---------- */
+.how{background:var(--bg)}
+.how .section-header{text-align:center;margin-bottom:3.5rem}
+.how .section-header h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:700}
+.how .section-header p{color:var(--text-muted);margin-top:.5rem}
+.steps{display:flex;flex-direction:column;gap:0;max-width:700px;margin:0 auto;position:relative}
+.steps::before{content:'';position:absolute;left:27px;top:28px;bottom:28px;width:2px;background:linear-gradient(180deg,var(--accent),var(--accent2));opacity:.2}
+.step{display:flex;gap:1.5rem;align-items:flex-start;padding:1.5rem 0;opacity:0;transform:translateY(30px)}
+.step-num{flex-shrink:0;width:56px;height:56px;border-radius:50%;background:var(--card-bg);border:2px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;position:relative;z-index:1;transition:border-color var(--transition)}
+.step.is-active .step-num{border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,136,.15)}
+.step-content h3{font-size:1.05rem;font-weight:700;margin-bottom:.25rem}
+.step-content .verb{color:var(--accent);font-weight:700}
+.step-content p{font-size:.875rem;color:var(--text-muted);line-height:1.55}
+
+/* ---------- TEMARIO ---------- */
+.temario{background:#0d0d0d}
+.temario .section-header{text-align:center;margin-bottom:3.5rem}
+.temario .section-header h2{font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:700}
+.temario .section-header p{color:var(--text-muted);margin-top:.5rem}
+.accordion{max-width:800px;margin:0 auto;display:flex;flex-direction:column;gap:.75rem}
+.accordion-item{background:var(--card-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;transition:border-color var(--transition),box-shadow var(--transition)}
+.accordion-item.open{border-color:rgba(0,255,136,.15);box-shadow:0 4px 24px rgba(0,255,136,.04)}
+.accordion-header{display:flex;align-items:center;gap:1rem;padding:1.15rem 1.5rem;cursor:pointer;user-select:none;transition:background var(--transition)}
+.accordion-header:hover{background:rgba(255,255,255,.02)}
+.accordion-num{flex-shrink:0;width:32px;height:32px;border-radius:8px;background:var(--gradient);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;color:var(--bg)}
+.accordion-title{flex:1;font-weight:600;font-size:.95rem}
+.accordion-badges{display:flex;gap:.5rem;flex-shrink:0}
+.badge{padding:.2rem .6rem;border-radius:50px;font-size:.7rem;font-weight:600;letter-spacing:.02em}
+.badge-teoria{background:rgba(0,212,255,.1);color:var(--accent2)}
+.badge-practica{background:rgba(0,255,136,.1);color:var(--accent)}
+.badge-xp{background:rgba(255,255,255,.06);color:var(--text-muted)}
+.accordion-chevron{flex-shrink:0;width:20px;height:20px;transition:transform .3s ease}
+.accordion-item.open .accordion-chevron{transform:rotate(180deg)}
+.accordion-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.accordion-body-inner{padding:0 1.5rem 1.25rem;padding-left:calc(1.5rem + 32px + 1rem)}
+.accordion-body-inner p{font-size:.875rem;color:var(--text-muted);line-height:1.55}
+.accordion-body-inner .zone-tag{display:inline-block;font-size:.7rem;font-weight:600;color:var(--accent2);background:rgba(0,212,255,.08);padding:.15rem .55rem;border-radius:50px;margin-bottom:.5rem}
+
+
+/* ---------- CTA FINAL ---------- */
+.cta-final{background:radial-gradient(ellipse at center,rgba(0,255,136,.1) 0%,var(--bg) 65%);text-align:center;position:relative;overflow:hidden}
+.cta-final::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 80%,rgba(168,85,247,.08),transparent 50%),radial-gradient(circle at 70% 20%,rgba(0,212,255,.08),transparent 50%);pointer-events:none}
+.cta-final .btn-primary{box-shadow:0 0 30px rgba(0,255,136,.2),0 0 60px rgba(0,255,136,.1)}
+.cta-final .btn-primary:hover{box-shadow:0 0 40px rgba(0,255,136,.35),0 0 80px rgba(0,255,136,.15)}
+.cta-final h2{font-size:clamp(1.5rem,3.5vw,2.75rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.75rem;position:relative}
+.cta-final .sub{font-size:1.05rem;color:var(--text-muted);margin-bottom:2.5rem;position:relative}
+.cta-final .cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;position:relative}
+.btn-lg{padding:1rem 2.5rem;font-size:1.05rem}
+
+/* ---------- FOOTER ---------- */
+.footer{padding:3rem 0;border-top:1px solid rgba(255,255,255,.04);text-align:center;background:rgba(0,0,0,.3)}
+.footer p{font-size:.85rem;color:var(--text-muted);margin-bottom:.35rem}
+.footer-links{display:flex;gap:1.5rem;justify-content:center;margin-top:1rem}
+.footer-links a{font-size:.85rem;color:var(--text-muted);transition:color var(--transition)}
+.footer-links a:hover{color:var(--accent)}
+
+/* Reveal animation base */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.reveal.is-visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ========== NAV ========== -->
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="#inicio" class="nav-logo">Rural <span>Makers</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#temario">Temario</a></li>
+      <li><a href="curso-superwebs-scroll-driven.html" class="nav-cta">Empezar Gratis</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section class="hero" id="inicio">
+  <div class="hero-sticky">
+    <div class="hero-canvas"><canvas id="heroCanvas"></canvas></div>
+    <div class="hero-wipe" id="heroWipe"></div>
+    <div class="hero-overlay" id="heroOverlay">
+      <p class="kicker">Curso Premium — 12 Lecciones</p>
+      <h1><span class="gradient-text">Superwebs<br>Scroll-Driven</span><br>con Video + IA</h1>
+      <p class="subtitle">Crea landing pages premium con video frame-a-frame sincronizado al scroll</p>
+      <div class="hero-ctas">
+        <a href="curso-superwebs-scroll-driven.html" class="btn btn-primary">Empezar Gratis</a>
+        <a href="#temario" class="btn btn-outline">Ver Temario</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+<!-- ========== PAIN POINTS ========== -->
+<section class="pain section-padding" id="pain">
+  <div class="container">
+    <div class="section-header">
+      <h2>El problema que <span class="gradient-text">todos ignoran</span></h2>
+      <p>Estos son los muros que frenan a la mayoría de desarrolladores</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <div class="icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>
+        <h3>Tus webs se ven como las de todos</h3>
+        <p>Las landing genéricas no convierten. Sin diferenciación visual, tu trabajo se pierde en el ruido.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+        <h3>El scroll de tu web es plano y aburrido</h3>
+        <p>Los usuarios abandonan en 3 segundos. Sin animaciones, no hay engagement.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div>
+        <h3>No sabes cómo integrar video con scroll</h3>
+        <p>La técnica parece imposible sin guía. Frame-a-frame suena a magia negra del frontend.</p>
+      </div>
+      <div class="pain-card">
+        <div class="icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <h3>Las herramientas premium cuestan miles</h3>
+        <p>Agencias cobran 5.000€+ por una web así. Tú puedes hacerlo por tu cuenta.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== METRICS ========== -->
+<section class="metrics section-padding" id="metrics">
+  <div class="container">
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="number gradient-text" data-target="12" data-suffix="">0</div>
+        <div class="label">lecciones paso a paso</div>
+      </div>
+      <div class="metric">
+        <div class="number gradient-text" data-target="8" data-suffix="h">0</div>
+        <div class="label">de contenido práctico</div>
+      </div>
+      <div class="metric">
+        <div class="number gradient-text" data-target="7" data-suffix="">0</div>
+        <div class="label">tipos de animación</div>
+      </div>
+      <div class="metric">
+        <div class="number gradient-text" data-target="1" data-suffix="">0</div>
+        <div class="label">skill de Claude Code que automatiza todo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+<!-- ========== SOLUTIONS ========== -->
+<section class="solutions section-padding" id="solutions">
+  <div class="container">
+    <div class="section-header">
+      <h2>Lo que vas a <span class="gradient-text">aprender</span></h2>
+      <p>6 bloques que te llevan de cero a una web nivel Awwwards</p>
+    </div>
+    <div class="solutions-grid">
+      <div class="solution-card">
+        <div class="num">1</div>
+        <div>
+          <h3>Fundamentos Scroll-Driven</h3>
+          <p>Entiende la técnica que usan Apple y Tesla para crear experiencias web inmersivas.</p>
+        </div>
+      </div>
+      <div class="solution-card">
+        <div class="num">2</div>
+        <div>
+          <h3>IA Generativa</h3>
+          <p>Genera imágenes y vídeo de producto con IA. Sin necesidad de equipo de grabación.</p>
+        </div>
+      </div>
+      <div class="solution-card">
+        <div class="num">3</div>
+        <div>
+          <h3>FFmpeg Mastery</h3>
+          <p>Extrae y optimiza frames como un pro. El paso clave que nadie te enseña.</p>
+        </div>
+      </div>
+      <div class="solution-card">
+        <div class="num">4</div>
+        <div>
+          <h3>Canvas + GSAP + Lenis</h3>
+          <p>El stack premium del frontend moderno. Smooth scroll + animaciones de alto nivel.</p>
+        </div>
+      </div>
+      <div class="solution-card">
+        <div class="num">5</div>
+        <div>
+          <h3>7 Animaciones</h3>
+          <p>fade-up, slide-left, scale-up, rotate-in, stagger, clip-reveal y más. Todas integradas.</p>
+        </div>
+      </div>
+      <div class="solution-card">
+        <div class="num">6</div>
+        <div>
+          <h3>Automatización con Claude Code</h3>
+          <p>Un skill que genera toda la web por ti. Pipeline completo de principio a fin.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+<!-- ========== BEFORE / AFTER ========== -->
+<section class="comparison section-padding" id="comparison">
+  <div class="container">
+    <div class="section-header">
+      <h2>Antes vs <span class="gradient-text">Después</span></h2>
+    </div>
+    <div class="comparison-wrap">
+      <div class="comparison-col before clip-left" id="compBefore">
+        <span class="col-label">Antes</span>
+        <ul>
+          <li>Webs planas sin vida</li>
+          <li>Scroll estándar aburrido</li>
+          <li>Vídeos que solo se reproducen</li>
+          <li>Diseño genérico</li>
+          <li>Horas de código manual</li>
+          <li>Sin animaciones premium</li>
+          <li>Dependes de agencias caras</li>
+          <li>No sabes por dónde empezar</li>
+        </ul>
+      </div>
+      <div class="comparison-col after clip-right" id="compAfter">
+        <span class="col-label">Después</span>
+        <ul>
+          <li>Landing pages nivel Awwwards</li>
+          <li>Smooth scroll profesional con Lenis</li>
+          <li>Vídeo frame-a-frame controlado por scroll</li>
+          <li>Identidad de marca generada con IA</li>
+          <li>Automatización total con Claude Code</li>
+          <li>7 tipos de animaciones integradas</li>
+          <li>Independencia creativa total</li>
+          <li>Pipeline completo de principio a fin</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+<!-- ========== HOW IT WORKS ========== -->
+<section class="how section-padding" id="como-funciona">
+  <div class="container">
+    <div class="section-header">
+      <h2>Cómo <span class="gradient-text">funciona</span></h2>
+      <p>5 pasos. De la idea a la web premium.</p>
+    </div>
+    <div class="steps" id="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3><span class="verb">Genera</span></h3>
+          <p>Crea imágenes y vídeo con IA generativa. Define tu producto y tu marca visual sin grabar nada.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3><span class="verb">Extrae</span></h3>
+          <p>Descompón el vídeo en frames con FFmpeg. Optimiza peso y calidad para la web.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3><span class="verb">Construye</span></h3>
+          <p>Monta el canvas con GSAP + Lenis + ScrollTrigger. La base técnica de toda Superweb.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3><span class="verb">Anima</span></h3>
+          <p>Añade 7 tipos de animación por sección. fade-up, slide, scale, rotate, stagger, clip-reveal.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h3><span class="verb">Automatiza</span></h3>
+          <p>Usa el skill video2website de Claude Code. Una instrucción y toda la web se genera sola.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+<!-- ========== TEMARIO ========== -->
+<section class="temario section-padding" id="temario">
+  <div class="container">
+    <div class="section-header">
+      <h2>Temario <span class="gradient-text">completo</span></h2>
+      <p>12 lecciones organizadas por zonas de dominio</p>
+    </div>
+    <div class="accordion" id="accordion">
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">01</div>
+          <div class="accordion-title">Qué es una Superweb Scroll-Driven</div>
+          <div class="accordion-badges">
+            <span class="badge badge-teoria">Teoría</span>
+            <span class="badge badge-xp">100 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Fundamentos</span>
+          <p>Descubre cómo Apple, Tesla y las mejores agencias usan vídeo sincronizado al scroll para crear experiencias web inmersivas. Anatomía completa de una Superweb.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">02</div>
+          <div class="accordion-title">Pipeline completo: de la idea al deploy</div>
+          <div class="accordion-badges">
+            <span class="badge badge-teoria">Teoría</span>
+            <span class="badge badge-xp">100 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Fundamentos</span>
+          <p>El mapa completo del proceso: generación de assets con IA, extracción de frames, código frontend y automatización. Visión global antes de entrar al detalle.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">03</div>
+          <div class="accordion-title">Generación de imágenes con IA</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">200 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Assets</span>
+          <p>Usa herramientas de IA generativa para crear las imágenes de producto que necesitas. Prompting efectivo, estilos visuales y coherencia de marca.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">04</div>
+          <div class="accordion-title">Generación de vídeo con IA</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">200 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Assets</span>
+          <p>Genera vídeos de producto con modelos de IA de última generación. De imagen estática a vídeo fluido listo para descomponer en frames.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">05</div>
+          <div class="accordion-title">FFmpeg: extracción y optimización de frames</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">250 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Herramientas</span>
+          <p>Domina FFmpeg para extraer frames del vídeo, ajustar FPS, redimensionar y comprimir. El paso clave entre el vídeo y el canvas.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">06</div>
+          <div class="accordion-title">HTML5 Canvas: render de frames</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">250 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Frontend</span>
+          <p>Carga secuencias de imágenes en un canvas HTML5. Precarga inteligente, gestión de memoria y render suave a 60fps.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">07</div>
+          <div class="accordion-title">GSAP + ScrollTrigger: video al scroll</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">300 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Frontend</span>
+          <p>Sincroniza los frames del canvas con la posición del scroll usando GSAP y ScrollTrigger. El corazón de toda Superweb.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">08</div>
+          <div class="accordion-title">Lenis: smooth scroll profesional</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">200 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Frontend</span>
+          <p>Integra Lenis para un scroll suave y premium. Conexión con el ticker de GSAP para sincronización perfecta.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">09</div>
+          <div class="accordion-title">Estructura HTML + secciones de contenido</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">200 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Integración</span>
+          <p>Construye la estructura completa de la landing: hero con canvas, secciones de contenido, navegación y layout responsive.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">10</div>
+          <div class="accordion-title">7 animaciones scroll-driven</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">300 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Diseño</span>
+          <p>Implementa fade-up, slide-left, scale-up, rotate-in, stagger, clip-reveal y parallax. Cada animación con su ScrollTrigger.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">11</div>
+          <div class="accordion-title">Diseño premium: tipografía, color y spacing</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">200 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Diseño</span>
+          <p>Aplica un sistema de diseño profesional: variables CSS, tipografía Inter, paleta dark premium y ritmo vertical coherente.</p>
+        </div></div>
+      </div>
+
+      <div class="accordion-item">
+        <div class="accordion-header">
+          <div class="accordion-num">12</div>
+          <div class="accordion-title">Skill video2website: automatización total</div>
+          <div class="accordion-badges">
+            <span class="badge badge-practica">Práctica</span>
+            <span class="badge badge-xp">350 XP</span>
+          </div>
+          <svg class="accordion-chevron" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="accordion-body"><div class="accordion-body-inner">
+          <span class="zone-tag">Automatización</span>
+          <p>Crea y usa un skill de Claude Code que genera la Superweb completa con una sola instrucción. El pipeline automatizado de principio a fin.</p>
+        </div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-sep"></div>
+<!-- ========== CTA FINAL ========== -->
+<section class="cta-final section-padding" id="empezar">
+  <div class="container">
+    <h2>¿Listo para crear tu primera <span class="gradient-text">Superweb</span>?</h2>
+    <p class="sub">12 lecciones, 8 horas, y una web premium al final</p>
+    <div class="cta-buttons">
+      <a href="curso-superwebs-scroll-driven.html" class="btn btn-primary btn-lg">Empezar el Curso Gratis</a>
+      <a href="#contacto" class="btn btn-outline btn-lg">Mentoría Personalizada</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer" id="contacto">
+  <div class="container">
+    <p>Creado por <strong style="color:var(--accent)">Alipio / Rural Makers</strong></p>
+    <p style="font-size:.75rem;opacity:.5">Powered by Synapis Course Architect v2.3</p>
+    <div class="footer-links">
+      <a href="curso-superwebs-scroll-driven.html">Curso</a>
+      <a href="bitacora.html">Bitacora</a>
+      <a href="https://github.com/AlipioDev" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ========== CDN ========== -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
+<script>
+/* ==========================================================
+   SUPERWEBS SCROLL-DRIVEN LANDING — All JS inline
+   ========================================================== */
+(function(){
+'use strict';
+
+/* ---------- LENIS + GSAP SYNC ---------- */
+const lenis = new Lenis({ lerp: 0.07, smoothWheel: true, wheelMultiplier: 0.8 });
+gsap.ticker.lagSmoothing(0);
+gsap.ticker.add((time) => lenis.raf(time * 1000));
+gsap.registerPlugin(ScrollTrigger);
+lenis.on('scroll', ScrollTrigger.update);
+
+/* ---------- MOBILE NAV ---------- */
+const navToggle = document.getElementById('navToggle');
+const navLinks  = document.getElementById('navLinks');
+navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
+navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('open')));
+
+/* ---------- SMOOTH SCROLL ANCHORS ---------- */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) lenis.scrollTo(target, { offset: -64 });
+  });
+});
+
+/* ---------- HERO CANVAS — 80 mesh gradient frames ---------- */
+const canvas = document.getElementById('heroCanvas');
+const ctx    = canvas.getContext('2d');
+const TOTAL_FRAMES = 80;
+const frames = [];
+
+function resizeCanvas(){
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Blob definitions: centered positions that spread outward with scroll
+const blobs = [
+  { bx: 0.48, by: 0.45, r: 0.35, h: 155, s: 100, l: 55, a: 0.30, dx: -0.15, dy: -0.08 },
+  { bx: 0.52, by: 0.42, r: 0.30, h: 195, s: 100, l: 50, a: 0.25, dx: 0.15, dy: -0.10 },
+  { bx: 0.50, by: 0.52, r: 0.25, h: 270, s: 80,  l: 55, a: 0.18, dx: 0.08, dy: 0.12 },
+  { bx: 0.46, by: 0.50, r: 0.20, h: 165, s: 100, l: 60, a: 0.15, dx: -0.20, dy: 0.15 },
+  { bx: 0.54, by: 0.48, r: 0.22, h: 200, s: 90,  l: 50, a: 0.12, dx: 0.20, dy: 0.08 },
+];
+
+function generateFrame(i){
+  const offscreen = document.createElement('canvas');
+  const w = canvas.width;
+  const h = canvas.height;
+  offscreen.width = w;
+  offscreen.height = h;
+  const c = offscreen.getContext('2d');
+  const progress = i / (TOTAL_FRAMES - 1);
+  const maxDim = Math.max(w, h);
+
+  // Dark bg
+  c.fillStyle = '#0a0a0a';
+  c.fillRect(0, 0, w, h);
+
+  // Compositing for soft blob merging
+  c.globalCompositeOperation = 'lighter';
+
+  // Draw each blob — start centered, spread outward
+  blobs.forEach((b, bi) => {
+    const phase = progress * Math.PI * 2 + bi * 1.3;
+    const cx = (b.bx + b.dx * progress + Math.sin(phase) * 0.03) * w;
+    const cy = (b.by + b.dy * progress + Math.cos(phase * 0.7) * 0.03) * h;
+    const r = b.r * maxDim * (0.15 + progress * 0.85);
+    const alpha = b.a * (0.5 + progress * 0.5);
+
+    const grad = c.createRadialGradient(cx, cy, 0, cx, cy, r);
+    grad.addColorStop(0, `hsla(${b.h + progress * 15}, ${b.s}%, ${b.l}%, ${alpha})`);
+    grad.addColorStop(0.4, `hsla(${b.h + 10}, ${b.s}%, ${b.l - 10}%, ${alpha * 0.5})`);
+    grad.addColorStop(1, 'hsla(0,0%,0%,0)');
+    c.fillStyle = grad;
+    c.beginPath();
+    c.arc(cx, cy, r, 0, Math.PI * 2);
+    c.fill();
+  });
+
+  c.globalCompositeOperation = 'source-over';
+
+  // Floating particles — start from center, expand out
+  const numParticles = 40;
+  for (let p = 0; p < numParticles; p++){
+    const seed = p * 137.508;
+    const angle = seed + progress * Math.PI * 1.5;
+    const dist = (0.05 + (p / numParticles) * 0.45) * maxDim * (0.1 + progress * 0.9);
+    const px = w * 0.5 + Math.cos(angle) * dist;
+    const py = h * 0.5 + Math.sin(angle * 0.8) * dist * 0.7;
+    const size = 1 + Math.sin(progress * Math.PI + p * 0.5) * 1.2;
+    const pAlpha = 0.1 + progress * 0.3 + Math.sin(progress * Math.PI * 2 + p) * 0.1;
+    const hue = 150 + (p % 3) * 25;
+    c.fillStyle = `hsla(${hue}, 100%, 75%, ${Math.max(0, pAlpha)})`;
+    c.beginPath();
+    c.arc(px, py, Math.max(0.5, size), 0, Math.PI * 2);
+    c.fill();
+  }
+
+  // Center glow core — brighter at start, fades as blobs expand
+  const coreR = maxDim * (0.06 + progress * 0.06);
+  const coreGrad = c.createRadialGradient(w/2, h/2, 0, w/2, h/2, coreR);
+  coreGrad.addColorStop(0, `hsla(160, 100%, 85%, ${0.45 - progress * 0.25})`);
+  coreGrad.addColorStop(1, 'hsla(0,0%,0%,0)');
+  c.fillStyle = coreGrad;
+  c.beginPath();
+  c.arc(w/2, h/2, coreR, 0, Math.PI * 2);
+  c.fill();
+
+  return offscreen;
+}
+
+function buildFrames(){
+  frames.length = 0;
+  for(let i = 0; i < TOTAL_FRAMES; i++) frames.push(generateFrame(i));
+  renderFrame(0);
+}
+buildFrames();
+
+let debounceResize;
+window.addEventListener('resize', () => {
+  clearTimeout(debounceResize);
+  debounceResize = setTimeout(() => { resizeCanvas(); buildFrames(); }, 200);
+});
+
+function renderFrame(index){
+  const idx = Math.min(Math.max(Math.round(index), 0), TOTAL_FRAMES - 1);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(frames[idx], 0, 0, canvas.width, canvas.height);
+}
+
+/* ---------- HERO CIRCLE-WIPE REVEAL ---------- */
+const heroWipe = document.getElementById('heroWipe');
+gsap.to(heroWipe, {
+  clipPath: 'circle(0% at 50% 50%)',
+  duration: 1.4,
+  delay: 0.2,
+  ease: 'power3.inOut',
+  onStart(){ heroWipe.style.clipPath = 'circle(100% at 50% 50%)'; },
+  onComplete(){ heroWipe.style.display = 'none'; }
+});
+
+/* ---------- HERO OVERLAY ENTRANCE ---------- */
+const heroOverlay = document.getElementById('heroOverlay');
+const heroChildren = heroOverlay.children;
+gsap.timeline({ delay: 0.6 })
+  .to(heroChildren[0], { opacity:1, y:0, duration:.7, ease:'power2.out' }, 0)
+  .fromTo(heroChildren[1], {opacity:0,y:30}, {opacity:1,y:0,duration:.8,ease:'power2.out'}, 0.15)
+  .fromTo(heroChildren[2], {opacity:0,y:20}, {opacity:1,y:0,duration:.7,ease:'power2.out'}, 0.35)
+  .to(heroChildren[3], {opacity:1,y:0,duration:.7,ease:'power2.out'}, 0.5);
+
+/* ---------- HERO SCROLL-DRIVEN CANVAS ---------- */
+const heroObj = { frame: 0 };
+ScrollTrigger.create({
+  trigger: '.hero',
+  start: 'top top',
+  end: 'bottom bottom',
+  pin: '.hero-sticky',
+  scrub: 0.5,
+  onUpdate(self){
+    const f = self.progress * (TOTAL_FRAMES - 1);
+    renderFrame(f);
+  }
+});
+
+/* ---------- PAIN CARDS — stagger up ---------- */
+gsap.utils.toArray('.pain-card').forEach((card, i) => {
+  gsap.to(card, {
+    opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+    scrollTrigger: { trigger: card, start: 'top 85%', toggleActions: 'play none none none' },
+    delay: i * 0.1
+  });
+});
+
+/* ---------- METRICS — counter up ---------- */
+gsap.utils.toArray('.metric').forEach(metric => {
+  const numEl  = metric.querySelector('.number');
+  const target = parseInt(numEl.dataset.target);
+  const suffix = numEl.dataset.suffix || '';
+  const obj    = { val: 0 };
+
+  ScrollTrigger.create({
+    trigger: metric,
+    start: 'top 85%',
+    once: true,
+    onEnter(){
+      gsap.to(metric, { opacity:1, y:0, duration:.6, ease:'power2.out' });
+      gsap.to(obj, {
+        val: target, duration: 1.5, ease: 'power2.out',
+        onUpdate(){ numEl.textContent = Math.round(obj.val) + suffix; }
+      });
+    }
+  });
+});
+
+/* ---------- SOLUTION CARDS — slide alternating ---------- */
+gsap.utils.toArray('.solution-card').forEach(card => {
+  gsap.to(card, {
+    opacity: 1, x: 0, duration: 0.8, ease: 'power2.out',
+    scrollTrigger: { trigger: card, start: 'top 85%', toggleActions: 'play none none none' }
+  });
+});
+
+/* ---------- BEFORE/AFTER — clip reveal ---------- */
+ScrollTrigger.create({
+  trigger: '#compBefore',
+  start: 'top 80%',
+  once: true,
+  onEnter(){
+    gsap.to('#compBefore', { clipPath:'inset(0 0% 0 0)', duration:1, ease:'power3.inOut' });
+  }
+});
+ScrollTrigger.create({
+  trigger: '#compAfter',
+  start: 'top 80%',
+  once: true,
+  onEnter(){
+    gsap.to('#compAfter', { clipPath:'inset(0 0 0 0%)', duration:1, ease:'power3.inOut', delay:0.2 });
+  }
+});
+
+/* ---------- HOW IT WORKS — stagger steps ---------- */
+gsap.utils.toArray('.step').forEach((step, i) => {
+  gsap.to(step, {
+    opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+    scrollTrigger: { trigger: step, start: 'top 85%', toggleActions: 'play none none none',
+      onEnter(){ step.classList.add('is-active'); }
+    },
+    delay: i * 0.08
+  });
+});
+
+/* ---------- ACCORDION ---------- */
+document.querySelectorAll('.accordion-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const item = header.parentElement;
+    const body = item.querySelector('.accordion-body');
+    const isOpen = item.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.accordion-item.open').forEach(openItem => {
+      openItem.classList.remove('open');
+      openItem.querySelector('.accordion-body').style.maxHeight = null;
+    });
+
+    if (!isOpen){
+      item.classList.add('open');
+      body.style.maxHeight = body.scrollHeight + 'px';
+    }
+  });
+});
+
+/* ---------- TEMARIO SECTION REVEAL ---------- */
+gsap.utils.toArray('.accordion-item').forEach((item, i) => {
+  gsap.fromTo(item,
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out',
+      scrollTrigger: { trigger: item, start: 'top 90%', toggleActions: 'play none none none' },
+      delay: i * 0.04
+    }
+  );
+});
+
+/* ---------- CTA FINAL REVEAL ---------- */
+gsap.fromTo('.cta-final h2', {opacity:0,y:30}, {opacity:1,y:0,duration:.8,ease:'power2.out',
+  scrollTrigger:{trigger:'.cta-final',start:'top 80%',toggleActions:'play none none none'}
+});
+gsap.fromTo('.cta-final .sub', {opacity:0,y:20}, {opacity:1,y:0,duration:.7,ease:'power2.out',delay:.15,
+  scrollTrigger:{trigger:'.cta-final',start:'top 80%',toggleActions:'play none none none'}
+});
+gsap.fromTo('.cta-final .cta-buttons', {opacity:0,y:20}, {opacity:1,y:0,duration:.7,ease:'power2.out',delay:.3,
+  scrollTrigger:{trigger:'.cta-final',start:'top 80%',toggleActions:'play none none none'}
+});
+
+/* ---------- NAV ACTIVE LINK ON SCROLL ---------- */
+const sections = document.querySelectorAll('section[id]');
+const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+ScrollTrigger.create({
+  trigger: 'body',
+  start: 'top top',
+  end: 'bottom bottom',
+  onUpdate(){
+    let current = '';
+    sections.forEach(s => {
+      if (s.getBoundingClientRect().top < window.innerHeight * 0.4) current = s.id;
+    });
+    navAnchors.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }
+});
+
+})();
+</script>
+</body>
+</html>

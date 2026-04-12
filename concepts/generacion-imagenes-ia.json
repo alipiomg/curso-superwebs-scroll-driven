@@ -1,0 +1,48 @@
+{
+  "id": "generacion-imagenes-ia",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "Generar imágenes de producto con IA",
+  "numero": 2,
+  "contenido": {
+    "explicacion": "## ¿Qué es la generación de imágenes de producto con IA?\n\nConsiste en usar herramientas de inteligencia artificial como **Freepik AI, Midjourney, DALL-E o Leonardo AI** para crear imágenes fotorrealistas de productos desde distintos ángulos. El objetivo es generar una secuencia de fotogramas que simulen una rotación 3D del producto, como si una cámara girara alrededor de él.\n\n## ¿Por qué importa?\n\nAntes, para conseguir una secuencia de rotación de producto necesitabas un estudio fotográfico con mesa giratoria, cámara profesional y horas de postproducción. O un artista 3D que modelara el producto en Blender/Cinema4D. Con IA generativa, puedes crear estas secuencias en **minutos y a coste cero**. Esto democratiza una técnica que antes solo podían permitirse grandes marcas como Apple o Nike.\n\n## ¿Cómo funciona?\n\nLa clave está en el **prompting estratégico**. Necesitas mantener consistencia visual entre frames: mismo producto, misma iluminación, mismo fondo, solo cambia el ángulo. Usamos fondo oscuro o negro porque facilita la consistencia y da aspecto premium. El flujo es: (1) definir el producto, (2) crear un prompt base con iluminación y estilo fijos, (3) variar solo el ángulo en cada iteración (front view → 45° → side view → 135° → back view), (4) revisar y regenerar los frames inconsistentes. Herramientas como Freepik AI permiten usar una imagen de referencia para mantener la coherencia entre generaciones.",
+    "metafora": "Imagina a un **fotógrafo con una mesa giratoria**. Coloca el producto en el centro, enciende las luces del estudio (siempre las mismas), y va girando la mesa unos grados entre cada disparo. La cámara no se mueve, la luz no cambia, solo rota el producto. Con IA hacemos exactamente lo mismo: mantenemos todo constante en el prompt y solo cambiamos el ángulo de visión.",
+    "ejemplo_codigo": {
+      "lenguaje": "javascript",
+      "titulo": "Plantilla de prompts secuenciales para rotación de producto",
+      "codigo": "// Prompt template system for consistent product image generation\n// Use with Freepik AI, Midjourney, DALL-E, or Leonardo AI\n\nconst productConfig = {\n  product: 'wireless noise-cancelling headphones',\n  color: 'matte black with silver accents',\n  background: 'pure black background, no reflections',\n  lighting: 'soft studio lighting, single key light from top-right, subtle rim light',\n  style: 'product photography, 8K, photorealistic, studio shot, centered in frame',\n  negativePrompt: 'text, watermark, blurry, low quality, hands, people'\n};\n\nconst angles = [\n  { id: '001', angle: 'front view, facing camera directly' },\n  { id: '002', angle: 'slightly rotated 30 degrees to the right' },\n  { id: '003', angle: 'rotated 60 degrees to the right, showing side profile emerging' },\n  { id: '004', angle: 'side view, 90 degrees, left ear cup visible' },\n  { id: '005', angle: 'rotated 120 degrees, showing back at an angle' },\n  { id: '006', angle: 'rotated 150 degrees, nearly back view' },\n  { id: '007', angle: 'back view, 180 degrees, headband fully visible' },\n  { id: '008', angle: 'rotated 210 degrees, other side emerging' },\n  { id: '009', angle: 'rotated 240 degrees' },\n  { id: '010', angle: 'right side view, 270 degrees' },\n  { id: '011', angle: 'rotated 300 degrees, returning to front' },\n  { id: '012', angle: 'rotated 330 degrees, almost front view' }\n];\n\nfunction generatePrompt(config, angleData) {\n  return `${config.product}, ${config.color}, ${angleData.angle}, ${config.background}, ${config.lighting}, ${config.style}`;\n}\n\n// Generate all prompts\nangles.forEach(a => {\n  console.log(`--- Frame ${a.id} ---`);\n  console.log(generatePrompt(productConfig, a));\n  console.log();\n});"
+    }
+  },
+  "mini_reto": {
+    "titulo": "Tu primera secuencia de producto con IA",
+    "descripcion": "Elige un producto (auriculares, zapatilla, botella, reloj) y genera 4 imágenes secuenciales usando cualquier herramienta de IA (Freepik AI, Leonardo AI, DALL-E, Midjourney). Los ángulos deben ser: frontal, 45°, lateral (90°) y trasera (180°). Mantén consistencia en iluminación y fondo.",
+    "tipo": "texto-libre",
+    "criterios_exito": [
+      "Se generaron 4 imágenes con ángulos claramente distintos",
+      "El producto es reconocible como el mismo en las 4 imágenes",
+      "El fondo es oscuro/negro y consistente en todas las imágenes",
+      "La iluminación es similar en todas las imágenes"
+    ],
+    "respuesta_esperada": "4 imágenes PNG/JPG del mismo producto en ángulos progresivos (0°, 45°, 90°, 180°) con fondo oscuro consistente. Se acepta variación menor en detalles entre frames ya que la IA no es 100% determinista.",
+    "xp_extra": 20
+  },
+  "glosario": {
+    "prompt engineering (para imágenes)": "Arte de escribir instrucciones precisas para que una IA generativa produzca la imagen deseada. Incluye describir sujeto, ángulo, iluminación, estilo, fondo y usar negative prompts para excluir elementos no deseados.",
+    "fotograma": "Una imagen individual dentro de una secuencia de animación. En nuestro contexto, cada imagen generada por IA representa un fotograma de la rotación del producto. Al mostrarlos en secuencia rápida, crean la ilusión de movimiento fluido.",
+    "consistencia visual": "Mantener los mismos atributos visuales (iluminación, color, fondo, estilo) entre todas las imágenes de una secuencia. Es el mayor desafío al generar frames con IA, ya que cada generación puede introducir variaciones no deseadas."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía que muestre: (1) El flujo de trabajo: Definir producto → Crear prompt base → Variar ángulos → Revisar consistencia. (2) Anatomía de un buen prompt: producto + ángulo + iluminación + fondo + estilo. (3) Comparativa de 4 frames ejemplo mostrando la progresión de ángulos. (4) Tips: fondo negro, misma iluminación, negative prompts.",
+    "plataforma_recomendada": "Figma o Canva",
+    "estilo": "Fondo oscuro, grid de imágenes de producto, flechas indicando rotación, badges con los ángulos (0°, 45°, 90°, 180°), estilo tech premium"
+  },
+  "conexiones": {
+    "prerequisitos": ["scroll-driven-intro"],
+    "siguiente_recomendado": ["generacion-video-ia"],
+    "conceptos_relacionados": ["ffmpeg-extraccion-frames"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno puede generar una secuencia de al menos 4 imágenes de producto con IA manteniendo consistencia visual aceptable entre frames.",
+    "instincts_que_aplican": ["iteración rápida", "atención al detalle", "pensamiento secuencial"],
+    "confidence_pedagogica": 0.85
+  }
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 05 — HTML5 Canvas Rendering Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Comparison Table */
+.compare-table{width:100%;border-collapse:separate;border-spacing:0;margin-bottom:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.compare-table th{padding:.8rem 1rem;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)}
+.compare-table th:first-child{color:var(--muted);width:45%}
+.compare-table th:nth-child(2){color:#ef4444;text-align:center;width:27.5%}
+.compare-table th:nth-child(3){color:var(--accent);text-align:center;width:27.5%}
+.compare-table td{padding:.65rem 1rem;font-size:.75rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table td:first-child{color:var(--text);font-weight:600}
+.compare-table td:nth-child(2),.compare-table td:nth-child(3){text-align:center;font-size:1rem}
+.icon-bad{color:#ef4444}
+.icon-good{color:var(--accent)}
+.feature-desc{display:block;font-size:.62rem;color:var(--muted);font-weight:400;margin-top:.15rem}
+
+/* Cover-Fit Formula */
+.formula-card{background:var(--card);border:1px solid rgba(0,212,255,.15);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;text-align:center}
+.formula-card h3{font-size:.85rem;font-weight:700;color:var(--cyan);margin-bottom:1rem}
+.formula-visual{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:1rem;flex-wrap:wrap}
+.formula-box{background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:10px;padding:1rem 1.2rem;text-align:center}
+.formula-box .label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.formula-box .value{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;color:var(--cyan)}
+.formula-op{font-size:1.2rem;font-weight:800;color:var(--muted)}
+.formula-result{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);border-radius:10px;padding:1rem 1.2rem}
+.formula-result .label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.formula-result .value{font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;color:var(--accent)}
+.formula-code{background:#0d0d0d;border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.6;text-align:left;color:var(--muted);margin-top:.75rem}
+.formula-code .kw{color:#c792ea}
+.formula-code .fn{color:#82aaff}
+.formula-code .val{color:#c3e88d}
+.formula-code .hl{color:var(--accent);font-weight:600}
+
+/* Cycle Diagram */
+.cycle{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1.5rem;position:relative}
+.cycle-step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem .8rem;text-align:center;position:relative}
+.cycle-step::after{content:'\2192';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--purple);font-weight:700;font-size:1rem;z-index:1}
+.cycle-step:last-child::after{content:'\21BA';right:auto;left:50%;top:auto;bottom:-18px;transform:translateX(-50%);font-size:1.1rem}
+.cycle-icon{font-size:1.5rem;margin-bottom:.4rem;display:block}
+.cycle-step h4{font-size:.75rem;font-weight:700;margin-bottom:.25rem}
+.cycle-step:nth-child(1) h4{color:var(--cyan)}
+.cycle-step:nth-child(2) h4{color:var(--purple)}
+.cycle-step:nth-child(3) h4{color:#ef4444}
+.cycle-step:nth-child(4) h4{color:var(--accent)}
+.cycle-step p{font-size:.62rem;color:var(--muted);line-height:1.4}
+.cycle-step code{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--cyan);background:rgba(0,212,255,.08);padding:.1rem .3rem;border-radius:3px}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .compare-table{font-size:.68rem}
+  .formula-visual{flex-direction:column;gap:.5rem}
+  .cycle{grid-template-columns:1fr 1fr;gap:.5rem}
+  .cycle-step::after{display:none}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">05</div>
+    <h1><span>Canvas</span> Rendering Engine</h1>
+    <p>Motor de renderizado con HTML5 Canvas para animaciones de producto por scroll</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">img vs canvas</div>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Caracteristica</th>
+          <th>&lt;img&gt; tag</th>
+          <th>&lt;canvas&gt;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Renderizado pixel-perfect<span class="feature-desc">Control exacto de cada pixel en pantalla</span></td>
+          <td><span class="icon-bad">&#10060;</span></td>
+          <td><span class="icon-good">&#9989;</span></td>
+        </tr>
+        <tr>
+          <td>Cover-fit automatico<span class="feature-desc">Ajuste proporcional al contenedor</span></td>
+          <td><span class="icon-bad">&#10060;</span></td>
+          <td><span class="icon-good">&#9989;</span></td>
+        </tr>
+        <tr>
+          <td>Sin layout shift<span class="feature-desc">No provoca reflow del DOM al cambiar frames</span></td>
+          <td><span class="icon-bad">&#10060;</span></td>
+          <td><span class="icon-good">&#9989;</span></td>
+        </tr>
+        <tr>
+          <td>Transicion instantanea<span class="feature-desc">Cambio de frame sin parpadeo visible</span></td>
+          <td><span class="icon-bad">&#10060;</span></td>
+          <td><span class="icon-good">&#9989;</span></td>
+        </tr>
+        <tr>
+          <td>GPU accelerated<span class="feature-desc">Renderizado acelerado por hardware</span></td>
+          <td><span class="icon-bad">&#10060;</span></td>
+          <td><span class="icon-good">&#9989;</span></td>
+        </tr>
+        <tr>
+          <td>Facil de usar<span class="feature-desc">Implementacion simple sin JavaScript</span></td>
+          <td><span class="icon-good">&#9989;</span></td>
+          <td><span class="icon-bad">&#10060;</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Formula cover-fit</div>
+    <div class="formula-card">
+      <h3>Escalar imagen al canvas manteniendo proporcion</h3>
+      <div class="formula-visual">
+        <div class="formula-box">
+          <div class="label">Ratio canvas</div>
+          <div class="value">cW / cH</div>
+        </div>
+        <span class="formula-op">vs</span>
+        <div class="formula-box">
+          <div class="label">Ratio imagen</div>
+          <div class="value">iW / iH</div>
+        </div>
+        <span class="formula-op">=</span>
+        <div class="formula-result">
+          <div class="label">Escala</div>
+          <div class="value">Math.max()</div>
+        </div>
+      </div>
+      <div class="formula-code">
+        <span class="kw">const</span> <span class="fn">scale</span> = <span class="hl">Math.max</span>(canvas.width / img.width, canvas.height / img.height);<br>
+        <span class="kw">const</span> <span class="fn">x</span> = (canvas.width - img.width * scale) / <span class="val">2</span>;<br>
+        <span class="kw">const</span> <span class="fn">y</span> = (canvas.height - img.height * scale) / <span class="val">2</span>;<br>
+        ctx.<span class="hl">drawImage</span>(img, x, y, img.width * scale, img.height * scale);
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Ciclo de renderizado</div>
+    <div class="cycle">
+      <div class="cycle-step">
+        <span class="cycle-icon">&#128208;</span>
+        <h4>resize</h4>
+        <p>Detectar cambio de tamano del viewport</p>
+        <code>ResizeObserver</code>
+      </div>
+      <div class="cycle-step">
+        <span class="cycle-icon">&#128290;</span>
+        <h4>recalc</h4>
+        <p>Recalcular escala y offsets del canvas</p>
+        <code>scale = max()</code>
+      </div>
+      <div class="cycle-step">
+        <span class="cycle-icon">&#128465;</span>
+        <h4>clearRect</h4>
+        <p>Limpiar el canvas completo antes de pintar</p>
+        <code>ctx.clearRect()</code>
+      </div>
+      <div class="cycle-step">
+        <span class="cycle-icon">&#127912;</span>
+        <h4>drawImage</h4>
+        <p>Pintar el frame actual con cover-fit</p>
+        <code>ctx.drawImage()</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 05 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

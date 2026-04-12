@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 11 — Arquitectura de Proyecto Superweb</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Wireframe stack */
+.wireframe-stack{display:flex;flex-direction:column;gap:4px;margin-bottom:1.5rem}
+.wire-block{display:flex;align-items:center;gap:.75rem;padding:.6rem 1rem;border-radius:8px;border:1px solid var(--border);background:var(--card);transition:border-color .2s}
+.wire-block .wire-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.wire-block .wire-name{font-size:.75rem;font-weight:600;flex:1}
+.wire-block .wire-desc{font-size:.6rem;color:var(--muted);text-align:right}
+.wire-block.loader .wire-icon{background:rgba(168,85,247,.15);color:var(--purple)}
+.wire-block.loader{border-color:rgba(168,85,247,.15)}
+.wire-block.nav .wire-icon{background:rgba(0,212,255,.15);color:var(--cyan)}
+.wire-block.nav{border-color:rgba(0,212,255,.15)}
+.wire-block.hero .wire-icon{background:rgba(0,255,136,.15);color:var(--accent)}
+.wire-block.hero{border-color:rgba(0,255,136,.15)}
+.wire-block.canvas .wire-icon{background:rgba(251,191,36,.15);color:#fbbf24}
+.wire-block.canvas{border-color:rgba(251,191,36,.15)}
+.wire-block.sections .wire-icon{background:rgba(0,212,255,.15);color:var(--cyan)}
+.wire-block.sections{border-color:rgba(0,212,255,.15)}
+.wire-block.foot .wire-icon{background:rgba(136,136,136,.15);color:var(--muted)}
+.wire-block.foot{border-color:rgba(136,136,136,.15)}
+.wire-connector{width:2px;height:8px;background:var(--border);margin-left:2rem}
+
+/* File tree */
+.file-tree{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:2}
+.ft-root{color:var(--accent);font-weight:600}
+.ft-dir{color:var(--cyan)}
+.ft-file{color:var(--text)}
+.ft-desc{color:var(--muted);font-size:.6rem;font-family:'Inter',sans-serif}
+.ft-indent{padding-left:1.2rem;border-left:1px solid var(--border);margin-left:.4rem}
+
+/* Anti-patterns */
+.anti-patterns{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+.anti-card{background:var(--card);border:1px solid rgba(239,68,68,.15);border-radius:10px;padding:1rem;position:relative;text-align:center}
+.anti-card::after{content:'';position:absolute;top:50%;left:10%;right:10%;height:2px;background:#ef4444;transform:translateY(-50%) rotate(-8deg)}
+.anti-icon{font-size:1.2rem;margin-bottom:.4rem;opacity:.4}
+.anti-text{font-size:.7rem;color:rgba(239,68,68,.7);font-weight:600;text-decoration:line-through;text-decoration-color:#ef4444}
+.anti-fix{font-size:.6rem;color:var(--accent);margin-top:.4rem;font-weight:600;position:relative;z-index:1}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .anti-patterns{grid-template-columns:1fr}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">11</div>
+    <h1>Arquitectura de <span>Proyecto Superweb</span></h1>
+    <p>La estructura de archivos y componentes que hace funcionar una superweb scroll-driven</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Wireframe stack</div>
+    <div class="wireframe-stack">
+      <div class="wire-block loader">
+        <div class="wire-icon">&#9203;</div>
+        <div class="wire-name">Loader</div>
+        <div class="wire-desc">Precarga de frames</div>
+      </div>
+      <div class="wire-block nav">
+        <div class="wire-icon">&#9776;</div>
+        <div class="wire-name">Header / Nav</div>
+        <div class="wire-desc">Fijo con blur</div>
+      </div>
+      <div class="wire-block hero">
+        <div class="wire-icon">&#9733;</div>
+        <div class="wire-name">Hero</div>
+        <div class="wire-desc">Titulo + CTA animado</div>
+      </div>
+      <div class="wire-block canvas">
+        <div class="wire-icon">&#127912;</div>
+        <div class="wire-name">Canvas (sticky)</div>
+        <div class="wire-desc">Video scroll-driven</div>
+      </div>
+      <div class="wire-block sections">
+        <div class="wire-icon">&#9638;</div>
+        <div class="wire-name">Secciones x7</div>
+        <div class="wire-desc">Cada una con su animacion</div>
+      </div>
+      <div class="wire-block foot">
+        <div class="wire-icon">&#9473;</div>
+        <div class="wire-name">Footer</div>
+        <div class="wire-desc">CTA final + creditos</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Arbol de archivos</div>
+    <div class="file-tree">
+      <div class="ft-root">proyecto/</div>
+      <div class="ft-indent">
+        <span class="ft-file">index.html</span> <span class="ft-desc">&#8212; Estructura semantica</span><br>
+        <span class="ft-dir">css/</span><br>
+        <div class="ft-indent">
+          <span class="ft-file">style.css</span> <span class="ft-desc">&#8212; Custom properties + layout</span><br>
+          <span class="ft-file">animations.css</span> <span class="ft-desc">&#8212; 7 animaciones reutilizables</span>
+        </div>
+        <span class="ft-dir">js/</span><br>
+        <div class="ft-indent">
+          <span class="ft-file">main.js</span> <span class="ft-desc">&#8212; GSAP + ScrollTrigger</span><br>
+          <span class="ft-file">frames.js</span> <span class="ft-desc">&#8212; Canvas frame binding</span><br>
+          <span class="ft-file">loader.js</span> <span class="ft-desc">&#8212; Precarga de imagenes</span>
+        </div>
+        <span class="ft-dir">frames/</span> <span class="ft-desc">&#8212; 120 PNGs secuenciales</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Anti-patrones</div>
+    <div class="anti-patterns">
+      <div class="anti-card">
+        <div class="anti-icon">&#128247;</div>
+        <div class="anti-text">JPG para frames</div>
+        <div class="anti-fix">Usar PNG sin compresion</div>
+      </div>
+      <div class="anti-card">
+        <div class="anti-icon">&#128230;</div>
+        <div class="anti-text">Todo en un solo JS</div>
+        <div class="anti-fix">Modularizar por funcion</div>
+      </div>
+      <div class="anti-card">
+        <div class="anti-icon">&#128260;</div>
+        <div class="anti-text">Misma animacion x7</div>
+        <div class="anti-fix">Alternar entre tipos</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 11 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

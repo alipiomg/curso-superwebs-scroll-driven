@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 02 — Generacion de Imagenes con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Workflow Steps */
+.workflow{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem}
+.workflow-step{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem 1rem;text-align:center;position:relative}
+.workflow-step::after{content:'\2192';position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700;font-size:1.1rem;z-index:1}
+.workflow-step:last-child::after{display:none}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;font-size:.75rem;font-weight:800;margin-bottom:.6rem}
+.step-1 .step-num{background:rgba(0,255,136,.12);color:var(--accent)}
+.step-2 .step-num{background:rgba(0,212,255,.12);color:var(--cyan)}
+.step-3 .step-num{background:rgba(168,85,247,.12);color:var(--purple)}
+.step-4 .step-num{background:rgba(0,255,136,.12);color:var(--accent)}
+.workflow-step h4{font-size:.78rem;font-weight:700;margin-bottom:.3rem;line-height:1.3}
+.workflow-step p{font-size:.65rem;color:var(--muted);line-height:1.4}
+
+/* Prompt Anatomy Bar */
+.prompt-bar-container{margin-bottom:1.5rem}
+.prompt-bar{display:flex;border-radius:10px;overflow:hidden;height:44px;margin-bottom:.75rem}
+.prompt-segment{display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;letter-spacing:.02em;color:var(--bg)}
+.seg-product{background:var(--accent);flex:2}
+.seg-angle{background:var(--cyan);flex:1.5}
+.seg-lighting{background:var(--purple);flex:1.5}
+.seg-background{background:#f59e0b;flex:1.5}
+.seg-style{background:#ef4444;flex:1.5}
+.prompt-legend{display:flex;flex-wrap:wrap;gap:.6rem}
+.legend-item{display:flex;align-items:center;gap:.35rem;font-size:.68rem;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* Example prompt */
+.prompt-example{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:1.7;color:var(--muted)}
+.prompt-example .seg-hl-product{color:var(--accent);font-weight:600}
+.prompt-example .seg-hl-angle{color:var(--cyan);font-weight:600}
+.prompt-example .seg-hl-lighting{color:var(--purple);font-weight:600}
+.prompt-example .seg-hl-background{color:#f59e0b;font-weight:600}
+.prompt-example .seg-hl-style{color:#ef4444;font-weight:600}
+
+/* Tips Box */
+.tips-box{background:var(--card);border:1px solid rgba(0,255,136,.15);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.tips-box h3{font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.tips-list{list-style:none;padding:0}
+.tips-list li{font-size:.75rem;color:var(--muted);padding:.4rem 0;padding-left:1.2rem;position:relative;line-height:1.5}
+.tips-list li::before{content:'\2713';position:absolute;left:0;color:var(--accent);font-weight:700;font-size:.7rem}
+.tips-list li strong{color:var(--text)}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .workflow{grid-template-columns:1fr 1fr;gap:.5rem}
+  .workflow-step::after{display:none}
+  .prompt-bar{height:36px}
+  .prompt-segment{font-size:.6rem}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">02</div>
+    <h1>Generacion de <span>Imagenes con IA</span></h1>
+    <p>Flujo completo para crear imagenes de producto consistentes usando inteligencia artificial</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Flujo de trabajo</div>
+    <div class="workflow">
+      <div class="workflow-step step-1">
+        <div class="step-num">1</div>
+        <h4>Definir producto</h4>
+        <p>Caracteristicas clave, materiales, forma, color</p>
+      </div>
+      <div class="workflow-step step-2">
+        <div class="step-num">2</div>
+        <h4>Crear prompt base</h4>
+        <p>Describir el producto con todos sus atributos visuales</p>
+      </div>
+      <div class="workflow-step step-3">
+        <div class="step-num">3</div>
+        <h4>Variar angulos</h4>
+        <p>Generar multiples vistas: frontal, lateral, cenital, 3/4</p>
+      </div>
+      <div class="workflow-step step-4">
+        <div class="step-num">4</div>
+        <h4>Verificar consistencia</h4>
+        <p>Comparar colores, proporciones y detalles entre tomas</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Anatomia del prompt</div>
+    <div class="prompt-bar-container">
+      <div class="prompt-bar">
+        <div class="prompt-segment seg-product">Producto</div>
+        <div class="prompt-segment seg-angle">Angulo</div>
+        <div class="prompt-segment seg-lighting">Luz</div>
+        <div class="prompt-segment seg-background">Fondo</div>
+        <div class="prompt-segment seg-style">Estilo</div>
+      </div>
+      <div class="prompt-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Producto</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>Angulo de camara</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Iluminacion</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Fondo</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>Estilo visual</div>
+      </div>
+    </div>
+    <div class="prompt-example">
+      <span class="seg-hl-product">A premium wireless headphone, matte black finish, over-ear design</span>,
+      <span class="seg-hl-angle">front view, slightly angled</span>,
+      <span class="seg-hl-lighting">studio lighting, soft shadows</span>,
+      <span class="seg-hl-background">solid white background</span>,
+      <span class="seg-hl-style">product photography, 8K, hyper realistic</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Consejos clave</div>
+    <div class="tips-box">
+      <h3>&#9889; Tips para consistencia</h3>
+      <ul class="tips-list">
+        <li>Usa <strong>seed fijo</strong> cuando la herramienta lo permita para mantener coherencia entre generaciones</li>
+        <li>Incluye <strong>descriptores de material</strong> en cada prompt: matte, glossy, brushed metal, etc.</li>
+        <li>Mantener el <strong>mismo estilo de iluminacion</strong> en todas las variantes del producto</li>
+        <li>Generar en <strong>alta resolucion</strong> (minimo 1024x1024) para tener margen de recorte</li>
+        <li>Guardar los <strong>prompts base</strong> en un documento para reutilizar y iterar</li>
+        <li>Verificar que el <strong>color del producto</strong> no cambie entre angulos diferentes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 02 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

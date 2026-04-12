@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 03 — De Imagenes a Video con IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Parallel Paths */
+.paths{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:stretch;margin-bottom:1.5rem}
+.path-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative}
+.path-card.ai-path{border-color:rgba(168,85,247,.15)}
+.path-card.ffmpeg-path{border-color:rgba(0,255,136,.15)}
+.path-card h3{font-size:.85rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.path-card.ai-path h3{color:var(--purple)}
+.path-card.ffmpeg-path h3{color:var(--accent)}
+.path-icon{font-size:1.2rem}
+.path-vs{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:var(--muted)}
+.path-steps{list-style:none;padding:0}
+.path-steps li{font-size:.72rem;color:var(--muted);padding:.35rem 0;padding-left:1.1rem;position:relative;line-height:1.4}
+.path-steps li::before{content:'\25B6';position:absolute;left:0;font-size:.5rem;top:.55rem}
+.path-card.ai-path .path-steps li::before{color:var(--purple)}
+.path-card.ffmpeg-path .path-steps li::before{color:var(--accent)}
+.path-steps li strong{color:var(--text)}
+.path-tag{display:inline-block;padding:.2rem .6rem;border-radius:6px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:.6rem}
+.tag-creative{background:rgba(168,85,247,.12);color:var(--purple)}
+.tag-technical{background:rgba(0,255,136,.12);color:var(--accent)}
+
+/* Specs Card */
+.specs-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.specs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+.spec-item{text-align:center;padding:1rem .5rem;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:10px}
+.spec-value{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--cyan);margin-bottom:.3rem}
+.spec-label{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* Quality Comparison */
+.quality-compare{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.quality-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;text-align:center}
+.quality-card.bad{border-color:rgba(239,68,68,.15)}
+.quality-card.good{border-color:rgba(0,255,136,.15)}
+.quality-card h4{font-size:.78rem;font-weight:700;margin-bottom:.75rem}
+.quality-card.bad h4{color:#ef4444}
+.quality-card.good h4{color:var(--accent)}
+.frames-visual{display:flex;gap:3px;justify-content:center;margin-bottom:.6rem;height:32px;align-items:end}
+.frame-bar{width:8px;border-radius:2px 2px 0 0;background:var(--border)}
+.quality-card.bad .frame-bar:nth-child(odd){background:#ef4444;height:70%}
+.quality-card.bad .frame-bar:nth-child(even){background:rgba(239,68,68,.3);height:30%}
+.quality-card.good .frame-bar{background:var(--accent)}
+.quality-card.good .frame-bar:nth-child(1){height:40%}
+.quality-card.good .frame-bar:nth-child(2){height:50%}
+.quality-card.good .frame-bar:nth-child(3){height:60%}
+.quality-card.good .frame-bar:nth-child(4){height:70%}
+.quality-card.good .frame-bar:nth-child(5){height:78%}
+.quality-card.good .frame-bar:nth-child(6){height:85%}
+.quality-card.good .frame-bar:nth-child(7){height:90%}
+.quality-card.good .frame-bar:nth-child(8){height:95%}
+.quality-card.good .frame-bar:nth-child(9){height:98%}
+.quality-card.good .frame-bar:nth-child(10){height:100%}
+.quality-desc{font-size:.68rem;color:var(--muted)}
+.quality-desc strong{color:var(--text)}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .paths{grid-template-columns:1fr;gap:.75rem}
+  .path-vs{display:none}
+  .specs-grid{grid-template-columns:1fr 1fr}
+  .quality-compare{grid-template-columns:1fr}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">03</div>
+    <h1>De Imagenes a <span>Video con IA</span></h1>
+    <p>Dos caminos para convertir tus imagenes de producto en video fluido</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Dos caminos paralelos</div>
+    <div class="paths">
+      <div class="path-card ai-path">
+        <h3><span class="path-icon">&#9734;</span> Video IA generativo</h3>
+        <ul class="path-steps">
+          <li>Subir imagen de referencia a la <strong>herramienta IA</strong></li>
+          <li>Definir <strong>movimiento deseado</strong> (rotacion, zoom, paneo)</li>
+          <li>La IA genera <strong>frames intermedios</strong> automaticamente</li>
+          <li>Resultado: video corto con <strong>movimiento creativo</strong></li>
+          <li>Ideal para <strong>hero sections</strong> y contenido social</li>
+        </ul>
+        <span class="path-tag tag-creative">Creativo</span>
+      </div>
+      <div class="path-vs">VS</div>
+      <div class="path-card ffmpeg-path">
+        <h3><span class="path-icon">&#9881;</span> FFmpeg concat</h3>
+        <ul class="path-steps">
+          <li>Preparar <strong>secuencia de imagenes</strong> numeradas</li>
+          <li>Definir <strong>framerate</strong> y orden de la secuencia</li>
+          <li>FFmpeg concatena en <strong>video MP4</strong></li>
+          <li>Resultado: video preciso con <strong>control total</strong></li>
+          <li>Ideal para <strong>scroll-driven animations</strong></li>
+        </ul>
+        <span class="path-tag tag-technical">Tecnico</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Especificaciones ideales</div>
+    <div class="specs-card">
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-value">24fps</div>
+          <div class="spec-label">Framerate</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">1920x1080</div>
+          <div class="spec-label">Resolucion</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">H.264</div>
+          <div class="spec-label">Codec</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">yuv420p</div>
+          <div class="spec-label">Pixel Format</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Calidad segun frames</div>
+    <div class="quality-compare">
+      <div class="quality-card bad">
+        <h4>&#10060; Pocos frames</h4>
+        <div class="frames-visual">
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+        </div>
+        <p class="quality-desc">Saltos visibles entre frames. Movimiento <strong>entrecortado</strong> y poco natural. El scroll se siente roto.</p>
+      </div>
+      <div class="quality-card good">
+        <h4>&#9989; Muchos frames</h4>
+        <div class="frames-visual">
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+          <div class="frame-bar"></div>
+        </div>
+        <p class="quality-desc">Transiciones suaves y fluidas. Movimiento <strong>cinematografico</strong>. El scroll se siente premium.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 03 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

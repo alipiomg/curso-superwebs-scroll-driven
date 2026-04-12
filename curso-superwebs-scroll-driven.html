@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superwebs Scroll-Driven con Video + IA | Rural Makers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f0f;--card:#1a1a1a;--card-border:#2a2a2a;
+  --text:#f0f0f0;--text-muted:#888;--text-dim:#555;
+  --accent:#00ff88;--accent-dim:#00cc6a;--cyan:#00d4ff;
+  --teoria:#3b82f6;--practica:#10b981;
+  --danger:#ef4444;--warning:#f59e0b;--purple:#a855f7;
+  --radius:12px;--radius-sm:8px;
+  --font:'Inter',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{cursor:pointer;font-family:var(--font)}
+img{max-width:100%}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--card-border);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:#444}
+
+/* ===== NAV ===== */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,15,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--card-border);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between}
+.nav__logo{font-weight:800;font-size:1.1rem;letter-spacing:-0.02em;color:var(--text)}
+.nav__logo span{color:var(--accent)}
+.nav__links{display:flex;align-items:center;gap:1.5rem}
+.nav__back{font-size:.85rem;color:var(--text-muted);transition:color .2s}
+.nav__back:hover{color:var(--accent);text-decoration:none}
+.nav__xp{display:flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--card-border);border-radius:20px;padding:.35rem .85rem;font-size:.8rem;font-weight:600}
+.nav__xp-icon{color:var(--accent);font-size:1rem}
+.nav__xp-val{color:var(--accent);transition:transform .3s}
+.nav__xp-val.bump{animation:xpBump .4s ease}
+@keyframes xpBump{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+.nav__burger{display:none;background:none;border:none;color:var(--text);font-size:1.5rem;padding:.25rem}
+@media(max-width:768px){
+  .nav__links{position:fixed;top:60px;left:0;right:0;background:rgba(15,15,15,0.98);flex-direction:column;padding:1.5rem;gap:1rem;transform:translateY(-120%);transition:transform .3s ease;border-bottom:1px solid var(--card-border)}
+  .nav__links.open{transform:translateY(0)}
+  .nav__burger{display:block}
+}
+
+/* ===== MAIN CONTAINER ===== */
+.main{max-width:1100px;margin:0 auto;padding:80px 1.5rem 2rem}
+
+/* ===== HERO / DASHBOARD ===== */
+.dashboard{margin-bottom:3rem}
+.dashboard__title{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:.25rem}
+.dashboard__title span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.dashboard__subtitle{color:var(--text-muted);font-size:.95rem;margin-bottom:1.5rem}
+.dashboard__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem}
+.dash-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:1.25rem;position:relative;overflow:hidden}
+.dash-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.dash-card--xp::after{background:linear-gradient(90deg,var(--accent),var(--cyan))}
+.dash-card--level::after{background:var(--purple)}
+.dash-card--badges::after{background:var(--warning)}
+.dash-card--lessons::after{background:var(--teoria)}
+.dash-card__label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:.35rem}
+.dash-card__value{font-size:1.8rem;font-weight:800}
+.dash-card__extra{font-size:.75rem;color:var(--text-dim);margin-top:.2rem}
+.progress-section{margin-bottom:1rem}
+.progress-label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-muted);margin-bottom:.4rem}
+.progress-bar{height:8px;background:var(--card-border);border-radius:4px;overflow:hidden}
+.progress-bar__fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan));border-radius:4px;transition:width .6s ease;width:0%}
+
+/* ===== ROUTE SELECTOR ===== */
+.routes{margin-bottom:3rem}
+.section-title{font-size:1.3rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.section-title__icon{font-size:1.1rem}
+.routes__grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.routes__grid{grid-template-columns:1fr}}
+.route-card{background:var(--card);border:2px solid var(--card-border);border-radius:var(--radius);padding:1.25rem;cursor:pointer;transition:all .25s ease;position:relative}
+.route-card:hover{border-color:#444}
+.route-card.active{border-color:var(--accent);box-shadow:0 0 20px rgba(0,255,136,0.1)}
+.route-card__badge{display:inline-block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .5rem;border-radius:4px;background:rgba(0,255,136,0.1);color:var(--accent);margin-bottom:.5rem}
+.route-card__name{font-weight:700;font-size:1.05rem;margin-bottom:.3rem}
+.route-card__desc{font-size:.85rem;color:var(--text-muted)}
+
+/* ===== LESSONS ===== */
+.lessons{margin-bottom:3rem}
+.lesson-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:.75rem;overflow:hidden;transition:all .3s ease}
+.lesson-card.locked{opacity:.5;pointer-events:none}
+.lesson-card.locked .lesson-header{cursor:default}
+.lesson-header{padding:1rem 1.25rem;display:flex;align-items:center;gap:.75rem;cursor:pointer;transition:background .2s}
+.lesson-header:hover{background:rgba(255,255,255,0.02)}
+.lesson-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;border:2px solid var(--card-border);color:var(--text-muted);transition:all .3s}
+.lesson-card.completed .lesson-num{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.lesson-info{flex:1;min-width:0}
+.lesson-title{font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson-meta{display:flex;align-items:center;gap:.5rem;margin-top:.2rem;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;font-size:.65rem;padding:.15rem .45rem;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.badge--teoria{background:rgba(59,130,246,0.15);color:var(--teoria)}
+.badge--practica{background:rgba(16,185,129,0.15);color:var(--practica)}
+.badge--zone{background:rgba(168,85,247,0.1);color:var(--purple);font-size:.6rem}
+.badge--xp{background:rgba(0,255,136,0.1);color:var(--accent);font-size:.6rem}
+.lesson-status{flex-shrink:0;font-size:1.1rem}
+.lesson-lock{color:var(--text-dim)}
+.lesson-check{color:var(--accent)}
+.lesson-chevron{color:var(--text-dim);transition:transform .3s;font-size:.8rem}
+.lesson-card.expanded .lesson-chevron{transform:rotate(180deg)}
+
+/* Lesson Body */
+.lesson-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.lesson-body__inner{padding:0 1.25rem 1.25rem}
+.lesson-tab-nav{display:flex;gap:.25rem;margin-bottom:1rem;flex-wrap:wrap;border-bottom:1px solid var(--card-border);padding-bottom:.5rem}
+.lesson-tab-btn{background:none;border:none;color:var(--text-muted);font-size:.75rem;padding:.4rem .7rem;border-radius:var(--radius-sm);transition:all .2s;font-weight:500}
+.lesson-tab-btn:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+.lesson-tab-btn.active{color:var(--accent);background:rgba(0,255,136,0.08)}
+.lesson-tab-content{display:none}
+.lesson-tab-content.active{display:block}
+
+/* Explicacion */
+.explicacion h2{font-size:1.1rem;font-weight:700;margin:1rem 0 .5rem;color:var(--cyan)}
+.explicacion h3{font-size:1rem;font-weight:600;margin:.8rem 0 .4rem}
+.explicacion p{color:var(--text-muted);margin-bottom:.6rem;font-size:.88rem;line-height:1.7}
+.explicacion strong{color:var(--text);font-weight:600}
+.explicacion code{background:rgba(0,212,255,0.1);color:var(--cyan);padding:.1rem .35rem;border-radius:3px;font-size:.82rem;font-family:'Courier New',monospace}
+.explicacion ul,.explicacion ol{color:var(--text-muted);margin:.5rem 0 .5rem 1.2rem;font-size:.88rem}
+.explicacion li{margin-bottom:.3rem}
+.explicacion pre{background:#111;border:1px solid var(--card-border);border-radius:var(--radius-sm);padding:1rem;overflow-x:auto;margin:.8rem 0;font-size:.8rem;line-height:1.5}
+.explicacion pre code{background:none;padding:0;color:var(--text-muted)}
+
+/* Metafora */
+.metafora-card{background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(168,85,247,0.08));border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius);padding:1.25rem;position:relative}
+.metafora-card__icon{font-size:1.5rem;margin-bottom:.5rem}
+.metafora-card__title{font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;color:var(--warning);margin-bottom:.5rem}
+.metafora-card__text{font-size:.88rem;color:var(--text-muted);line-height:1.7}
+.metafora-card__text strong{color:var(--text)}
+
+/* Codigo */
+.code-block{position:relative;background:#0a0a0a;border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden}
+.code-block__header{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1rem;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--card-border)}
+.code-block__title{font-size:.75rem;color:var(--text-muted);font-weight:500}
+.code-block__lang{font-size:.65rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.06em}
+.code-block__copy{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2);color:var(--accent);font-size:.7rem;padding:.3rem .7rem;border-radius:4px;cursor:pointer;transition:all .2s}
+.code-block__copy:hover{background:rgba(0,255,136,0.2)}
+.code-block__copy.copied{background:var(--accent);color:var(--bg)}
+.code-block pre{padding:1rem;overflow-x:auto;font-size:.78rem;line-height:1.6;margin:0}
+.code-block code{font-family:'Courier New',monospace;color:#ccc}
+/* Syntax highlighting */
+.code-block .kw{color:#c792ea}
+.code-block .str{color:#c3e88d}
+.code-block .cm{color:#546e7a}
+.code-block .fn{color:#82aaff}
+.code-block .num{color:#f78c6c}
+.code-block .op{color:#89ddff}
+.code-block .tag{color:#f07178}
+.code-block .attr{color:#ffcb6b}
+.code-block .css-prop{color:#82aaff}
+.code-block .css-val{color:#c3e88d}
+
+/* Mini reto */
+.reto-card{background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(0,212,255,0.05));border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius);padding:1.25rem}
+.reto-card__header{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.reto-card__icon{font-size:1.2rem}
+.reto-card__title{font-weight:700;font-size:.95rem;color:var(--practica)}
+.reto-card__xp{font-size:.7rem;background:rgba(0,255,136,0.1);color:var(--accent);padding:.15rem .5rem;border-radius:4px;margin-left:auto}
+.reto-card__desc{font-size:.85rem;color:var(--text-muted);margin-bottom:1rem;line-height:1.6}
+.reto-criteria{margin-bottom:1rem}
+.reto-criteria__item{display:flex;align-items:flex-start;gap:.5rem;margin-bottom:.4rem;font-size:.82rem;color:var(--text-muted)}
+.reto-criteria__item input[type="checkbox"]{accent-color:var(--accent);margin-top:3px;flex-shrink:0}
+.reto-criteria__item.checked{color:var(--accent)}
+.reto-textarea{width:100%;background:#111;border:1px solid var(--card-border);border-radius:var(--radius-sm);color:var(--text);padding:.75rem;font-size:.82rem;font-family:var(--font);resize:vertical;min-height:80px;margin-bottom:.75rem}
+.reto-textarea:focus{outline:none;border-color:var(--accent)}
+.reto-btn{background:var(--practica);color:var(--bg);border:none;padding:.5rem 1.25rem;border-radius:var(--radius-sm);font-weight:600;font-size:.82rem;transition:all .2s}
+.reto-btn:hover{filter:brightness(1.15)}
+.reto-btn:disabled{opacity:.5;cursor:not-allowed}
+.reto-result{margin-top:.75rem;padding:.75rem;border-radius:var(--radius-sm);font-size:.82rem;font-weight:500}
+.reto-result--success{background:rgba(16,185,129,0.1);color:var(--practica);border:1px solid rgba(16,185,129,0.3)}
+.reto-result--fail{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.3)}
+
+/* Glosario */
+.glosario-table{width:100%;border-collapse:collapse}
+.glosario-row{cursor:pointer;transition:background .2s}
+.glosario-row:hover{background:rgba(255,255,255,0.02)}
+.glosario-row td{padding:.6rem .5rem;border-bottom:1px solid var(--card-border);font-size:.82rem;vertical-align:top}
+.glosario-term{color:var(--cyan);font-weight:600;white-space:nowrap;width:30%}
+.glosario-def{color:var(--text-muted);line-height:1.5}
+
+/* Prompt infografia */
+.prompt-section{background:#111;border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden}
+.prompt-toggle{width:100%;background:none;border:none;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;color:var(--text-muted);font-size:.82rem;cursor:pointer;transition:background .2s}
+.prompt-toggle:hover{background:rgba(255,255,255,0.02)}
+.prompt-toggle__icon{transition:transform .3s}
+.prompt-toggle.open .prompt-toggle__icon{transform:rotate(180deg)}
+.prompt-content{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.prompt-content__inner{padding:0 1rem 1rem;font-size:.82rem;color:var(--text-muted);line-height:1.6}
+
+/* Complete button */
+.lesson-complete-btn{display:block;width:100%;background:linear-gradient(135deg,var(--accent),var(--cyan));color:var(--bg);border:none;padding:.7rem;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;margin-top:1rem;transition:all .3s}
+.lesson-complete-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.lesson-complete-btn.done{background:var(--card-border);color:var(--text-muted);cursor:default;transform:none}
+
+/* ===== BADGES GRID ===== */
+.badges-section{margin-bottom:3rem}
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.75rem}
+.badge-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:1rem;text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.badge-card.locked{opacity:.45;filter:grayscale(1)}
+.badge-card.unlocked{border-color:rgba(0,255,136,0.3)}
+.badge-card.unlocked::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+.badge-card__icon{font-size:2rem;margin-bottom:.5rem}
+.badge-card__name{font-weight:700;font-size:.85rem;margin-bottom:.3rem}
+.badge-card__desc{font-size:.7rem;color:var(--text-muted);line-height:1.4;margin-bottom:.3rem}
+.badge-card__condition{font-size:.65rem;color:var(--accent);font-weight:500}
+.badge-card__lock{font-size:1.2rem;color:var(--text-dim)}
+.badge-card__date{font-size:.6rem;color:var(--text-dim);margin-top:.25rem}
+
+/* ===== MAP VIEW ===== */
+.map-section{margin-bottom:3rem}
+.map-container{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:2rem 1.5rem;overflow-x:auto}
+.map-flow{display:flex;flex-direction:column;gap:0;align-items:center;min-width:300px}
+.map-zone-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);font-weight:600;margin:1.25rem 0 .5rem;padding:.2rem .6rem;background:rgba(168,85,247,0.1);border-radius:4px}
+.map-zone-label:first-child{margin-top:0}
+.map-node{width:220px;padding:.6rem .8rem;background:#111;border:2px solid var(--card-border);border-radius:var(--radius-sm);text-align:center;font-size:.78rem;font-weight:600;position:relative;transition:all .3s;cursor:default}
+.map-node.completed{border-color:var(--accent);background:rgba(0,255,136,0.05);color:var(--accent)}
+.map-node.current{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,212,255,0.3);animation:pulse 2s infinite}
+.map-node.locked{border-color:#222;color:var(--text-dim);background:#0d0d0d}
+@keyframes pulse{0%,100%{box-shadow:0 0 12px rgba(0,212,255,0.3)}50%{box-shadow:0 0 24px rgba(0,212,255,0.5)}}
+.map-arrow{color:var(--card-border);font-size:1.2rem;line-height:1;margin:.15rem 0}
+.map-node.completed+.map-arrow{color:var(--accent)}
+
+/* ===== FOOTER ===== */
+.footer{border-top:1px solid var(--card-border);padding:2rem 1.5rem;text-align:center;color:var(--text-dim);font-size:.75rem}
+.footer p{margin-bottom:.3rem}
+.footer a{color:var(--accent)}
+
+/* ===== TOAST ===== */
+.toast-container{position:fixed;top:80px;right:1.5rem;z-index:2000;display:flex;flex-direction:column;gap:.5rem}
+.toast{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:.85rem 1.25rem;min-width:280px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.5);animation:toastIn .4s ease,toastOut .4s ease 3.6s forwards;display:flex;align-items:center;gap:.75rem}
+.toast--xp{border-left:3px solid var(--accent)}
+.toast--level{border-left:3px solid var(--purple)}
+.toast--badge{border-left:3px solid var(--warning)}
+.toast--reto{border-left:3px solid var(--practica)}
+.toast__icon{font-size:1.3rem;flex-shrink:0}
+.toast__body{flex:1}
+.toast__title{font-weight:700;font-size:.82rem}
+.toast__desc{font-size:.72rem;color:var(--text-muted);margin-top:.1rem}
+@keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateX(50%)}}
+
+/* ===== RESET BTN ===== */
+.reset-btn{background:none;border:1px solid var(--card-border);color:var(--text-dim);font-size:.7rem;padding:.3rem .75rem;border-radius:4px;cursor:pointer;transition:all .2s;margin-top:1rem}
+.reset-btn:hover{border-color:var(--danger);color:var(--danger)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="#" class="nav__logo"><span>Rural</span> Makers</a>
+  <button class="nav__burger" id="burger" aria-label="Menu">&#9776;</button>
+  <div class="nav__links" id="navLinks">
+    <a href="#" class="nav__back">&larr; Volver a la Landing</a>
+    <div class="nav__xp">
+      <span class="nav__xp-icon">&#9889;</span>
+      <span class="nav__xp-val" id="navXp">0 XP</span>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <section class="dashboard" id="dashboard">
+    <h1 class="dashboard__title"><span>Superwebs Scroll-Driven</span> con Video + IA</h1>
+    <p class="dashboard__subtitle">Crea landing pages premium con video frame-a-frame sincronizado al scroll</p>
+    <div class="progress-section">
+      <div class="progress-label"><span>Progreso del curso</span><span id="progressPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-bar__fill" id="progressFill"></div></div>
+    </div>
+    <div class="dashboard__grid">
+      <div class="dash-card dash-card--xp"><div class="dash-card__label">Experiencia</div><div class="dash-card__value" id="dashXp">0 XP</div><div class="dash-card__extra" id="dashNextLevel">Siguiente nivel: 80 XP</div></div>
+      <div class="dash-card dash-card--level"><div class="dash-card__label">Nivel actual</div><div class="dash-card__value" id="dashLevel">Espectador</div><div class="dash-card__extra" id="dashLevelIcon">&#128065; Nivel 1</div></div>
+      <div class="dash-card dash-card--badges"><div class="dash-card__label">Badges</div><div class="dash-card__value" id="dashBadges">0/7</div><div class="dash-card__extra">conseguidos</div></div>
+      <div class="dash-card dash-card--lessons"><div class="dash-card__label">Lecciones</div><div class="dash-card__value" id="dashLessons">0/12</div><div class="dash-card__extra">completadas</div></div>
+    </div>
+  </section>
+
+  <!-- ROUTE SELECTOR -->
+  <section class="routes" id="routes">
+    <h2 class="section-title"><span class="section-title__icon">&#128739;</span> Elige tu ruta</h2>
+    <div class="routes__grid" id="routeGrid"></div>
+  </section>
+
+  <!-- LESSONS -->
+  <section class="lessons" id="lessons">
+    <h2 class="section-title"><span class="section-title__icon">&#128218;</span> Lecciones</h2>
+    <div id="lessonList"></div>
+  </section>
+
+  <!-- BADGES -->
+  <section class="badges-section" id="badges">
+    <h2 class="section-title"><span class="section-title__icon">&#127942;</span> Badges</h2>
+    <div class="badges-grid" id="badgeGrid"></div>
+  </section>
+
+  <!-- MAP -->
+  <section class="map-section" id="map">
+    <h2 class="section-title"><span class="section-title__icon">&#128506;</span> Mapa del curso</h2>
+    <div class="map-container"><div class="map-flow" id="mapFlow"></div></div>
+  </section>
+
+  <!-- RESET -->
+  <div style="text-align:center"><button class="reset-btn" onclick="if(confirm('Resetear todo el progreso?')){localStorage.removeItem(STORAGE_KEY);location.reload()}">Resetear progreso</button></div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Creado por <strong>Alipio / Rural Makers</strong></p>
+  <p>Powered by <a href="#">Synapis Course Architect v2.3</a></p>
+  <p>Curso v1.0.0</p>
+</footer>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const STORAGE_KEY = 'superweb-scroll-driven-progress';
+
+const COURSE_DATA = {
+  "id":"superwebs-scroll-driven","version":"1.0.0",
+  "title":"Superwebs Scroll-Driven con Video + IA",
+  "subtitle":"Crea landing pages premium con video frame-a-frame sincronizado al scroll",
+  "rutas_pedagogicas":[
+    {"nombre":"Ruta lineal","descripcion":"Paso a paso desde los fundamentos hasta la automatizaci\u00f3n total","nodos_orden":["scroll-driven-intro","generacion-imagenes-ia","generacion-video-ia","ffmpeg-extraccion-frames","html5-canvas-renderer","lenis-smooth-scroll","gsap-scrolltrigger","binding-scroll-frames","animaciones-por-seccion","identidad-marca-generativa","arquitectura-proyecto","skill-video2website"],"recomendada":true},
+    {"nombre":"Ruta exploratoria","descripcion":"Acceso libre a todos los nodos, con prerequisitos como gu\u00eda","nodos_orden":["scroll-driven-intro","generacion-imagenes-ia","generacion-video-ia","ffmpeg-extraccion-frames","html5-canvas-renderer","lenis-smooth-scroll","gsap-scrolltrigger","binding-scroll-frames","animaciones-por-seccion","identidad-marca-generativa","arquitectura-proyecto","skill-video2website"],"recomendada":false}
+  ]
+};
+
+const GAMIFICATION = {
+  "xp_config":{"xp_por_leccion_teoria":28,"xp_por_leccion_practica":40,"xp_por_reto":20,"xp_bonus_primer_intento":10},
+  "niveles":[
+    {"nivel":1,"nombre":"Espectador","xp_requerido":0,"descripcion":"Acabas de descubrir el scroll-driven. Todo es nuevo y fascinante.","icono":"&#128065;"},
+    {"nivel":2,"nombre":"Aprendiz de Scroll","xp_requerido":80,"descripcion":"Ya entiendes los fundamentos del scroll-driven y las animaciones basadas en scroll.","icono":"&#128220;"},
+    {"nivel":3,"nombre":"Frame Master","xp_requerido":200,"descripcion":"Dominas frames y canvas. Controlas cada fotograma de tus animaciones.","icono":"&#127910;"},
+    {"nivel":4,"nombre":"Scroll Architect","xp_requerido":350,"descripcion":"Construyes webs completas con scroll-driven animations integradas.","icono":"&#128736;"},
+    {"nivel":5,"nombre":"Superweb Creator","xp_requerido":480,"descripcion":"Automatizas todo con Claude Code. Creas superwebs de principio a fin.","icono":"&#128640;"}
+  ],
+  "badges":[
+    {"id":"primer-scroll","nombre":"Primer Scroll","categoria":"progreso","descripcion":"Has completado tus primeras 3 lecciones. El viaje del scroll-driven ha comenzado.","condicion":"Completar 3 lecciones","icono":"&#127919;"},
+    {"id":"medio-camino","nombre":"Medio Camino","categoria":"progreso","descripcion":"Ya llevas 6 lecciones completadas. Vas por la mitad del curso.","condicion":"Completar 6 lecciones","icono":"&#9989;"},
+    {"id":"retador","nombre":"Retador","categoria":"retos","descripcion":"Has superado 3 retos. Te gustan los desaf\u00edos.","condicion":"Completar 3 retos","icono":"&#9889;"},
+    {"id":"imparable","nombre":"Imparable","categoria":"retos","descripcion":"Has completado todos los retos del curso. Nadie te frena.","condicion":"Completar todos los retos","icono":"&#128293;"},
+    {"id":"curioso","nombre":"Curioso","categoria":"exploracion","descripcion":"Has consultado 10 t\u00e9rminos del glosario. La curiosidad es tu superpoder.","condicion":"Consultar 10 t\u00e9rminos del glosario","icono":"&#128269;"},
+    {"id":"explorador-rutas","nombre":"Explorador de Rutas","categoria":"exploracion","descripcion":"Has cambiado de ruta pedag\u00f3gica. Exploras diferentes formas de aprender.","condicion":"Cambiar de ruta pedag\u00f3gica","icono":"&#128506;"},
+    {"id":"superweb-completa","nombre":"Superweb Completa","categoria":"especial","descripcion":"Has completado el curso al 100%. Eres un verdadero Superweb Creator.","condicion":"Completar todo el curso al 100%","icono":"&#127775;"}
+  ]
+};
+
+const CONCEPTS = [
+  {
+    "id":"scroll-driven-intro","numero":1,"titulo":"Qu\u00e9 son las animaciones Scroll-Driven","tipo":"teoria","prerequisitos":[],"xp":25,"zona":"fundamentos",
+    "explicacion":"## \u00bfQu\u00e9 es una animaci\u00f3n Scroll-Driven?\n\nUna animaci\u00f3n **scroll-driven** es aquella cuyo progreso est\u00e1 controlado por la posici\u00f3n del scroll, no por el tiempo. En lugar de que una animaci\u00f3n dure X segundos y se ejecute autom\u00e1ticamente, el usuario controla cu\u00e1nto avanza la animaci\u00f3n seg\u00fan cu\u00e1nto hace scroll en la p\u00e1gina.\n\n## \u00bfPor qu\u00e9 importa?\n\nEn 2026, las animaciones scroll-driven son el **est\u00e1ndar premium** del dise\u00f1o web. Cada sitio ganador de Awwwards, FWA o CSS Design Awards las utiliza. Apple las populariz\u00f3 con sus p\u00e1ginas de producto (iPhone, MacBook Pro) donde el dispositivo rota, se descompone o revela caracter\u00edsticas mientras haces scroll. Agencias como Active Theory, Resn y Locomotive las implementan en cada proyecto. Si quieres crear webs que compitan al m\u00e1s alto nivel, dominar esta t\u00e9cnica es **obligatorio**.\n\n## \u00bfC\u00f3mo funciona?\n\nEl concepto es simple: se mapea la posici\u00f3n del scroll (0% arriba, 100% abajo) al progreso de una animaci\u00f3n (0% inicio, 100% fin). CSS nativo ya soporta esto con `animation-timeline: scroll()`, que vincula cualquier `@keyframes` al scroll del contenedor. Para animaciones m\u00e1s complejas, librer\u00edas como GSAP con ScrollTrigger permiten vincular timelines completas al scroll con opciones de scrub, pin y triggers avanzados. El resultado: el usuario tiene control total sobre la experiencia visual.",
+    "metafora":"Imagina un **flipbook** (esos cuadernitos donde cada p\u00e1gina tiene un dibujo ligeramente distinto). Si pasas las p\u00e1ginas r\u00e1pido, la animaci\u00f3n va r\u00e1pido. Si vas despacio, va despacio. Si te detienes, la animaci\u00f3n se congela. T\u00fa controlas la velocidad con tus dedos. Exactamente as\u00ed funciona una animaci\u00f3n scroll-driven: tu dedo en el trackpad o la rueda del rat\u00f3n es el que pasa las p\u00e1ginas.",
+    "codigo":{"lenguaje":"html","titulo":"Animaci\u00f3n CSS pura con scroll-driven animations","codigo":"<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Scroll-Driven Demo</title>\n<style>\n  * { margin: 0; padding: 0; box-sizing: border-box; }\n\n  body {\n    height: 400vh;\n    background: #0a0a0a;\n    color: white;\n    font-family: system-ui, sans-serif;\n  }\n\n  .progress-bar {\n    position: fixed;\n    top: 0;\n    left: 0;\n    height: 4px;\n    background: linear-gradient(90deg, #6366f1, #ec4899);\n    width: 0%;\n    /* Link animation to scroll position */\n    animation: grow-progress linear;\n    animation-timeline: scroll();\n  }\n\n  @keyframes grow-progress {\n    from { width: 0%; }\n    to   { width: 100%; }\n  }\n\n  .hero {\n    height: 100vh;\n    display: grid;\n    place-items: center;\n  }\n\n  .hero h1 {\n    font-size: clamp(2rem, 6vw, 5rem);\n    opacity: 0;\n    transform: translateY(60px);\n    animation: fade-up linear;\n    animation-timeline: scroll();\n    animation-range: 0vh 50vh;\n  }\n\n  @keyframes fade-up {\n    to {\n      opacity: 1;\n      transform: translateY(0);\n    }\n  }\n</style>\n</head>\n<body>\n  <div class=\"progress-bar\"></div>\n  <section class=\"hero\">\n    <h1>Haz scroll para animar</h1>\n  </section>\n  <section class=\"hero\">\n    <h1>Secci\u00f3n 2</h1>\n  </section>\n  <section class=\"hero\">\n    <h1>Secci\u00f3n 3</h1>\n  </section>\n  <section class=\"hero\">\n    <h1>Secci\u00f3n 4</h1>\n  </section>\n</body>\n</html>"},
+    "mini_reto":{"titulo":"Caza de animaciones scroll-driven","descripcion":"Encuentra 3 sitios web premiados (Awwwards, FWA, CSS Design Awards) que usen animaciones scroll-driven. Para cada uno, describe: (1) la URL, (2) qu\u00e9 elemento se anima con scroll, (3) qu\u00e9 t\u00e9cnica crees que usan (CSS nativo, GSAP ScrollTrigger, frames de video, etc.).","criterios_exito":["Incluye 3 URLs reales de sitios premiados","Describe correctamente el elemento animado en cada sitio","Identifica o deduce razonablemente la t\u00e9cnica utilizada"],"xp_extra":15},
+    "glosario":{"scroll-driven animation":"Animaci\u00f3n cuyo progreso est\u00e1 vinculado a la posici\u00f3n del scroll en lugar del tiempo. El usuario controla la velocidad y direcci\u00f3n al hacer scroll. CSS lo soporta nativamente con animation-timeline: scroll().","scroll-jacking":"T\u00e9cnica (a menudo mal vista) donde el comportamiento natural del scroll se secuestra completamente para controlar la navegaci\u00f3n. A diferencia de scroll-driven animations, el scroll-jacking reemplaza el scroll nativo.","scrub":"Par\u00e1metro en librer\u00edas como GSAP que vincula el progreso de una animaci\u00f3n directamente al scroll. Un scrub: true hace que la animaci\u00f3n siga el scroll en tiempo real. Un scrub: 0.5 a\u00f1ade medio segundo de suavizado.","frame-by-frame":"T\u00e9cnica de animaci\u00f3n donde se muestran im\u00e1genes individuales (frames) en secuencia r\u00e1pida para crear la ilusi\u00f3n de movimiento. En scroll-driven, cada posici\u00f3n de scroll corresponde a un frame espec\u00edfico."},
+    "prompt_infografia":"Infograf\u00eda vertical que muestre: (1) Comparativa visual tiempo-based vs scroll-driven - dos l\u00edneas de tiempo, una autom\u00e1tica y otra controlada por scroll. (2) Diagrama de c\u00f3mo scroll position (0-100%) se mapea a animation progress (0-100%). (3) 3 ejemplos ic\u00f3nicos: Apple product page, Linear.app, y un portfolio de Awwwards. (4) Snippet de CSS con animation-timeline: scroll() destacado."
+  },
+  {
+    "id":"generacion-imagenes-ia","numero":2,"titulo":"Generar im\u00e1genes de producto con IA","tipo":"practica","prerequisitos":["scroll-driven-intro"],"xp":35,"zona":"assets",
+    "explicacion":"## \u00bfQu\u00e9 es la generaci\u00f3n de im\u00e1genes de producto con IA?\n\nConsiste en usar herramientas de inteligencia artificial como **Freepik AI, Midjourney, DALL-E o Leonardo AI** para crear im\u00e1genes fotorrealistas de productos desde distintos \u00e1ngulos. El objetivo es generar una secuencia de fotogramas que simulen una rotaci\u00f3n 3D del producto, como si una c\u00e1mara girara alrededor de \u00e9l.\n\n## \u00bfPor qu\u00e9 importa?\n\nAntes, para conseguir una secuencia de rotaci\u00f3n de producto necesitabas un estudio fotogr\u00e1fico con mesa giratoria, c\u00e1mara profesional y horas de postproducci\u00f3n. O un artista 3D que modelara el producto en Blender/Cinema4D. Con IA generativa, puedes crear estas secuencias en **minutos y a coste cero**. Esto democratiza una t\u00e9cnica que antes solo pod\u00edan permitirse grandes marcas como Apple o Nike.\n\n## \u00bfC\u00f3mo funciona?\n\nLa clave est\u00e1 en el **prompting estrat\u00e9gico**. Necesitas mantener consistencia visual entre frames: mismo producto, misma iluminaci\u00f3n, mismo fondo, solo cambia el \u00e1ngulo. Usamos fondo oscuro o negro porque facilita la consistencia y da aspecto premium. El flujo es: (1) definir el producto, (2) crear un prompt base con iluminaci\u00f3n y estilo fijos, (3) variar solo el \u00e1ngulo en cada iteraci\u00f3n (front view \u2192 45\u00b0 \u2192 side view \u2192 135\u00b0 \u2192 back view), (4) revisar y regenerar los frames inconsistentes. Herramientas como Freepik AI permiten usar una imagen de referencia para mantener la coherencia entre generaciones.",
+    "metafora":"Imagina a un **fot\u00f3grafo con una mesa giratoria**. Coloca el producto en el centro, enciende las luces del estudio (siempre las mismas), y va girando la mesa unos grados entre cada disparo. La c\u00e1mara no se mueve, la luz no cambia, solo rota el producto. Con IA hacemos exactamente lo mismo: mantenemos todo constante en el prompt y solo cambiamos el \u00e1ngulo de visi\u00f3n.",
+    "codigo":{"lenguaje":"javascript","titulo":"Plantilla de prompts secuenciales para rotaci\u00f3n de producto","codigo":"// Prompt template system for consistent product image generation\n// Use with Freepik AI, Midjourney, DALL-E, or Leonardo AI\n\nconst productConfig = {\n  product: 'wireless noise-cancelling headphones',\n  color: 'matte black with silver accents',\n  background: 'pure black background, no reflections',\n  lighting: 'soft studio lighting, single key light from top-right, subtle rim light',\n  style: 'product photography, 8K, photorealistic, studio shot, centered in frame',\n  negativePrompt: 'text, watermark, blurry, low quality, hands, people'\n};\n\nconst angles = [\n  { id: '001', angle: 'front view, facing camera directly' },\n  { id: '002', angle: 'slightly rotated 30 degrees to the right' },\n  { id: '003', angle: 'rotated 60 degrees to the right, showing side profile emerging' },\n  { id: '004', angle: 'side view, 90 degrees, left ear cup visible' },\n  { id: '005', angle: 'rotated 120 degrees, showing back at an angle' },\n  { id: '006', angle: 'rotated 150 degrees, nearly back view' },\n  { id: '007', angle: 'back view, 180 degrees, headband fully visible' },\n  { id: '008', angle: 'rotated 210 degrees, other side emerging' },\n  { id: '009', angle: 'rotated 240 degrees' },\n  { id: '010', angle: 'right side view, 270 degrees' },\n  { id: '011', angle: 'rotated 300 degrees, returning to front' },\n  { id: '012', angle: 'rotated 330 degrees, almost front view' }\n];\n\nfunction generatePrompt(config, angleData) {\n  return `${config.product}, ${config.color}, ${angleData.angle}, ${config.background}, ${config.lighting}, ${config.style}`;\n}\n\n// Generate all prompts\nangles.forEach(a => {\n  console.log(`--- Frame ${a.id} ---`);\n  console.log(generatePrompt(productConfig, a));\n  console.log();\n});"},
+    "mini_reto":{"titulo":"Tu primera secuencia de producto con IA","descripcion":"Elige un producto (auriculares, zapatilla, botella, reloj) y genera 4 im\u00e1genes secuenciales usando cualquier herramienta de IA (Freepik AI, Leonardo AI, DALL-E, Midjourney). Los \u00e1ngulos deben ser: frontal, 45\u00b0, lateral (90\u00b0) y trasera (180\u00b0). Mant\u00e9n consistencia en iluminaci\u00f3n y fondo.","criterios_exito":["Se generaron 4 im\u00e1genes con \u00e1ngulos claramente distintos","El producto es reconocible como el mismo en las 4 im\u00e1genes","El fondo es oscuro/negro y consistente en todas las im\u00e1genes","La iluminaci\u00f3n es similar en todas las im\u00e1genes"],"xp_extra":20},
+    "glosario":{"prompt engineering (para im\u00e1genes)":"Arte de escribir instrucciones precisas para que una IA generativa produzca la imagen deseada. Incluye describir sujeto, \u00e1ngulo, iluminaci\u00f3n, estilo, fondo y usar negative prompts para excluir elementos no deseados.","fotograma":"Una imagen individual dentro de una secuencia de animaci\u00f3n. En nuestro contexto, cada imagen generada por IA representa un fotograma de la rotaci\u00f3n del producto. Al mostrarlos en secuencia r\u00e1pida, crean la ilusi\u00f3n de movimiento fluido.","consistencia visual":"Mantener los mismos atributos visuales (iluminaci\u00f3n, color, fondo, estilo) entre todas las im\u00e1genes de una secuencia. Es el mayor desaf\u00edo al generar frames con IA, ya que cada generaci\u00f3n puede introducir variaciones no deseadas."},
+    "prompt_infografia":"Infograf\u00eda que muestre: (1) El flujo de trabajo: Definir producto \u2192 Crear prompt base \u2192 Variar \u00e1ngulos \u2192 Revisar consistencia. (2) Anatom\u00eda de un buen prompt: producto + \u00e1ngulo + iluminaci\u00f3n + fondo + estilo. (3) Comparativa de 4 frames ejemplo mostrando la progresi\u00f3n de \u00e1ngulos. (4) Tips: fondo negro, misma iluminaci\u00f3n, negative prompts."
+  },
+  {
+    "id":"generacion-video-ia","numero":3,"titulo":"De im\u00e1genes a video con IA generativa","tipo":"practica","prerequisitos":["generacion-imagenes-ia"],"xp":35,"zona":"assets",
+    "explicacion":"## \u00bfQu\u00e9 es la generaci\u00f3n de video con IA?\n\nConsiste en transformar im\u00e1genes est\u00e1ticas en video fluido usando herramientas como **Runway Gen-3, Kling AI, Pika Labs o Sora**. Estas herramientas utilizan modelos de difusi\u00f3n para interpolar movimiento entre frames, creando transiciones suaves que ser\u00edan imposibles de lograr solo con las im\u00e1genes originales. Tambi\u00e9n podemos usar **FFmpeg** para compilar secuencias de im\u00e1genes en video.\n\n## \u00bfPor qu\u00e9 importa?\n\nLas im\u00e1genes generadas por IA en el concepto anterior tienen un problema: son est\u00e1ticas y pueden tener inconsistencias entre frames. Al pasarlas por un generador de video con IA, obtenemos **movimiento fluido y natural** que suaviza las diferencias. El resultado es un video de producto con calidad de estudio de producci\u00f3n profesional. Alternativa: si tienes suficientes frames consistentes, FFmpeg puede compilarlos directamente en video sin IA.\n\n## \u00bfC\u00f3mo funciona?\n\nHay dos flujos principales: (1) **IA generativa**: subes una imagen de referencia a Runway/Kling y describes el movimiento deseado (\"rotate slowly\"). La IA genera un video de 4-10 segundos interpolando frames. (2) **FFmpeg**: si ya tienes una secuencia de im\u00e1genes numeradas (frame_0001.png, frame_0002.png...), FFmpeg las ensambla en un video MP4. Especificaciones objetivo: **24 FPS, 1920x1080, MP4 con codec H.264, formato de pixel yuv420p** para m\u00e1xima compatibilidad. El video resultante ser\u00e1 la materia prima que despu\u00e9s cortaremos en frames individuales optimizados.",
+    "metafora":"Piensa en la animaci\u00f3n **stop-motion** como la de Wallace y Gromit. Alguien modela figuras de plastilina, las mueve mil\u00edmetro a mil\u00edmetro, y toma una foto entre cada movimiento. Al reproducir las fotos en secuencia r\u00e1pida (24 por segundo), las figuras cobran vida. Nosotros hacemos lo mismo: nuestras im\u00e1genes de IA son las poses de plastilina, y FFmpeg o Runway son la c\u00e1mara que las convierte en pel\u00edcula.",
+    "codigo":{"lenguaje":"bash","titulo":"FFmpeg: compilar im\u00e1genes en video MP4 optimizado","codigo":"#!/bin/bash\n# Compile a sequence of images into an optimized MP4 video\n# Images must be named: frame_0001.png, frame_0002.png, etc.\n\nINPUT_DIR=\"./frames\"\nOUTPUT=\"./output/product-rotation.mp4\"\nFRAMERATE=24\n\n# Create output directory\nmkdir -p ./output\n\n# Method 1: From numbered image sequence\nffmpeg -framerate $FRAMERATE \\\n  -i \"${INPUT_DIR}/frame_%04d.png\" \\\n  -c:v libx264 \\\n  -crf 18 \\\n  -preset slow \\\n  -pix_fmt yuv420p \\\n  -vf \"scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2\" \\\n  -movflags +faststart \\\n  \"$OUTPUT\"\n\n# Verify the output\necho \"=== Video info ===\"\nffprobe -v quiet -print_format json -show_streams \"$OUTPUT\" | grep -E '\"width|\"height|\"duration|\"r_frame_rate|\"codec_name'\n\necho \"Video created: $OUTPUT\""},
+    "mini_reto":{"titulo":"Crea tu primer video de producto","descripcion":"Usando las im\u00e1genes generadas en el concepto anterior (o nuevas), crea un video de 4-6 segundos. Puedes usar FFmpeg para compilar im\u00e1genes O una herramienta de IA como Runway/Kling para generar video desde una imagen. El video debe ser MP4, H.264, al menos 720p.","criterios_exito":["El video resultante es un MP4 v\u00e1lido y reproducible","Tiene una duraci\u00f3n de entre 4 y 6 segundos","La resoluci\u00f3n es al menos 1280x720","El movimiento es fluido (no hay saltos bruscos entre frames)"],"xp_extra":20},
+    "glosario":{"fps":"Frames Per Second (fotogramas por segundo). Define cu\u00e1ntas im\u00e1genes se muestran en un segundo de video. 24 FPS es el est\u00e1ndar cinematogr\u00e1fico. M\u00e1s FPS = movimiento m\u00e1s suave pero archivo m\u00e1s pesado y m\u00e1s frames para procesar.","H.264":"Codec de compresi\u00f3n de video m\u00e1s utilizado en la web. Ofrece excelente calidad con archivos peque\u00f1os y es compatible con todos los navegadores y dispositivos. Tambi\u00e9n conocido como AVC (Advanced Video Coding).","codec":"Algoritmo que comprime (codifica) y descomprime (decodifica) datos de audio o video. Los codecs de video m\u00e1s comunes son H.264, H.265/HEVC y VP9.","stop-motion":"T\u00e9cnica de animaci\u00f3n donde se fotograf\u00edan objetos f\u00edsicos movi\u00e9ndolos incrementalmente entre cada foto.","interpolaci\u00f3n de frames":"Proceso de generar frames intermedios entre dos frames existentes para crear transiciones m\u00e1s suaves."},
+    "prompt_infografia":"Infograf\u00eda que muestre: (1) Dos flujos paralelos: Im\u00e1genes \u2192 IA Video (Runway/Kling) \u2192 MP4 vs Im\u00e1genes \u2192 FFmpeg \u2192 MP4. (2) Specs del video ideal: 24fps, 1920x1080, H.264, yuv420p. (3) Comparativa visual de calidad: pocos frames (choppy) vs muchos frames (smooth). (4) Logos de herramientas."
+  },
+  {
+    "id":"ffmpeg-extraccion-frames","numero":4,"titulo":"FFmpeg: extraer y optimizar frames","tipo":"practica","prerequisitos":["generacion-video-ia"],"xp":40,"zona":"herramientas",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\n**FFmpeg** es la herramienta de l\u00ednea de comandos m\u00e1s potente para manipular audio y v\u00eddeo. En nuestro caso, la usamos para dos tareas: analizar el v\u00eddeo generado con IA (con `ffprobe`) y extraer cada fotograma como imagen individual optimizada (con `ffmpeg`).\n\n## \u00bfPor qu\u00e9 importa?\n\nEl v\u00eddeo generado por IA (Runway, Kling, Sora) viene en un formato pensado para reproducirse linealmente. Pero nosotros no queremos reproducirlo: queremos *controlarlo con el scroll*. Para eso necesitamos descomponer el v\u00eddeo en frames individuales que podamos cargar como im\u00e1genes y dibujar en un canvas. FFmpeg convierte un archivo de v\u00eddeo en cientos de im\u00e1genes WebP ligeras, listas para la web.\n\n## \u00bfC\u00f3mo funciona?\n\n1. **An\u00e1lisis con ffprobe**: primero inspeccionamos el v\u00eddeo para saber su resoluci\u00f3n, duraci\u00f3n, FPS y c\u00f3dec. Esto nos dice cu\u00e1ntos frames totales tiene y a qu\u00e9 calidad trabajar.\n2. **Extracci\u00f3n de frames**: `ffmpeg -i video.mp4 -vf fps=30 frame_%04d.webp` extrae un frame por cada 1/30 de segundo. El patr\u00f3n `%04d` numera los frames con ceros: 0001, 0002, etc.\n3. **Optimizaci\u00f3n WebP**: el formato WebP con calidad 80-85 ofrece el mejor ratio calidad/peso para frames de scroll. Un frame de 1920\u00d71080 pesa ~40-60KB en WebP vs ~150KB en JPEG.\n4. **Redimensionado**: si el v\u00eddeo es 4K pero la web se ve en 1080p, redimensionamos con `-vf scale=1920:-1` para ahorrar ancho de banda.\n5. **Control de FPS**: no siempre necesitamos todos los frames. Para scroll suave, 60-120 frames totales son suficientes.",
+    "metafora":"FFmpeg es como una m\u00e1quina de cortar fiambre de alta precisi\u00f3n: le metes un salchich\u00f3n entero (el v\u00eddeo) y te saca rodajas perfectas del grosor que quieras (frames). Puedes elegir cu\u00e1ntas rodajas, el grosor (calidad), y el tama\u00f1o de cada una (resoluci\u00f3n). Al final tienes un plato de rodajas listas para servir individualmente.",
+    "codigo":{"lenguaje":"bash","titulo":"Pipeline completo: analizar v\u00eddeo \u2192 extraer frames WebP optimizados","codigo":"#!/bin/bash\n# === Step 1: Analyze video with ffprobe ===\necho \"Analyzing video...\"\nffprobe -v quiet -print_format json -show_streams -show_format input.mp4\n\n# Quick summary\nDURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 input.mp4)\nFPS=$(ffprobe -v error -select_streams v -show_entries stream=r_frame_rate -of csv=p=0 input.mp4)\nWIDTH=$(ffprobe -v error -select_streams v -show_entries stream=width -of csv=p=0 input.mp4)\nHEIGHT=$(ffprobe -v error -select_streams v -show_entries stream=height -of csv=p=0 input.mp4)\necho \"Duration: ${DURATION}s | FPS: ${FPS} | Resolution: ${WIDTH}x${HEIGHT}\"\n\n# === Step 2: Create output directory ===\nmkdir -p frames\n\n# === Step 3: Extract frames as optimized WebP ===\n# Option A: Extract ALL frames at original FPS\nffmpeg -i input.mp4 -vf \"fps=${FPS}\" -c:v libwebp -quality 82 frames/frame_%04d.webp\n\n# Option B: Extract exactly 120 frames (recommended for scroll)\nTARGET_FPS=$(echo \"120 / $DURATION\" | bc -l)\nffmpeg -i input.mp4 -vf \"fps=${TARGET_FPS},scale=1920:-1\" -c:v libwebp -quality 82 frames/frame_%04d.webp\n\n# === Step 4: Verify output ===\nFRAME_COUNT=$(ls frames/*.webp | wc -l)\nTOTAL_SIZE=$(du -sh frames/ | cut -f1)\necho \"Extracted ${FRAME_COUNT} frames | Total: ${TOTAL_SIZE}\""},
+    "mini_reto":{"titulo":"Extrae 120 frames optimizados de un v\u00eddeo","descripcion":"Dado un v\u00eddeo de entrada (puedes usar cualquier v\u00eddeo MP4 de 5-10 segundos), escribe un script bash que: 1) Analice el v\u00eddeo con ffprobe, 2) Calcule el FPS objetivo para obtener exactamente 120 frames, 3) Extraiga los frames en formato WebP con calidad 82 y resoluci\u00f3n m\u00e1xima 1920px de ancho, 4) Muestre un resumen.","criterios_exito":["El script usa ffprobe para analizar el v\u00eddeo","Calcula el FPS objetivo como 120/duraci\u00f3n","Usa ffmpeg con -c:v libwebp y -quality entre 80-85","Redimensiona a 1920px de ancho manteniendo proporci\u00f3n","Los frames se nombran con padded numbers (frame_0001.webp)","Muestra un resumen con conteo y peso medio","Se obtienen aproximadamente 120 frames"],"xp_extra":25},
+    "glosario":{"ffprobe":"Herramienta de an\u00e1lisis de FFmpeg que inspecciona archivos multimedia sin modificarlos. Devuelve metadatos como duraci\u00f3n, resoluci\u00f3n, c\u00f3dec, FPS y bitrate.","ffmpeg":"Herramienta de l\u00ednea de comandos para convertir, extraer y manipular audio/v\u00eddeo.","WebP":"Formato de imagen desarrollado por Google que ofrece compresi\u00f3n superior a JPEG y PNG. Con calidad 80-85, un frame 1080p pesa ~40-60KB vs ~150KB en JPEG.","FPS (frames per second)":"N\u00famero de fotogramas por segundo en un v\u00eddeo. Para extraer N frames totales, usamos fps=N/duraci\u00f3n.","frame padding":"Numeraci\u00f3n con ceros a la izquierda (%04d = 0001, 0002...). Garantiza orden correcto.","scale filter":"Filtro de FFmpeg (-vf scale=W:H) que redimensiona el v\u00eddeo. Usar -1 en un eje mantiene la proporci\u00f3n."},
+    "prompt_infografia":"Infograf\u00eda que muestre el pipeline FFmpeg: 1) V\u00eddeo MP4 de IA. 2) ffprobe analizando. 3) ffmpeg procesando. 4) Carpeta de salida con frames WebP. 5) Comparativa JPEG vs WebP. 6) Comando completo con flags explicadas."
+  },
+  {
+    "id":"html5-canvas-renderer","numero":5,"titulo":"Canvas como motor de rendering","tipo":"teoria","prerequisitos":["scroll-driven-intro"],"xp":30,"zona":"frontend",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\nEl elemento `<canvas>` de HTML5 es una superficie de dibujo programable. A diferencia de un `<img>` o un `<video>`, el canvas no tiene contenido propio: t\u00fa decides qu\u00e9 dibujar y cu\u00e1ndo. Es una pizarra en blanco controlada por JavaScript donde podemos renderizar frames de v\u00eddeo a demanda.\n\n## \u00bfPor qu\u00e9 importa?\n\nPodr\u00edamos cambiar el `src` de un `<img>` en cada scroll, pero eso dispara reflows, eventos de carga y parpadeos. El canvas evita todo eso: `drawImage()` pinta directamente en memoria de GPU, sin reflow ni layout. Es la superficie m\u00e1s r\u00e1pida y limpia para dibujar frames secuenciales. Por eso Apple, Tesla y las mejores agencias lo usan para sus webs scroll-driven.\n\n## \u00bfC\u00f3mo funciona?\n\n1. **Crear el canvas**: un `<canvas>` con dimensiones que cubran el viewport (`width = window.innerWidth`, `height = window.innerHeight`).\n2. **Obtener el contexto 2D**: `canvas.getContext('2d')` nos da acceso a la API de dibujo.\n3. **drawImage()**: el m\u00e9todo clave. Acepta un objeto `Image` precargado y lo dibuja en las coordenadas y dimensiones que indiquemos.\n4. **Cover-fit**: para que la imagen cubra todo el canvas sin deformarse, calculamos el `scale` como `Math.max(canvasW/imgW, canvasH/imgH)` y centramos.\n5. **clearRect()**: antes de dibujar un nuevo frame, limpiamos el anterior.\n6. **Responsive**: en `resize`, actualizamos `canvas.width` y `canvas.height` y redibujamos el frame actual.",
+    "metafora":"El canvas es como una pantalla de cine en una sala privada: la pantalla en s\u00ed no tiene pel\u00edcula propia, sino que proyectas sobre ella lo que quieras, cuando quieras. T\u00fa eres el proyeccionista y decides qu\u00e9 fotograma mostrar en cada momento. La pantalla solo sabe mostrar lo que le env\u00edas, de forma instant\u00e1nea y sin parpadeo.",
+    "codigo":{"lenguaje":"javascript","titulo":"Canvas renderer con cover-fit y resize responsivo","codigo":"const canvas = document.getElementById('hero-canvas');\nconst ctx = canvas.getContext('2d');\n\n// === Resize canvas to fill viewport ===\nfunction resizeCanvas() {\n  canvas.width = window.innerWidth;\n  canvas.height = window.innerHeight;\n}\nresizeCanvas();\nwindow.addEventListener('resize', () => {\n  resizeCanvas();\n  if (currentImage) drawFrame(currentImage);\n});\n\nlet currentImage = null;\n\n// === Draw an image with cover-fit ===\nfunction drawFrame(img) {\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n\n  const imgRatio = img.width / img.height;\n  const canvasRatio = canvas.width / canvas.height;\n  let drawW, drawH, drawX, drawY;\n\n  if (canvasRatio > imgRatio) {\n    drawW = canvas.width;\n    drawH = canvas.width / imgRatio;\n    drawX = 0;\n    drawY = (canvas.height - drawH) / 2;\n  } else {\n    drawH = canvas.height;\n    drawW = canvas.height * imgRatio;\n    drawX = (canvas.width - drawW) / 2;\n    drawY = 0;\n  }\n\n  ctx.drawImage(img, drawX, drawY, drawW, drawH);\n  currentImage = img;\n}\n\nconst testImg = new Image();\ntestImg.src = './frames/frame_0001.webp';\ntestImg.onload = () => drawFrame(testImg);"},
+    "mini_reto":{"titulo":"Canvas a pantalla completa con cover-fit","descripcion":"Crea un canvas que ocupe todo el viewport (100vw \u00d7 100vh). Carga una imagen cualquiera y dib\u00fajala con efecto cover-fit. El canvas debe ser responsivo: al redimensionar la ventana, debe actualizar sus dimensiones y redibujar la imagen.","criterios_exito":["El canvas ocupa exactamente el viewport completo","canvas.width y canvas.height se setean en JavaScript (no solo CSS)","La imagen se dibuja con cover-fit usando Math.max para el ratio","La imagen se centra (no se pega a una esquina)","Al redimensionar la ventana, el canvas se actualiza y redibuja","Se usa clearRect antes de dibujar","No hay deformaci\u00f3n de la imagen (aspect ratio mantenido)"],"xp_extra":20},
+    "glosario":{"canvas":"Elemento HTML5 (<canvas>) que proporciona una superficie de dibujo programable mediante JavaScript.","getContext('2d')":"M\u00e9todo que devuelve el contexto de rendering 2D del canvas, con acceso a m\u00e9todos como drawImage, clearRect, fillRect, etc.","drawImage()":"M\u00e9todo del contexto 2D que dibuja una imagen (Image, canvas, o video) en el canvas.","cover-fit":"T\u00e9cnica de escalado que hace que una imagen cubra completamente un contenedor sin deformarse. Se calcula con Math.max(containerW/imgW, containerH/imgH).","clearRect()":"M\u00e9todo del contexto 2D que borra un \u00e1rea rectangular del canvas.","requestAnimationFrame":"API del navegador que programa una funci\u00f3n para ejecutarse antes del siguiente repintado."},
+    "prompt_infografia":"Infograf\u00eda que muestre: 1) Comparativa img vs canvas (reflow vs GPU direct draw). 2) Diagrama del canvas con ejes. 3) F\u00f3rmula visual del cover-fit. 4) Flujo resize \u2192 recalcular \u2192 clearRect \u2192 drawImage."
+  },
+  {
+    "id":"lenis-smooth-scroll","numero":6,"titulo":"Lenis: smooth scroll profesional","tipo":"teoria","prerequisitos":["scroll-driven-intro"],"xp":30,"zona":"frontend",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\n**Lenis** es una librer\u00eda de smooth scroll ligera (~3KB) que intercepta el scroll nativo del navegador y lo suaviza con interpolaci\u00f3n. En vez del scroll brusco por defecto (especialmente con rueda del rat\u00f3n), Lenis crea un desplazamiento fluido y predecible que se siente premium.\n\n## \u00bfPor qu\u00e9 importa?\n\nEl scroll nativo del navegador es irregular: la rueda del rat\u00f3n env\u00eda saltos discretos (100-120px por step), el trackpad env\u00eda eventos inerciales, y el t\u00e1ctil tiene su propia f\u00edsica. Esta irregularidad hace que las animaciones scroll-driven se vean entrecortadas. Lenis normaliza todo esto: independientemente del dispositivo, el scroll se mueve suavemente con una curva de easing configurable. Adem\u00e1s, Lenis se integra nativamente con GSAP ScrollTrigger, lo que es esencial para nuestro sistema.\n\n## \u00bfC\u00f3mo funciona?\n\n1. **Intercepta el scroll**: Lenis escucha los eventos de scroll del navegador y los reemplaza con su propio sistema de interpolaci\u00f3n.\n2. **Lerp (linear interpolation)**: en cada frame, Lenis mueve la posici\u00f3n actual hacia la posici\u00f3n objetivo usando una interpolaci\u00f3n: `current += (target - current) * lerp`. Un lerp de 0.1 es suave, 0.2 es m\u00e1s \u00e1gil.\n3. **RAF loop**: Lenis necesita un `requestAnimationFrame` loop para actualizar la posici\u00f3n. Se conecta con GSAP v\u00eda `gsap.ticker` para compartir el mismo loop de rendering.\n4. **ScrollTrigger sync**: `ScrollTrigger.scrollerProxy` o la integraci\u00f3n directa permite que ScrollTrigger lea la posici\u00f3n de Lenis en vez del scroll nativo.\n5. **Touch & wheel**: Lenis maneja ambos inputs. En m\u00f3vil usa `touch-action: none` y gestiona el gesto directamente.",
+    "metafora":"Lenis es como la suspensi\u00f3n hidr\u00e1ulica de un coche de lujo: la carretera (el scroll nativo) tiene baches y grietas, pero t\u00fa dentro del coche sientes un deslizamiento suave y continuo. Sin Lenis, vas en un carro de madera sintiendo cada piedra. Con Lenis, vas en un Mercedes sintiendo seda.",
+    "codigo":{"lenguaje":"javascript","titulo":"Lenis + GSAP ScrollTrigger: setup completo con sincronizaci\u00f3n","codigo":"import Lenis from 'lenis';\nimport { gsap } from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\n\ngsap.registerPlugin(ScrollTrigger);\n\nconst lenis = new Lenis({\n  duration: 1.2,\n  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),\n  orientation: 'vertical',\n  gestureOrientation: 'vertical',\n  smoothWheel: true,\n  wheelMultiplier: 1,\n  touchMultiplier: 2,\n  infinite: false\n});\n\n// Connect Lenis to GSAP ticker\nlenis.on('scroll', ScrollTrigger.update);\n\ngsap.ticker.add((time) => {\n  lenis.raf(time * 1000);\n});\n\ngsap.ticker.lagSmoothing(0);\n\nfunction scrollToSection(selector) {\n  lenis.scrollTo(selector, {\n    offset: 0,\n    duration: 1.5,\n    easing: (t) => 1 - Math.pow(1 - t, 3)\n  });\n}\n\nconsole.log('Lenis initialized');"},
+    "mini_reto":{"titulo":"Smooth scroll con Lenis + ScrollTrigger sincronizados","descripcion":"Crea una p\u00e1gina con 5 secciones a pantalla completa (100vh cada una) con colores diferentes. Inicializa Lenis para smooth scroll y con\u00e9ctalo con GSAP ScrollTrigger. Cada secci\u00f3n debe tener un t\u00edtulo que haga fade-in cuando entra en el viewport.","criterios_exito":["Lenis est\u00e1 inicializado con duration y easing configurados","Lenis est\u00e1 conectado a gsap.ticker correctamente","ScrollTrigger.update se llama en el evento scroll de Lenis","lagSmoothing(0) est\u00e1 configurado","Las 5 secciones tienen 100vh y colores distintos","Cada t\u00edtulo hace fade-in con ScrollTrigger al entrar en viewport","El bot\u00f3n ejecuta lenis.scrollTo correctamente","El scroll se siente suave y continuo"],"xp_extra":20},
+    "glosario":{"Lenis":"Librer\u00eda de smooth scroll (~3KB) que intercepta y suaviza el scroll nativo del navegador mediante interpolaci\u00f3n lineal (lerp).","lerp (linear interpolation)":"T\u00e9cnica matem\u00e1tica que mueve un valor hacia un objetivo proporcionalmente en cada frame: current += (target - current) * factor.","gsap.ticker":"El loop de animaci\u00f3n interno de GSAP que se ejecuta en cada requestAnimationFrame.","lagSmoothing":"Funci\u00f3n de GSAP que compensa frames perdidos. Con Lenis se desactiva (lagSmoothing(0)).","wheelMultiplier":"Configuraci\u00f3n de Lenis que escala la velocidad del scroll por rueda del rat\u00f3n.","scrollTo":"M\u00e9todo de Lenis para hacer scroll program\u00e1tico a una posici\u00f3n o selector CSS."},
+    "prompt_infografia":"Infograf\u00eda que compare: 1) Scroll nativo (gr\u00e1fica escalonada) vs Lenis (curva suave). 2) Diagrama del lerp. 3) Flujo de integraci\u00f3n: Lenis \u2192 scroll event \u2192 ScrollTrigger.update + gsap.ticker \u2192 lenis.raf."
+  },
+  {
+    "id":"gsap-scrolltrigger","numero":7,"titulo":"GSAP + ScrollTrigger: el cerebro del scroll","tipo":"teoria","prerequisitos":["html5-canvas-renderer","lenis-smooth-scroll"],"xp":40,"zona":"frontend",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\n**ScrollTrigger** es el plugin de GSAP que conecta animaciones con la posici\u00f3n del scroll. Sin \u00e9l, GSAP anima por tiempo; con \u00e9l, anima por *scroll*. Es el cerebro que decide cu\u00e1ndo empieza, cu\u00e1ndo termina y c\u00f3mo progresa cada animaci\u00f3n mientras el usuario hace scroll.\n\n## \u00bfPor qu\u00e9 importa?\n\nLas webs premium que ves en Awwwards no usan CSS scroll-snap ni IntersectionObserver crudo. Usan ScrollTrigger porque ofrece control quir\u00fargico: defines un **trigger** (el elemento que activa la animaci\u00f3n), un **start** (cu\u00e1ndo arranca, ej. `\"top center\"`), un **end** (cu\u00e1ndo termina), y un **scrub** que mapea el progreso del scroll (0 a 1) al progreso de la animaci\u00f3n. Adem\u00e1s, **pin** fija un elemento en pantalla mientras dura la animaci\u00f3n, creando el efecto de \"scroll que transforma\" en vez de \"scroll que desplaza\".\n\n## \u00bfC\u00f3mo funciona?\n\n1. **Trigger**: el elemento HTML que ScrollTrigger vigila.\n2. **Start/End**: puntos de scroll donde la animaci\u00f3n comienza y termina. Se definen como `\"posici\u00f3n-del-trigger posici\u00f3n-del-viewport\"`.\n3. **Scrub**: con `scrub: true`, la animaci\u00f3n sigue al scroll 1:1. Con `scrub: 0.5`, hay un suavizado de 0.5 segundos.\n4. **Pin**: fija el trigger en su posici\u00f3n mientras el scroll avanza, creando espacio virtual.\n5. **Timeline**: encadena m\u00faltiples animaciones en secuencia dentro del mismo ScrollTrigger.",
+    "metafora":"Como la claqueta de un director de cine: ScrollTrigger marca exactamente cu\u00e1ndo empieza y termina cada escena (animaci\u00f3n). Y el modo scrub convierte tu dedo en un mando de rebobinado: scrolleas hacia abajo y la pel\u00edcula avanza, scrolleas hacia arriba y rebobinas. T\u00fa controlas el tiempo de la pel\u00edcula con tu scroll.",
+    "codigo":{"lenguaje":"javascript","titulo":"Timeline con ScrollTrigger: pin + animaciones vinculadas al scroll","codigo":"import { gsap } from 'gsap';\nimport { ScrollTrigger } from 'gsap/ScrollTrigger';\n\ngsap.registerPlugin(ScrollTrigger);\n\nconst tl = gsap.timeline({\n  scrollTrigger: {\n    trigger: '.hero',\n    start: 'top top',\n    end: '+=200%',\n    scrub: true,\n    pin: true,\n    markers: true // Remove in production\n  }\n});\n\n// Phase 1: fade in the heading\ntl.fromTo('.hero__heading', {\n  opacity: 0, y: 60\n}, {\n  opacity: 1, y: 0, duration: 1\n});\n\n// Phase 2: slide in the subtext\ntl.fromTo('.hero__subtext', {\n  opacity: 0, x: -100\n}, {\n  opacity: 1, x: 0, duration: 1\n});\n\n// Phase 3: scale up the CTA button\ntl.fromTo('.hero__cta', {\n  scale: 0.5, opacity: 0\n}, {\n  scale: 1, opacity: 1, duration: 0.5\n});\n\n// Phase 4: fade everything out\ntl.to('.hero__content', {\n  opacity: 0, y: -40, duration: 1\n});"},
+    "mini_reto":{"titulo":"Tres secciones, tres pins, tres animaciones","descripcion":"Crea una p\u00e1gina con 3 secciones a pantalla completa. Cada secci\u00f3n debe estar pinneada durante el scroll y contener una animaci\u00f3n diferente: la primera hace un fade de opacidad (0\u21921), la segunda una translaci\u00f3n horizontal (x: -200 \u2192 0), y la tercera un scale (0.3 \u2192 1). Usa scrub: true en todas.","criterios_exito":["Las 3 secciones ocupan 100vh cada una","Cada secci\u00f3n tiene pin: true con ScrollTrigger","La secci\u00f3n 1 anima opacity de 0 a 1","La secci\u00f3n 2 anima x de -200 a 0","La secci\u00f3n 3 anima scale de 0.3 a 1","Todas usan scrub: true","Las animaciones son reversibles al scrollear hacia arriba"],"xp_extra":25},
+    "glosario":{"ScrollTrigger":"Plugin de GSAP que vincula animaciones a la posici\u00f3n del scroll en vez del tiempo.","scrub":"Propiedad que sincroniza la animaci\u00f3n con el scroll. Con true es 1:1 inmediato. Con un n\u00famero a\u00f1ade suavizado.","pin":"Fija el elemento trigger en su posici\u00f3n mientras el scroll avanza a trav\u00e9s de la zona de animaci\u00f3n.","timeline":"Secuencia de animaciones GSAP encadenadas.","trigger point":"El elemento HTML que ScrollTrigger observa.","start/end markers":"Los puntos de scroll donde la animaci\u00f3n comienza y termina."},
+    "prompt_infografia":"Infograf\u00eda vertical: 1) Viewport con trigger y l\u00edneas start/end. 2) Barra de progreso lateral (0-100%). 3) Tres paneles: scrub, pin, timeline. 4) C\u00f3digo m\u00ednimo."
+  },
+  {
+    "id":"binding-scroll-frames","numero":8,"titulo":"Vincular scroll \u2192 frame del canvas","tipo":"practica","prerequisitos":["ffmpeg-extraccion-frames","gsap-scrolltrigger"],"xp":45,"zona":"integracion",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\n**Frame binding** es la t\u00e9cnica central de las superwebs scroll-driven: conectar la posici\u00f3n del scroll directamente con el frame que se dibuja en un `<canvas>`. Cuando el usuario scrollea, no se desplaza contenido sino que se cambia la imagen renderizada, creando la ilusi\u00f3n de un v\u00eddeo controlado por el dedo.\n\n## \u00bfPor qu\u00e9 importa?\n\nEste es el efecto que separa una web gen\u00e9rica de una web premium tipo Apple. El usuario siente que est\u00e1 *dentro* del producto, manipul\u00e1ndolo. No es un v\u00eddeo que se reproduce solo: es una experiencia interactiva donde el scroll controla el tiempo. Adem\u00e1s, al ser frames est\u00e1ticos (WebP/JPEG), tienes control total del rendimiento y compatibilidad.\n\n## \u00bfC\u00f3mo funciona?\n\n1. **Preloading en dos fases**: primero se cargan los frames cr\u00edticos (cada 10\u00ba frame) para que la experiencia sea funcional r\u00e1pido. Despu\u00e9s, en segundo plano, se cargan los intermedios para suavizar la transici\u00f3n.\n2. **Mapeo de progreso**: ScrollTrigger devuelve un progreso de 0 a 1. Multiplicamos por `(totalFrames - 1)` y redondeamos para obtener el `frameIndex`.\n3. **Render loop**: en cada `onUpdate` de ScrollTrigger, dibujamos `frames[frameIndex]` en el canvas con `drawImage`.\n4. **Circle-wipe reveal**: usamos `clip-path: circle()` animado con GSAP para revelar el canvas con un efecto circular que crece desde el centro.\n5. **Optimizaci\u00f3n**: solo redibujamos si el frame cambi\u00f3 (`lastFrame !== currentFrame`).",
+    "metafora":"Como el plato de un DJ: tu dedo en el scroll es como la mano del DJ sobre el vinilo. T\u00fa controlas exactamente qu\u00e9 'frame' de la canci\u00f3n suena, hacia adelante o hacia atr\u00e1s, r\u00e1pido o lento. Si dejas de tocar, la m\u00fasica se congela en ese instante exacto.",
+    "codigo":{"lenguaje":"javascript","titulo":"Sistema completo: preload de frames + scroll\u2192canvas + circle-wipe","codigo":"const canvas = document.getElementById('hero-canvas');\nconst ctx = canvas.getContext('2d');\n\nconst TOTAL_FRAMES = 120;\nconst FRAME_PATH = './frames/frame_';\nconst frames = new Array(TOTAL_FRAMES);\nlet loadedCount = 0;\n\nfunction resizeCanvas() {\n  canvas.width = window.innerWidth;\n  canvas.height = window.innerHeight;\n}\nresizeCanvas();\nwindow.addEventListener('resize', resizeCanvas);\n\n// Phase 1: Load critical frames (every 10th)\nfunction preloadCritical() {\n  return new Promise((resolve) => {\n    let criticalLoaded = 0;\n    const criticalIndices = [];\n    for (let i = 0; i < TOTAL_FRAMES; i += 10) criticalIndices.push(i);\n\n    criticalIndices.forEach((i) => {\n      const img = new Image();\n      img.src = `${FRAME_PATH}${String(i).padStart(4, '0')}.webp`;\n      img.onload = () => {\n        frames[i] = img;\n        criticalLoaded++;\n        loadedCount++;\n        if (criticalLoaded === criticalIndices.length) resolve();\n      };\n    });\n  });\n}\n\n// Phase 2: Load remaining frames\nfunction preloadRemaining() {\n  for (let i = 0; i < TOTAL_FRAMES; i++) {\n    if (frames[i]) continue;\n    const img = new Image();\n    img.src = `${FRAME_PATH}${String(i).padStart(4, '0')}.webp`;\n    img.onload = () => { frames[i] = img; loadedCount++; };\n  }\n}\n\nfunction getNearestFrame(index) {\n  if (frames[index]) return frames[index];\n  for (let offset = 1; offset < TOTAL_FRAMES; offset++) {\n    if (frames[index - offset]) return frames[index - offset];\n    if (frames[index + offset]) return frames[index + offset];\n  }\n  return null;\n}\n\nlet lastFrameIndex = -1;\nfunction renderFrame(index) {\n  if (index === lastFrameIndex) return;\n  const img = getNearestFrame(index);\n  if (!img) return;\n  ctx.clearRect(0, 0, canvas.width, canvas.height);\n  const scale = Math.max(canvas.width / img.width, canvas.height / img.height);\n  const w = img.width * scale;\n  const h = img.height * scale;\n  ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);\n  lastFrameIndex = index;\n}\n\nasync function init() {\n  await preloadCritical();\n  renderFrame(0);\n\n  gsap.fromTo(canvas,\n    { clipPath: 'circle(0% at 50% 50%)' },\n    { clipPath: 'circle(75% at 50% 50%)', duration: 1.5, ease: 'power2.out' }\n  );\n\n  ScrollTrigger.create({\n    trigger: '.hero',\n    start: 'top top',\n    end: '+=300%',\n    scrub: true,\n    pin: true,\n    onUpdate: (self) => {\n      const frameIndex = Math.round(self.progress * (TOTAL_FRAMES - 1));\n      renderFrame(frameIndex);\n    }\n  });\n\n  preloadRemaining();\n}\n\ninit();"},
+    "mini_reto":{"titulo":"Renderer scroll\u2192frame con preloader visual","descripcion":"Construye un sistema funcional de scroll-to-frame: crea un canvas a pantalla completa, precarga al menos 10 im\u00e1genes, muestra un indicador de progreso de carga con porcentaje, y vincula el scroll al frame index usando ScrollTrigger. A\u00f1ade un efecto circle-wipe al revelar el canvas.","criterios_exito":["El canvas ocupa 100vw \u00d7 100vh","Las im\u00e1genes se precargan con objetos Image()","Hay un indicador de progreso visual (barra + porcentaje)","ScrollTrigger mapea progress (0-1) a frameIndex correctamente","Solo se redibuja si el frame cambi\u00f3 (optimizaci\u00f3n)","Hay un efecto circle-wipe con clip-path al iniciar","El preloading es en dos fases (cr\u00edtico + resto)"],"xp_extra":30},
+    "glosario":{"frame binding":"T\u00e9cnica que conecta la posici\u00f3n del scroll con un \u00edndice de frame, dibujando la imagen correspondiente en un canvas.","preloading":"Proceso de cargar im\u00e1genes en memoria antes de necesitarlas. Se crean objetos new Image() y se asigna su src.","progress mapping":"Conversi\u00f3n del progreso del scroll (0-1) a un \u00edndice de frame concreto. F\u00f3rmula: Math.round(progress * (totalFrames - 1)).","clip-path":"Propiedad CSS que recorta un elemento usando formas geom\u00e9tricas.","circle-wipe reveal":"Efecto visual donde el contenido aparece desde un c\u00edrculo que crece desde el centro.","two-phase loading":"Estrategia de carga en dos fases: primero frames cr\u00edticos, luego intermedios."},
+    "prompt_infografia":"Infograf\u00eda del flujo completo: 1) V\u00eddeo \u2192 FFmpeg \u2192 120 frames. 2) Fase 1 de carga. 3) ScrollTrigger progress mapeado a frameIndex. 4) Canvas drawImage. 5) Circle-wipe reveal."
+  },
+  {
+    "id":"animaciones-por-seccion","numero":9,"titulo":"7 tipos de animaci\u00f3n para secciones","tipo":"practica","prerequisitos":["gsap-scrolltrigger"],"xp":40,"zona":"frontend",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\nUn sistema de **7 animaciones predefinidas** que se asignan a las secciones de la p\u00e1gina mediante atributos `data-animation`. Cada tipo tiene un prop\u00f3sito narrativo y visual distinto: fade-up, slide-left, slide-right, scale-up, rotate-in, stagger-up y clip-reveal.\n\n## \u00bfPor qu\u00e9 importa?\n\nLa diferencia entre una web amateur y una premium no es tener animaciones, sino tener las **animaciones correctas en el lugar correcto**. Repetir el mismo efecto en todas las secciones aburre. Usar un efecto inadecuado distrae. Este sistema da variedad con coherencia: cada animaci\u00f3n cumple un rol narrativo. Regla de oro: **nunca repetir la misma animaci\u00f3n en secciones consecutivas**.\n\n## \u00bfC\u00f3mo funciona?\n\n- **fade-up**: contenido sube con fade. Ideal para introducciones.\n- **slide-left**: entra desde la izquierda. Para texto alineado a la izquierda.\n- **slide-right**: entra desde la derecha. Para texto alineado a la derecha.\n- **scale-up**: escala desde peque\u00f1o. Secciones de impacto.\n- **rotate-in**: gira al entrar. Rompe la monoton\u00eda.\n- **stagger-up**: elementos aparecen en secuencia escalonada. Ideal para stats/grids.\n- **clip-reveal**: revelado con clip-path. Perfecto para el CTA final.\n\nDentro de cada secci\u00f3n, los elementos se revelan en orden: **label \u2192 heading \u2192 body \u2192 CTA**. Esto crea una jerarqu\u00eda visual natural que gu\u00eda la lectura del usuario. El stagger entre elementos es de 0.15-0.2 segundos.",
+    "metafora":"Como el set de cuchillos de un chef profesional: cada cuchillo (animaci\u00f3n) tiene un prop\u00f3sito espec\u00edfico. El cuchillo de pan (fade-up) no sirve para filetear (clip-reveal), y un buen chef nunca usa el mismo cuchillo para todo. La variedad con prop\u00f3sito es lo que convierte platos simples en alta cocina.",
+    "codigo":{"lenguaje":"javascript","titulo":"Los 7 tipos de animaci\u00f3n con ScrollTrigger y data-attributes","codigo":"// HTML: <section data-animation=\"fade-up\"> ... </section>\n\nconst ANIMATIONS = {\n  'fade-up': {\n    from: { opacity: 0, y: 60 },\n    to: { opacity: 1, y: 0 }\n  },\n  'slide-left': {\n    from: { opacity: 0, x: -120 },\n    to: { opacity: 1, x: 0 }\n  },\n  'slide-right': {\n    from: { opacity: 0, x: 120 },\n    to: { opacity: 1, x: 0 }\n  },\n  'scale-up': {\n    from: { opacity: 0, scale: 0.7 },\n    to: { opacity: 1, scale: 1 }\n  },\n  'rotate-in': {\n    from: { opacity: 0, rotation: -8, y: 40 },\n    to: { opacity: 1, rotation: 0, y: 0 }\n  },\n  'stagger-up': {\n    from: { opacity: 0, y: 50 },\n    to: { opacity: 1, y: 0 }\n  },\n  'clip-reveal': {\n    from: { clipPath: 'inset(100% 0% 0% 0%)' },\n    to: { clipPath: 'inset(0% 0% 0% 0%)' }\n  }\n};\n\nfunction initSectionAnimations() {\n  document.querySelectorAll('[data-animation]').forEach((section) => {\n    const type = section.dataset.animation;\n    const anim = ANIMATIONS[type];\n    if (!anim) return;\n\n    if (type === 'stagger-up') {\n      const children = section.querySelectorAll('.stagger-item');\n      gsap.fromTo(children, anim.from, {\n        ...anim.to,\n        duration: 0.8,\n        stagger: 0.15,\n        ease: 'power2.out',\n        scrollTrigger: {\n          trigger: section,\n          start: 'top 75%',\n          end: 'top 25%',\n          toggleActions: 'play none none reverse'\n        }\n      });\n      return;\n    }\n\n    const elements = section.querySelectorAll(\n      '.section__label, .section__heading, .section__body, .section__cta'\n    );\n\n    if (elements.length > 0) {\n      gsap.set(section, anim.from);\n      const tl = gsap.timeline({\n        scrollTrigger: {\n          trigger: section,\n          start: 'top 75%',\n          end: 'top 25%',\n          toggleActions: 'play none none reverse'\n        }\n      });\n      tl.to(section, { ...anim.to, duration: 0.8, ease: 'power2.out' });\n      tl.fromTo(elements,\n        { opacity: 0, y: 30 },\n        { opacity: 1, y: 0, duration: 0.6, stagger: 0.18, ease: 'power2.out' },\n        '-=0.4'\n      );\n    }\n  });\n}\n\ninitSectionAnimations();"},
+    "mini_reto":{"titulo":"7 secciones, 7 animaciones, revelado escalonado","descripcion":"Crea una p\u00e1gina con 7 secciones, cada una usando un tipo de animaci\u00f3n diferente (fade-up, slide-left, slide-right, scale-up, rotate-in, stagger-up, clip-reveal). Cada secci\u00f3n debe tener label, heading y body que se revelan en secuencia escalonada.","criterios_exito":["Hay 7 secciones, cada una con un data-animation diferente","Cada secci\u00f3n contiene label, heading y body","Los elementos internos se revelan en orden escalonado","No se repite la misma animaci\u00f3n en secciones consecutivas","La secci\u00f3n stagger-up tiene elementos con clase .stagger-item","La secci\u00f3n clip-reveal usa clipPath animado","Las animaciones se reversan al scrollear hacia arriba"],"xp_extra":30},
+    "glosario":{"stagger":"Propiedad de GSAP que aplica un retardo incremental entre animaciones de m\u00faltiples elementos.","clip-reveal":"Animaci\u00f3n que revela contenido animando clip-path de inset(100% 0 0 0) a inset(0% 0 0 0).","fade-up":"Animaci\u00f3n donde el elemento sube (y: 60\u21920) mientras aparece (opacity: 0\u21921).","data attribute":"Atributo HTML personalizado con prefijo data-. Permite al JS leer configuraci\u00f3n sin contaminar clases CSS.","reveal sequence":"Orden predefinido en que los elementos de una secci\u00f3n se hacen visibles: label \u2192 heading \u2192 body \u2192 CTA.","easing":"Funci\u00f3n que controla la aceleraci\u00f3n de una animaci\u00f3n. power2.out empieza r\u00e1pido y desacelera."},
+    "prompt_infografia":"Infograf\u00eda con 7 columnas, una por animaci\u00f3n. Cada columna: nombre, icono de direcci\u00f3n, cu\u00e1ndo usarla, mini-screenshot del efecto. Regla: nunca repetir animaci\u00f3n consecutiva."
+  },
+  {
+    "id":"identidad-marca-generativa","numero":10,"titulo":"Branding generativo: paleta, tipo, naming","tipo":"teoria","prerequisitos":["scroll-driven-intro"],"xp":30,"zona":"diseno",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\nEl **branding generativo** es el proceso por el cual Claude Code genera autom\u00e1ticamente la identidad visual completa de una marca: nombre, paleta de colores, tipograf\u00eda y sistema de dise\u00f1o. Todo parte de unas pocas decisiones iniciales (qu\u00e9 es el producto, qu\u00e9 sensaci\u00f3n quiere transmitir) y se materializa en **design tokens** como CSS custom properties.\n\n## \u00bfPor qu\u00e9 importa?\n\nUn dise\u00f1ador tarda horas en definir una identidad visual coherente. Claude Code lo hace en segundos, generando nombres cortos y memorables (tipo tech: 4-7 letras, pronunciable), paletas de colores con fondos oscuros y acentos vibrantes, y parejas tipogr\u00e1ficas de Google Fonts. El resultado no es gen\u00e9rico: cada marca generada tiene personalidad propia y coherencia interna.\n\n## \u00bfC\u00f3mo funciona?\n\n1. **Naming**: Claude genera nombres cortos, tech-sounding, f\u00e1ciles de recordar. Ejemplos: Volta, Neon, Prisma, Flux.\n2. **Paleta**: fondo oscuro (`#0a0a0a`\u2013`#1a1a1a`), color primario de acento (vibrante), secundario (complementario), texto claro.\n3. **Tipograf\u00eda**: pareja display + mono de Google Fonts. Ejemplo cl\u00e1sico: Space Grotesk (headings) + Space Mono (c\u00f3digo/detalles). Los headings usan `12vw` para impacto.\n4. **Design tokens**: todo se define como `--custom-properties` en `:root`. Colores, tama\u00f1os, espaciados, radios.\n5. **Layout side-aligned**: el texto siempre va al lado (40% del viewport), nunca centrado sobre el canvas.",
+    "metafora":"Como el ADN de una persona: a partir de unos pocos 'genes' fundamentales (nombre de marca + 2 colores + 2 fuentes), Claude genera el 'cuerpo' visual completo del sitio web con una personalidad coherente. Igual que el ADN determina ojos, pelo y rasgos, los design tokens determinan cada elemento visual de la p\u00e1gina.",
+    "codigo":{"lenguaje":"css","titulo":"Design tokens completos: colores, tipograf\u00eda, layout side-aligned","codigo":"/* Google Fonts import */\n@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap');\n\n:root {\n  /* Brand colors */\n  --color-bg: #0a0a0a;\n  --color-bg-elevated: #141414;\n  --color-bg-overlay: rgba(10, 10, 10, 0.85);\n  --color-primary: #00ff88;\n  --color-primary-dim: #00cc6a;\n  --color-secondary: #7b61ff;\n  --color-text: #f5f5f5;\n  --color-text-muted: #888888;\n  --color-border: #2a2a2a;\n\n  /* Typography */\n  --font-display: 'Space Grotesk', sans-serif;\n  --font-mono: 'Space Mono', monospace;\n  --font-size-hero: clamp(3rem, 12vw, 10rem);\n  --font-size-heading: clamp(2rem, 5vw, 4rem);\n  --font-size-body: clamp(1rem, 1.2vw, 1.125rem);\n  --font-size-label: clamp(0.75rem, 1vw, 0.875rem);\n  --line-height-tight: 1.05;\n  --letter-spacing-tight: -0.03em;\n  --letter-spacing-wide: 0.15em;\n\n  /* Spacing */\n  --space-sm: 1rem;\n  --space-md: 2rem;\n  --space-lg: 4rem;\n  --space-xl: 8rem;\n\n  /* Layout */\n  --content-width: 40%;\n  --content-max-width: 560px;\n  --border-radius: 0.5rem;\n}\n\nbody {\n  margin: 0;\n  background: var(--color-bg);\n  color: var(--color-text);\n  font-family: var(--font-display);\n  -webkit-font-smoothing: antialiased;\n}\n\n.section {\n  position: relative;\n  min-height: 100vh;\n  display: flex;\n  align-items: center;\n  padding: var(--space-lg) clamp(1.5rem, 4vw, 3rem);\n}\n\n.section__content {\n  width: var(--content-width);\n  max-width: var(--content-max-width);\n}\n\n.section__label {\n  font-family: var(--font-mono);\n  font-size: var(--font-size-label);\n  color: var(--color-primary);\n  text-transform: uppercase;\n  letter-spacing: var(--letter-spacing-wide);\n  margin-bottom: var(--space-sm);\n}\n\n.section__heading {\n  font-size: var(--font-size-heading);\n  font-weight: 700;\n  line-height: var(--line-height-tight);\n  letter-spacing: var(--letter-spacing-tight);\n  margin-bottom: var(--space-md);\n}"},
+    "mini_reto":{"titulo":"Identidad de marca para un producto ficticio","descripcion":"Define la identidad visual completa para un producto ficticio: inventa un nombre (4-7 letras, tech-sounding), elige una paleta de 4 colores (fondo oscuro + primario + secundario + texto), selecciona 2 Google Fonts (display + mono), e impl\u00e9mentalo todo como CSS custom properties en :root.","criterios_exito":["El nombre de marca tiene 4-7 letras y suena tech","La paleta tiene al menos 4 colores definidos como custom properties","El fondo es oscuro (#0a0a0a a #1a1a1a)","Hay un color de acento vibrante","Se importan 2 Google Fonts: una display y una mono","Los tokens incluyen tipograf\u00eda, espaciado y colores","El layout usa side-aligned (contenido al 40% del viewport)"],"xp_extra":20},
+    "glosario":{"design tokens":"Variables de dise\u00f1o reutilizables que definen la identidad visual. En CSS se implementan como custom properties (--nombre: valor) en :root.","CSS custom properties":"Variables nativas de CSS declaradas con -- y consumidas con var(). Son din\u00e1micas y heredan por cascada.","brand identity":"Conjunto de elementos visuales que hacen reconocible a una marca: nombre, colores, tipograf\u00eda, tono.","font pairing":"Combinaci\u00f3n de dos tipograf\u00edas complementarias: una display (headings) y una mono (labels/c\u00f3digo).","side-aligned layout":"Patr\u00f3n de dise\u00f1o donde el texto ocupa el 40% del viewport, nunca centrado sobre el canvas."},
+    "prompt_infografia":"Infograf\u00eda mostrando el proceso generativo: 1) Input: nombre del producto + sector. 2) Claude genera: nombre, paleta, tipograf\u00eda. 3) Output: CSS custom properties. 4) Ejemplo visual del layout side-aligned."
+  },
+  {
+    "id":"arquitectura-proyecto","numero":11,"titulo":"Estructura HTML/CSS/JS y tokens de dise\u00f1o","tipo":"practica","prerequisitos":["binding-scroll-frames","animaciones-por-seccion","identidad-marca-generativa"],"xp":40,"zona":"integracion",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\nLa **arquitectura del proyecto** es la estructura completa de archivos y landmarks HTML que componen una superweb scroll-driven. Define d\u00f3nde va cada pieza: `index.html` (loader, header, hero, canvas, secciones, marquee, stats, CTA), `css/style.css` (tokens, layout, responsive), y `js/app.js` (Lenis, GSAP, preloader, renderer, animaciones).\n\n## \u00bfPor qu\u00e9 importa?\n\nSin una arquitectura clara, el proyecto se convierte en espagueti. Cada superweb sigue el mismo patr\u00f3n probado: un **loader** que oculta la carga, un **header sticky** con marca y CTA, un **hero standalone** (m\u00ednimo 12rem de altura), un **canvas fixed** para los frames, **secciones** con animaciones data-driven, un **marquee** con tipograf\u00eda de 12vw, una secci\u00f3n de **stats con dark overlay**, y un **CTA persistente**. Seguir este patr\u00f3n garantiza consistencia y calidad.\n\n## \u00bfC\u00f3mo funciona?\n\n- **Loader**: pantalla completa con barra de progreso, desaparece al cargar frames cr\u00edticos.\n- **Header sticky**: fixed top, con logo y bot\u00f3n CTA, fondo transparente que oscurece al scrollear.\n- **Hero standalone**: primera impresi\u00f3n, m\u00ednimo 12rem, con t\u00edtulo grande y subt\u00edtulo.\n- **Canvas fixed**: `position: fixed`, cubre todo el viewport, z-index detr\u00e1s del contenido.\n- **Secciones**: cada una con `data-animation`, contenido side-aligned al 40%.\n- **Marquee**: texto corriendo infinito con font-size de `12vw`.\n- **Stats**: overlay oscuro sobre el canvas, n\u00fameros que animan al entrar.\n- **CTA final**: secci\u00f3n de cierre con bot\u00f3n de acci\u00f3n.\n\n**Anti-patterns**: no glassmorphism, no texto centrado sobre canvas, no FRAME_SPEED < 1.8.",
+    "metafora":"Como el plano de un edificio: antes de poner un solo ladrillo, el arquitecto define d\u00f3nde va cada habitaci\u00f3n (secci\u00f3n), ventana (animaci\u00f3n), ascensor (scroll) y escalera de emergencia (loader). Saltarse el plano significa demoler y reconstruir. Con el plano correcto, cada pieza encaja a la primera.",
+    "codigo":{"lenguaje":"html","titulo":"Esqueleto HTML completo con todos los landmarks y data-attributes","codigo":"<!DOCTYPE html>\n<html lang=\"es\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Volta \u2014 Next-gen Energy</title>\n  <link rel=\"stylesheet\" href=\"css/style.css\">\n  <link href=\"https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap\" rel=\"stylesheet\">\n</head>\n<body>\n\n  <!-- LOADER -->\n  <div class=\"loader\" aria-label=\"Cargando\">\n    <div class=\"loader__brand\">VOLTA</div>\n    <div class=\"loader__track\"><div class=\"loader__bar\"></div></div>\n    <div class=\"loader__percent\">0%</div>\n  </div>\n\n  <!-- HEADER (sticky) -->\n  <header class=\"header\">\n    <a href=\"/\" class=\"header__logo\">VOLTA</a>\n    <nav class=\"header__nav\">\n      <a href=\"#features\">Features</a>\n      <a href=\"#specs\">Specs</a>\n    </nav>\n    <a href=\"#cta\" class=\"btn btn--primary\">Pre-order</a>\n  </header>\n\n  <!-- HERO (standalone, min 12rem) -->\n  <section class=\"hero\" id=\"hero\">\n    <h1 class=\"hero__title\">VOLTA</h1>\n    <p class=\"hero__subtitle\">Energy, reimagined.</p>\n  </section>\n\n  <!-- CANVAS (fixed, full viewport) -->\n  <canvas id=\"hero-canvas\" class=\"canvas-fixed\"></canvas>\n\n  <!-- SECTIONS -->\n  <section class=\"section\" data-animation=\"fade-up\">\n    <div class=\"section__content\">\n      <span class=\"section__label\">Innovacion</span>\n      <h2 class=\"section__heading\">Energia sin limites</h2>\n      <p class=\"section__body\">Nueva generacion de baterias.</p>\n    </div>\n  </section>\n\n  <!-- MARQUEE -->\n  <div class=\"marquee\" aria-hidden=\"true\">\n    <div class=\"marquee__track\">\n      <span class=\"marquee__text\">VOLTA</span>\n    </div>\n  </div>\n\n  <!-- STATS (dark overlay) -->\n  <section class=\"section section--stats\" data-animation=\"stagger-up\">\n    <div class=\"section__overlay\"></div>\n    <div class=\"stat stagger-item\"><span data-count=\"72\">0</span> Capas nano</div>\n  </section>\n\n  <!-- CTA FINAL -->\n  <section class=\"section section--cta\" data-animation=\"clip-reveal\" id=\"cta\">\n    <div class=\"section__content\">\n      <h2>Reserva tu Volta</h2>\n      <a href=\"#\" class=\"btn btn--primary\">Pre-order</a>\n    </div>\n  </section>\n\n  <footer>&copy; 2026 Volta.</footer>\n\n  <script src=\"https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js\"><\/script>\n  <script src=\"https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js\"><\/script>\n  <script src=\"https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js\"><\/script>\n  <script src=\"js/app.js\"><\/script>\n</body>\n</html>"},
+    "mini_reto":{"titulo":"Esqueleto completo de una superweb scroll-driven","descripcion":"Construye el HTML y CSS completo de una superweb scroll-driven para un producto ficticio. Debe incluir todos los landmarks: loader, header sticky, hero standalone, canvas fixed, al menos 4 secciones con data-animation diferente, marquee con tipograf\u00eda 12vw, stats con dark overlay, y CTA final.","criterios_exito":["Tiene loader con barra de progreso y porcentaje","Header es sticky con logo y CTA","Hero tiene m\u00ednimo 12rem de altura y es standalone","Canvas tiene position: fixed y cubre el viewport","M\u00ednimo 4 secciones con data-animation diferentes","Marquee con font-size de 12vw","Secci\u00f3n stats con dark overlay y elementos stagger","CTA final con bot\u00f3n de acci\u00f3n","Design tokens definidos como CSS custom properties en :root","No hay glassmorphism ni texto centrado sobre canvas"],"xp_extra":35},
+    "glosario":{"landmark (HTML)":"Elemento sem\u00e1ntico principal que estructura la p\u00e1gina: header, main, section, footer.","dark overlay":"Capa semitransparente oscura (rgba(10,10,10,0.85)) que se coloca sobre el canvas para mejorar la legibilidad.","marquee":"Banda de texto que se desplaza horizontalmente de forma infinita. En superwebs usa tipograf\u00eda de 12vw.","CSS tokens":"Sistema de variables CSS en :root que centralizan todas las decisiones de dise\u00f1o.","hero standalone":"Secci\u00f3n hero que funciona como primera impresi\u00f3n independiente, con m\u00ednimo 12rem de altura.","persistent CTA":"Bot\u00f3n de llamada a la acci\u00f3n que aparece tanto en el header como en la secci\u00f3n final."},
+    "prompt_infografia":"Infograf\u00eda vertical tipo wireframe mostrando la estructura completa de una superweb: loader, header, hero, canvas, secciones, marquee, stats, CTA. Al lado: \u00e1rbol de archivos."
+  },
+  {
+    "id":"skill-video2website","numero":12,"titulo":"El skill video2website: automatizar todo","tipo":"practica","prerequisitos":["arquitectura-proyecto"],"xp":50,"zona":"automatizacion",
+    "explicacion":"## \u00bfQu\u00e9 es?\n\nEl **skill video2website** es un archivo `.md` que se instala en `~/.claude/skills/` y le ense\u00f1a a Claude Code c\u00f3mo transformar un archivo de v\u00eddeo en una landing page premium completa de forma autom\u00e1tica. Es como un manual de instrucciones que Claude sigue paso a paso: analiza el v\u00eddeo, extrae frames, genera HTML/CSS/JS, crea la identidad de marca, aplica las 7 animaciones, y valida la calidad.\n\n## \u00bfPor qu\u00e9 importa?\n\nSin el skill, tendr\u00edas que dar instrucciones detalladas a Claude en cada proyecto. Con el skill, dices `/video2website` y Claude ya sabe todo: qu\u00e9 preguntar (ruta del v\u00eddeo, nombre de marca, contenido, paleta), qu\u00e9 herramientas usar (ffprobe para analizar, ffmpeg para extraer), y qu\u00e9 est\u00e1ndares cumplir (checklist de calidad). Es la diferencia entre ense\u00f1ar a alguien desde cero cada vez y tener un empleado experto que ya sabe el proceso.\n\n## \u00bfC\u00f3mo funciona?\n\n1. **Instalaci\u00f3n**: copiar el archivo `.md` a `~/.claude/skills/`.\n2. **Invocaci\u00f3n**: el usuario escribe `/video2website` en Claude Code.\n3. **Claude pregunta**: ruta del v\u00eddeo, nombre de marca, secciones de contenido, colores preferidos.\n4. **An\u00e1lisis**: `ffprobe` obtiene duraci\u00f3n, FPS, resoluci\u00f3n del v\u00eddeo.\n5. **Extracci\u00f3n**: `ffmpeg` extrae frames como WebP optimizado.\n6. **Generaci\u00f3n**: Claude crea index.html, style.css, app.js con toda la arquitectura.\n7. **Validaci\u00f3n**: checklist de calidad (loader funciona, scroll es fluido, sin anti-patterns, responsive).\n8. **Preview**: `npx serve .` para ver el resultado en el navegador.",
+    "metafora":"Como contratar a un equipo completo (fot\u00f3grafo, dise\u00f1ador, maquetador, programador) que trabajan perfectamente coordinados y ya conocen tu estilo. Solo que el 'equipo' es un solo archivo de skill que orquesta todo el proceso. T\u00fa entregas el v\u00eddeo y recibes la web terminada.",
+    "codigo":{"lenguaje":"bash","titulo":"Instalaci\u00f3n del skill y flujo completo de invocaci\u00f3n","codigo":"#!/bin/bash\n# INSTALL VIDEO2WEBSITE SKILL FOR CLAUDE CODE\n\n# Step 1: Create the skills directory\nmkdir -p ~/.claude/skills\n\n# Step 2: Copy the skill file\ncp ./skills/video2website.md ~/.claude/skills/video2website.md\n\n# Step 3: Verify installation\necho \"Skills instalados:\"\nls -la ~/.claude/skills/*.md\n\n# USAGE (in Claude Code terminal):\n# /video2website\n#\n# Claude asks:\n#   1. Ruta del video: ./product-demo.mp4\n#   2. Nombre de marca: Volta\n#   3. Secciones: Innovacion, Tecnologia, Impacto, Diseno\n#   4. Color primario: #00ff88\n#\n# Claude executes:\nffprobe -v quiet -print_format json -show_streams ./product-demo.mp4\n\nmkdir -p ./frames\nffmpeg -i ./product-demo.mp4 \\\n  -vf \"fps=30,scale=1920:-1\" \\\n  -c:v libwebp \\\n  -quality 80 \\\n  ./frames/frame_%04d.webp\n\nTOTAL_FRAMES=$(ls ./frames/*.webp | wc -l)\necho \"Frames extraidos: $TOTAL_FRAMES\"\n\n# Claude generates: index.html, css/style.css, js/app.js\n# Preview:\nnpx serve .\n\n# QUALITY CHECKLIST:\n# [x] Loader shows progress\n# [x] Smooth scroll (Lenis)\n# [x] Canvas renders frames on scroll\n# [x] No same animation on consecutive sections\n# [x] Side-aligned text\n# [x] Hero standalone min 12rem\n# [x] Marquee 12vw\n# [x] Stats dark overlay\n# [x] CTA persistent\n# [x] No glassmorphism\n# [x] FRAME_SPEED >= 1.8\n# [x] Responsive\n# [x] CSS tokens"},
+    "mini_reto":{"titulo":"Instala el skill, genera una landing page, documenta el proceso","descripcion":"Instala el skill video2website en Claude Code (copia el .md a ~/.claude/skills/). Luego inv\u00f3calo con un v\u00eddeo de tu elecci\u00f3n. Documenta todo el proceso: qu\u00e9 te pregunt\u00f3 Claude, qu\u00e9 comandos ejecut\u00f3, cu\u00e1nto tard\u00f3, y eval\u00faa el resultado con el checklist de calidad.","criterios_exito":["El skill est\u00e1 instalado en ~/.claude/skills/","Se invoc\u00f3 con /video2website o instrucci\u00f3n equivalente","Claude analiz\u00f3 el v\u00eddeo con ffprobe","Claude extrajo frames con ffmpeg","Se gener\u00f3 index.html, style.css y app.js","El resultado pasa al menos 10 de 13 puntos del checklist","El alumno document\u00f3 el proceso paso a paso"],"xp_extra":40},
+    "glosario":{"skill (Claude Code)":"Archivo Markdown (.md) que se instala en ~/.claude/skills/ y le da a Claude Code conocimiento especializado.","scaffold":"Estructura inicial de archivos y carpetas que el skill genera autom\u00e1ticamente.","quality gate":"Checklist de validaci\u00f3n que Claude ejecuta al final del proceso.","npx serve":"Comando que levanta un servidor HTTP local para previsualizar el resultado.","checklist de calidad":"Lista de 13 verificaciones que validan una superweb scroll-driven."},
+    "prompt_infografia":"Infograf\u00eda del pipeline completo: 1) Archivo .md del skill. 2) Usuario escribe /video2website. 3) Claude pregunta. 4) ffprobe analiza. 5) ffmpeg extrae frames. 6) Claude genera HTML/CSS/JS. 7) Quality checklist. 8) npx serve."
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+function getDefaultState() {
+  return {
+    completedLessons: [],
+    completedRetos: [],
+    xp: 0,
+    level: 1,
+    badges: [],
+    route: 'Ruta lineal',
+    glossaryViews: 0,
+    routeChanges: 0,
+    routesUsed: ['Ruta lineal']
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return { ...getDefaultState(), ...JSON.parse(raw) };
+  } catch(e) {}
+  return getDefaultState();
+}
+
+function saveState(s) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+let state = loadState();
+
+// ============================================================
+// HELPERS
+// ============================================================
+function mdToHtml(md) {
+  if (!md) return '';
+  let html = md;
+  // Code blocks — escape HTML inside, then wrap
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(_, lang, code) {
+    return '<pre><code>' + escapeHtml(code) + '</code></pre>';
+  });
+  // Headers
+  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+  // Bold
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Inline code — escape HTML inside backticks so <canvas> etc render as text
+  html = html.replace(/`([^`]+)`/g, function(_, code) {
+    return '<code>' + escapeHtml(code) + '</code>';
+  });
+  // Ordered lists
+  html = html.replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>');
+  // Unordered lists
+  html = html.replace(/^[-*]\s+(.+)$/gm, '<li>$1</li>');
+  // Wrap consecutive li's in ul
+  html = html.replace(/(<li>.*?<\/li>\n?)+/g, '<ul>$&</ul>');
+  // Paragraphs
+  html = html.replace(/^(?!<[huplo])((?!<).+)$/gm, '<p>$1</p>');
+  // Clean empty p
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  return html;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function getLevelInfo(xp) {
+  const levels = GAMIFICATION.niveles;
+  let current = levels[0];
+  for (let i = levels.length - 1; i >= 0; i--) {
+    if (xp >= levels[i].xp_requerido) { current = levels[i]; break; }
+  }
+  const next = levels.find(l => l.xp_requerido > xp);
+  return { current, next };
+}
+
+function checkPrereqs(concept) {
+  if (state.route === 'Ruta exploratoria') {
+    // Only first lesson required, rest unlock after scroll-driven-intro
+    if (concept.prerequisitos.length === 0) return true;
+    return state.completedLessons.includes('scroll-driven-intro');
+  }
+  return concept.prerequisitos.every(p => state.completedLessons.includes(p));
+}
+
+// ============================================================
+// TOASTS
+// ============================================================
+function showToast(type, title, desc) {
+  const container = document.getElementById('toastContainer');
+  const icons = { xp: '&#9889;', level: '&#127775;', badge: '&#127942;', reto: '&#9989;' };
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = `<span class="toast__icon">${icons[type] || ''}</span><div class="toast__body"><div class="toast__title">${title}</div><div class="toast__desc">${desc}</div></div>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// ============================================================
+// GAMIFICATION
+// ============================================================
+function addXp(amount, reason) {
+  state.xp += amount;
+  showToast('xp', `+${amount} XP`, reason);
+  const { current } = getLevelInfo(state.xp);
+  if (current.nivel > state.level) {
+    state.level = current.nivel;
+    showToast('level', `Nivel ${current.nivel}: ${current.nombre}`, current.descripcion);
+  }
+  saveState(state);
+  updateDashboard();
+}
+
+function checkBadges(silent) {
+  const completedCount = state.completedLessons.length;
+  const retoCount = state.completedRetos.length;
+
+  const checks = [
+    { id: 'primer-scroll', cond: completedCount >= 3 },
+    { id: 'medio-camino', cond: completedCount >= 6 },
+    { id: 'retador', cond: retoCount >= 3 },
+    { id: 'imparable', cond: retoCount >= 12 },
+    { id: 'curioso', cond: state.glossaryViews >= 10 },
+    { id: 'explorador-rutas', cond: state.routeChanges >= 2 || (state.routesUsed && state.routesUsed.length >= 2) },
+    { id: 'superweb-completa', cond: completedCount >= 12 }
+  ];
+
+  checks.forEach(({ id, cond }) => {
+    if (cond && !state.badges.includes(id)) {
+      state.badges.push(id);
+      if (!silent) {
+        const badge = GAMIFICATION.badges.find(b => b.id === id);
+        if (badge) showToast('badge', `Badge: ${badge.nombre}`, badge.descripcion);
+      }
+    }
+  });
+  saveState(state);
+}
+
+// ============================================================
+// RENDER DASHBOARD
+// ============================================================
+function updateDashboard() {
+  const { current, next } = getLevelInfo(state.xp);
+  const completedCount = state.completedLessons.length;
+  const pct = Math.round((completedCount / 12) * 100);
+
+  document.getElementById('navXp').textContent = `${state.xp} XP`;
+  document.getElementById('navXp').classList.add('bump');
+  setTimeout(() => document.getElementById('navXp').classList.remove('bump'), 400);
+
+  document.getElementById('dashXp').textContent = `${state.xp} XP`;
+  document.getElementById('dashLevel').textContent = current.nombre;
+  document.getElementById('dashLevelIcon').innerHTML = `${current.icono} Nivel ${current.nivel}`;
+  document.getElementById('dashNextLevel').textContent = next ? `Siguiente nivel: ${next.xp_requerido} XP` : 'Nivel maximo alcanzado';
+  document.getElementById('dashBadges').textContent = `${state.badges.length}/7`;
+  document.getElementById('dashLessons').textContent = `${completedCount}/12`;
+  document.getElementById('progressPct').textContent = `${pct}%`;
+  document.getElementById('progressFill').style.width = `${pct}%`;
+}
+
+// ============================================================
+// ROUTES
+// ============================================================
+function renderRoutes() {
+  const grid = document.getElementById('routeGrid');
+  grid.innerHTML = '';
+  COURSE_DATA.rutas_pedagogicas.forEach(r => {
+    const card = document.createElement('div');
+    card.className = `route-card${state.route === r.nombre ? ' active' : ''}`;
+    card.innerHTML = `
+      ${r.recomendada ? '<div class="route-card__badge">Recomendada</div>' : '<div class="route-card__badge" style="background:rgba(0,212,255,0.1);color:var(--cyan)">Libre</div>'}
+      <div class="route-card__name">${r.nombre}</div>
+      <div class="route-card__desc">${r.descripcion}</div>
+    `;
+    card.onclick = () => {
+      state.route = r.nombre;
+      if (!state.routesUsed) state.routesUsed = [];
+      if (!state.routesUsed.includes(r.nombre)) {
+        state.routesUsed.push(r.nombre);
+        state.routeChanges = (state.routeChanges || 0) + 1;
+      }
+      saveState(state);
+      checkBadges();
+      renderRoutes();
+      renderLessons();
+      renderMap();
+    };
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// LESSONS
+// ============================================================
+function renderLessons() {
+  const list = document.getElementById('lessonList');
+  list.innerHTML = '';
+  const route = COURSE_DATA.rutas_pedagogicas.find(r => r.nombre === state.route) || COURSE_DATA.rutas_pedagogicas[0];
+  const ordered = route.nodos_orden.map(id => CONCEPTS.find(c => c.id === id)).filter(Boolean);
+
+  ordered.forEach((concept, idx) => {
+    const isCompleted = state.completedLessons.includes(concept.id);
+    const isLocked = !checkPrereqs(concept);
+    const card = document.createElement('div');
+    card.className = `lesson-card${isCompleted ? ' completed' : ''}${isLocked ? ' locked' : ''}`;
+    card.id = `lesson-${concept.id}`;
+
+    const typeBadge = concept.tipo === 'teoria'
+      ? '<span class="badge badge--teoria">Teoria</span>'
+      : '<span class="badge badge--practica">Practica</span>';
+
+    card.innerHTML = `
+      <div class="lesson-header">
+        <div class="lesson-num">${isCompleted ? '&#10003;' : concept.numero}</div>
+        <div class="lesson-info">
+          <div class="lesson-title">${concept.titulo}</div>
+          <div class="lesson-meta">
+            ${typeBadge}
+            <span class="badge badge--zone">${concept.zona}</span>
+            <span class="badge badge--xp">${concept.xp} XP</span>
+          </div>
+        </div>
+        <div class="lesson-status">
+          ${isLocked ? '<span class="lesson-lock">&#128274;</span>' : isCompleted ? '<span class="lesson-check">&#10003;</span>' : ''}
+        </div>
+        <span class="lesson-chevron">&#9660;</span>
+      </div>
+      <div class="lesson-body">
+        <div class="lesson-body__inner">
+          ${buildLessonBody(concept)}
+        </div>
+      </div>
+    `;
+
+    if (!isLocked) {
+      card.querySelector('.lesson-header').addEventListener('click', () => {
+        const isExp = card.classList.contains('expanded');
+        // Close all
+        document.querySelectorAll('.lesson-card.expanded').forEach(c => {
+          c.classList.remove('expanded');
+          c.querySelector('.lesson-body').style.maxHeight = '0';
+        });
+        if (!isExp) {
+          card.classList.add('expanded');
+          const body = card.querySelector('.lesson-body');
+          body.style.maxHeight = body.scrollHeight + 'px';
+          // Re-measure after images/content load
+          setTimeout(() => { body.style.maxHeight = body.scrollHeight + 'px'; }, 100);
+        }
+      });
+    }
+
+    list.appendChild(card);
+  });
+}
+
+function buildLessonBody(c) {
+  const tabs = [
+    { id: 'exp', label: 'Explicacion', content: buildExplicacion(c) },
+    { id: 'met', label: 'Metafora', content: buildMetafora(c) },
+    { id: 'cod', label: 'Codigo', content: buildCodigo(c) },
+    { id: 'ret', label: 'Mini-reto', content: buildReto(c) },
+    { id: 'glo', label: 'Glosario', content: buildGlosario(c) },
+    { id: 'pro', label: 'Prompt Infografia', content: buildPrompt(c) }
+  ];
+
+  const tabNav = tabs.map((t, i) => `<button class="lesson-tab-btn${i === 0 ? ' active' : ''}" data-tab="${c.id}-${t.id}">${t.label}</button>`).join('');
+  const tabContent = tabs.map((t, i) => `<div class="lesson-tab-content${i === 0 ? ' active' : ''}" id="tab-${c.id}-${t.id}">${t.content}</div>`).join('');
+
+  const isCompleted = state.completedLessons.includes(c.id);
+  const completeBtn = `<button class="lesson-complete-btn${isCompleted ? ' done' : ''}" data-lesson="${c.id}" ${isCompleted ? 'disabled' : ''}>${isCompleted ? '&#10003; Completada' : 'Marcar como completada'}</button>`;
+
+  return `
+    <div class="lesson-tab-nav">${tabNav}</div>
+    ${tabContent}
+    ${completeBtn}
+  `;
+}
+
+function buildExplicacion(c) {
+  return `<div class="explicacion">${mdToHtml(c.explicacion)}</div>`;
+}
+
+function buildMetafora(c) {
+  return `<div class="metafora-card">
+    <div class="metafora-card__icon">&#128161;</div>
+    <div class="metafora-card__title">Metafora</div>
+    <div class="metafora-card__text">${mdToHtml(c.metafora)}</div>
+  </div>`;
+}
+
+function buildCodigo(c) {
+  const code = c.codigo;
+  return `<div class="code-block">
+    <div class="code-block__header">
+      <span class="code-block__title">${escapeHtml(code.titulo)}</span>
+      <span class="code-block__lang">${code.lenguaje}</span>
+      <button class="code-block__copy" onclick="copyCode(this)">Copiar</button>
+    </div>
+    <pre><code>${escapeHtml(code.codigo)}</code></pre>
+  </div>`;
+}
+
+function buildReto(c) {
+  const r = c.mini_reto;
+  const isCompleted = state.completedRetos.includes(c.id);
+  const criterios = r.criterios_exito.map((cr, i) => {
+    const checked = isCompleted ? 'checked' : '';
+    return `<label class="reto-criteria__item ${isCompleted ? 'checked' : ''}">
+      <input type="checkbox" data-reto="${c.id}" data-crit="${i}" ${checked} ${isCompleted ? 'disabled' : ''}>
+      <span>${cr}</span>
+    </label>`;
+  }).join('');
+
+  return `<div class="reto-card">
+    <div class="reto-card__header">
+      <span class="reto-card__icon">&#127919;</span>
+      <span class="reto-card__title">${r.titulo}</span>
+      <span class="reto-card__xp">+${r.xp_extra} XP</span>
+    </div>
+    <div class="reto-card__desc">${r.descripcion}</div>
+    <div class="reto-criteria">${criterios}</div>
+    <textarea class="reto-textarea" placeholder="Escribe tu solucion aqui..." ${isCompleted ? 'disabled' : ''}></textarea>
+    <button class="reto-btn" data-reto-verify="${c.id}" ${isCompleted ? 'disabled' : ''}>${isCompleted ? '&#10003; Reto completado' : 'Verificar reto'}</button>
+    <div class="reto-result-area" data-reto-result="${c.id}"></div>
+  </div>`;
+}
+
+function buildGlosario(c) {
+  const entries = Object.entries(c.glosario);
+  if (!entries.length) return '<p style="color:var(--text-muted)">Sin glosario para esta leccion.</p>';
+  const rows = entries.map(([term, def]) => `<tr class="glosario-row" data-glossary-click>
+    <td class="glosario-term">${term}</td>
+    <td class="glosario-def">${def}</td>
+  </tr>`).join('');
+  return `<table class="glosario-table"><tbody>${rows}</tbody></table>`;
+}
+
+function buildPrompt(c) {
+  return `<div class="prompt-section">
+    <button class="prompt-toggle" onclick="togglePrompt(this)">
+      <span>&#127912; Ver prompt para infografia</span>
+      <span class="prompt-toggle__icon">&#9660;</span>
+    </button>
+    <div class="prompt-content">
+      <div class="prompt-content__inner">${c.prompt_infografia}</div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// BADGES
+// ============================================================
+function renderBadges() {
+  const grid = document.getElementById('badgeGrid');
+  grid.innerHTML = '';
+  GAMIFICATION.badges.forEach(b => {
+    const unlocked = state.badges.includes(b.id);
+    const card = document.createElement('div');
+    card.className = `badge-card${unlocked ? ' unlocked' : ' locked'}`;
+    card.innerHTML = `
+      <div class="badge-card__icon">${unlocked ? b.icono : '&#128274;'}</div>
+      <div class="badge-card__name">${b.nombre}</div>
+      <div class="badge-card__desc">${b.descripcion}</div>
+      <div class="badge-card__condition">${b.condicion}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// MAP
+// ============================================================
+function renderMap() {
+  const flow = document.getElementById('mapFlow');
+  flow.innerHTML = '';
+  const route = COURSE_DATA.rutas_pedagogicas.find(r => r.nombre === state.route) || COURSE_DATA.rutas_pedagogicas[0];
+  const ordered = route.nodos_orden.map(id => CONCEPTS.find(c => c.id === id)).filter(Boolean);
+
+  let lastZone = '';
+  ordered.forEach((c, i) => {
+    if (c.zona !== lastZone) {
+      const zoneLabel = document.createElement('div');
+      zoneLabel.className = 'map-zone-label';
+      zoneLabel.textContent = c.zona.toUpperCase();
+      flow.appendChild(zoneLabel);
+      lastZone = c.zona;
+    }
+
+    const isCompleted = state.completedLessons.includes(c.id);
+    const isLocked = !checkPrereqs(c);
+    const isCurrent = !isCompleted && !isLocked && !state.completedLessons.includes(c.id);
+
+    // Find first incomplete, unlocked lesson
+    const firstIncomplete = ordered.find(cc => !state.completedLessons.includes(cc.id) && checkPrereqs(cc));
+    const isCurrentNode = firstIncomplete && firstIncomplete.id === c.id;
+
+    const node = document.createElement('div');
+    node.className = `map-node${isCompleted ? ' completed' : ''}${isCurrentNode ? ' current' : ''}${isLocked ? ' locked' : ''}`;
+    node.textContent = `${c.numero}. ${c.titulo}`;
+    flow.appendChild(node);
+
+    if (i < ordered.length - 1) {
+      const arrow = document.createElement('div');
+      arrow.className = 'map-arrow';
+      arrow.innerHTML = '&#9660;';
+      flow.appendChild(arrow);
+    }
+  });
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre code');
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function togglePrompt(btn) {
+  btn.classList.toggle('open');
+  const content = btn.nextElementSibling;
+  if (content.style.maxHeight) {
+    content.style.maxHeight = null;
+  } else {
+    content.style.maxHeight = content.scrollHeight + 'px';
+  }
+}
+
+// Event delegation
+document.addEventListener('click', (e) => {
+  // Tab switching
+  if (e.target.classList.contains('lesson-tab-btn')) {
+    const tabId = e.target.dataset.tab;
+    const nav = e.target.closest('.lesson-tab-nav');
+    const body = e.target.closest('.lesson-body__inner');
+    nav.querySelectorAll('.lesson-tab-btn').forEach(b => b.classList.remove('active'));
+    body.querySelectorAll('.lesson-tab-content').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById(`tab-${tabId}`).classList.add('active');
+    // Recalculate max-height
+    const lessonBody = e.target.closest('.lesson-body');
+    if (lessonBody) setTimeout(() => { lessonBody.style.maxHeight = lessonBody.scrollHeight + 'px'; }, 50);
+  }
+
+  // Complete lesson
+  if (e.target.classList.contains('lesson-complete-btn') && !e.target.classList.contains('done')) {
+    const lessonId = e.target.dataset.lesson;
+    const concept = CONCEPTS.find(c => c.id === lessonId);
+    if (!concept || state.completedLessons.includes(lessonId)) return;
+    state.completedLessons.push(lessonId);
+    saveState(state);
+    addXp(concept.xp, `Leccion completada: ${concept.titulo}`);
+    checkBadges();
+    renderLessons();
+    renderBadges();
+    renderMap();
+  }
+
+  // Verify reto
+  if (e.target.dataset.retoVerify) {
+    const lessonId = e.target.dataset.retoVerify;
+    if (state.completedRetos.includes(lessonId)) return;
+    const card = e.target.closest('.reto-card');
+    const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    const resultArea = card.querySelector(`[data-reto-result="${lessonId}"]`);
+
+    if (allChecked) {
+      state.completedRetos.push(lessonId);
+      saveState(state);
+      const concept = CONCEPTS.find(c => c.id === lessonId);
+      addXp(concept.mini_reto.xp_extra, `Reto completado: ${concept.mini_reto.titulo}`);
+      checkBadges();
+      showToast('reto', 'Reto superado!', concept.mini_reto.titulo);
+      resultArea.innerHTML = '<div class="reto-result reto-result--success">&#9989; Todos los criterios cumplidos. Reto completado!</div>';
+      e.target.disabled = true;
+      e.target.textContent = '&#10003; Reto completado';
+      checkboxes.forEach(cb => cb.disabled = true);
+      card.querySelector('.reto-textarea').disabled = true;
+      renderBadges();
+    } else {
+      resultArea.innerHTML = '<div class="reto-result reto-result--fail">&#10060; Marca todos los criterios de exito antes de verificar.</div>';
+    }
+  }
+
+  // Glossary click
+  if (e.target.closest('[data-glossary-click]')) {
+    state.glossaryViews = (state.glossaryViews || 0) + 1;
+    saveState(state);
+    checkBadges();
+    renderBadges();
+  }
+});
+
+// Burger menu
+document.getElementById('burger').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  checkBadges(true);
+  updateDashboard();
+  renderRoutes();
+  renderLessons();
+  renderBadges();
+  renderMap();
+}
+
+init();
+</script>
+</body>
+</html>

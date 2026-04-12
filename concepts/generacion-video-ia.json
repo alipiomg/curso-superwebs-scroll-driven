@@ -1,0 +1,50 @@
+{
+  "id": "generacion-video-ia",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "De imágenes a video con IA generativa",
+  "numero": 3,
+  "contenido": {
+    "explicacion": "## ¿Qué es la generación de video con IA?\n\nConsiste en transformar imágenes estáticas en video fluido usando herramientas como **Runway Gen-3, Kling AI, Pika Labs o Sora**. Estas herramientas utilizan modelos de difusión para interpolar movimiento entre frames, creando transiciones suaves que serían imposibles de lograr solo con las imágenes originales. También podemos usar **FFmpeg** para compilar secuencias de imágenes en video.\n\n## ¿Por qué importa?\n\nLas imágenes generadas por IA en el concepto anterior tienen un problema: son estáticas y pueden tener inconsistencias entre frames. Al pasarlas por un generador de video con IA, obtenemos **movimiento fluido y natural** que suaviza las diferencias. El resultado es un video de producto con calidad de estudio de producción profesional. Alternativa: si tienes suficientes frames consistentes, FFmpeg puede compilarlos directamente en video sin IA.\n\n## ¿Cómo funciona?\n\nHay dos flujos principales: (1) **IA generativa**: subes una imagen de referencia a Runway/Kling y describes el movimiento deseado (\"rotate slowly\"). La IA genera un video de 4-10 segundos interpolando frames. (2) **FFmpeg**: si ya tienes una secuencia de imágenes numeradas (frame_0001.png, frame_0002.png...), FFmpeg las ensambla en un video MP4. Especificaciones objetivo: **24 FPS, 1920x1080, MP4 con codec H.264, formato de pixel yuv420p** para máxima compatibilidad. El video resultante será la materia prima que después cortaremos en frames individuales optimizados.",
+    "metafora": "Piensa en la animación **stop-motion** como la de Wallace y Gromit. Alguien modela figuras de plastilina, las mueve milímetro a milímetro, y toma una foto entre cada movimiento. Al reproducir las fotos en secuencia rápida (24 por segundo), las figuras cobran vida. Nosotros hacemos lo mismo: nuestras imágenes de IA son las poses de plastilina, y FFmpeg o Runway son la cámara que las convierte en película.",
+    "ejemplo_codigo": {
+      "lenguaje": "bash",
+      "titulo": "FFmpeg: compilar imágenes en video MP4 optimizado",
+      "codigo": "#!/bin/bash\n# Compile a sequence of images into an optimized MP4 video\n# Images must be named: frame_0001.png, frame_0002.png, etc.\n\nINPUT_DIR=\"./frames\"\nOUTPUT=\"./output/product-rotation.mp4\"\nFRAMERATE=24\n\n# Create output directory\nmkdir -p ./output\n\n# Method 1: From numbered image sequence\n# -framerate: input FPS (how fast to show each image)\n# -i: input pattern (%04d = 4-digit zero-padded number)\n# -c:v libx264: H.264 codec (universal compatibility)\n# -crf 18: quality (0=lossless, 23=default, 18=visually lossless)\n# -pix_fmt yuv420p: pixel format for maximum player compatibility\n# -vf scale: ensure dimensions are even numbers (required by H.264)\nffmpeg -framerate $FRAMERATE \\\n  -i \"${INPUT_DIR}/frame_%04d.png\" \\\n  -c:v libx264 \\\n  -crf 18 \\\n  -preset slow \\\n  -pix_fmt yuv420p \\\n  -vf \"scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2\" \\\n  -movflags +faststart \\\n  \"$OUTPUT\"\n\n# Method 2: From a glob pattern (if names aren't sequential)\n# ffmpeg -framerate 24 \\\n#   -pattern_type glob -i '${INPUT_DIR}/*.png' \\\n#   -c:v libx264 -crf 18 -pix_fmt yuv420p \\\n#   \"$OUTPUT\"\n\n# Verify the output\necho \"=== Video info ===\"\nffprobe -v quiet -print_format json -show_streams \"$OUTPUT\" | grep -E '\"width|\"height|\"duration|\"r_frame_rate|\"codec_name'\n\necho \"Video created: $OUTPUT\""
+    }
+  },
+  "mini_reto": {
+    "titulo": "Crea tu primer video de producto",
+    "descripcion": "Usando las imágenes generadas en el concepto anterior (o nuevas), crea un video de 4-6 segundos. Puedes usar FFmpeg para compilar imágenes O una herramienta de IA como Runway/Kling para generar video desde una imagen. El video debe ser MP4, H.264, al menos 720p.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "El video resultante es un MP4 válido y reproducible",
+      "Tiene una duración de entre 4 y 6 segundos",
+      "La resolución es al menos 1280x720",
+      "El movimiento es fluido (no hay saltos bruscos entre frames)"
+    ],
+    "respuesta_esperada": "Un archivo MP4 de 4-6 segundos mostrando un producto en rotación o movimiento suave. Si se usó FFmpeg, incluir el comando utilizado. Si se usó IA, incluir el prompt y la herramienta.",
+    "xp_extra": 20
+  },
+  "glosario": {
+    "fps": "Frames Per Second (fotogramas por segundo). Define cuántas imágenes se muestran en un segundo de video. 24 FPS es el estándar cinematográfico. Más FPS = movimiento más suave pero archivo más pesado y más frames para procesar.",
+    "H.264": "Codec de compresión de video más utilizado en la web. Ofrece excelente calidad con archivos pequeños y es compatible con todos los navegadores y dispositivos. También conocido como AVC (Advanced Video Coding).",
+    "codec": "Algoritmo que comprime (codifica) y descomprime (decodifica) datos de audio o video. Los codecs de video más comunes son H.264, H.265/HEVC y VP9. Cada uno balancea calidad vs tamaño de archivo de forma diferente.",
+    "stop-motion": "Técnica de animación donde se fotografían objetos físicos moviéndolos incrementalmente entre cada foto. Al reproducir las fotos en secuencia rápida, se crea la ilusión de movimiento continuo. Es la base conceptual de nuestro flujo de trabajo.",
+    "interpolación de frames": "Proceso de generar frames intermedios entre dos frames existentes para crear transiciones más suaves. Las herramientas de video con IA hacen esto automáticamente, rellenando el movimiento entre las poses que les damos."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía que muestre: (1) Dos flujos paralelos: Imágenes → IA Video (Runway/Kling) → MP4 vs Imágenes → FFmpeg → MP4. (2) Specs del video ideal: 24fps, 1920x1080, H.264, yuv420p. (3) Comparativa visual de calidad: pocos frames (choppy) vs muchos frames (smooth). (4) Logos de herramientas: Runway, Kling, Pika, FFmpeg.",
+    "plataforma_recomendada": "Figma o Canva",
+    "estilo": "Fondo oscuro, diagrama de flujo con flechas neón, iconos de herramientas, antes/después del video resultante, estilo tech premium"
+  },
+  "conexiones": {
+    "prerequisitos": ["generacion-imagenes-ia"],
+    "siguiente_recomendado": ["ffmpeg-extraccion-frames"],
+    "conceptos_relacionados": ["html5-canvas-renderer"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno puede crear un video MP4 a partir de imágenes usando FFmpeg o herramientas de IA generativa, con las especificaciones técnicas correctas.",
+    "instincts_que_aplican": ["dominio de herramientas", "flujo de producción", "calidad técnica"],
+    "confidence_pedagogica": 0.85
+  }
+}

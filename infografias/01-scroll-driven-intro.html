@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografia 01 — Scroll-Driven Animations</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#111;--border:#1e1e1e;--text:#f0f0f0;--muted:#888;--accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.infographic{width:800px;max-width:100%;background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;position:relative}
+.infographic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,136,.04),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.04),transparent 50%);pointer-events:none}
+
+/* Header */
+.header{padding:2.5rem 2.5rem 1.5rem;text-align:center;position:relative}
+.header .num{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--cyan));font-weight:800;font-size:1.1rem;color:var(--bg);margin-bottom:1rem}
+.header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;line-height:1.2;margin-bottom:.5rem}
+.header h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header p{font-size:.85rem;color:var(--muted);max-width:500px;margin:0 auto}
+
+/* Section */
+.section{padding:0 2.5rem 2rem;position:relative}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(0,255,136,.2),transparent)}
+
+/* Comparison */
+.comparison{display:grid;grid-template-columns:1fr 60px 1fr;gap:0;align-items:stretch;margin-bottom:1.5rem}
+.comp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative}
+.comp-card.time{border-color:rgba(239,68,68,.15)}
+.comp-card.scroll{border-color:rgba(0,255,136,.15)}
+.comp-card h3{font-size:.85rem;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+.comp-card.time h3{color:#ef4444}
+.comp-card.scroll h3{color:var(--accent)}
+.comp-icon{font-size:1.2rem}
+.comp-vs{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;color:var(--muted)}
+
+/* Progress bars */
+.progress-demo{height:8px;border-radius:4px;background:var(--border);overflow:hidden;margin-bottom:.5rem;position:relative}
+.progress-demo .fill{height:100%;border-radius:4px}
+.progress-demo .fill.auto{background:#ef4444;width:100%;animation:autoProgress 3s linear infinite}
+.progress-demo .fill.manual{background:var(--accent);width:45%}
+@keyframes autoProgress{0%{width:0}100%{width:100%}}
+.comp-desc{font-size:.72rem;color:var(--muted)}
+.comp-desc strong{color:var(--text)}
+
+/* Mapping diagram */
+.mapping{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.mapping-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem}
+.mapping-label{font-size:.75rem;font-weight:600;width:120px;text-align:right;flex-shrink:0}
+.mapping-bar{flex:1;height:24px;border-radius:6px;position:relative;overflow:hidden}
+.mapping-bar.scroll-bar{background:linear-gradient(90deg,rgba(0,255,136,.15),rgba(0,255,136,.3))}
+.mapping-bar.anim-bar{background:linear-gradient(90deg,rgba(0,212,255,.15),rgba(0,212,255,.3))}
+.mapping-bar .tick{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.15)}
+.mapping-bar .tick-label{position:absolute;top:50%;transform:translateY(-50%);font-size:.6rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.mapping-arrow{display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--accent);margin:.3rem 0;letter-spacing:.5rem}
+
+/* Code snippet */
+.code-box{background:#0d0d0d;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem}
+.code-header{padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.code-header span{font-size:.65rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.code-lang{color:var(--cyan)!important;text-transform:uppercase;letter-spacing:.08em}
+.code-body{padding:1rem;font-family:'JetBrains Mono',monospace;font-size:.78rem;line-height:1.7}
+.code-body .kw{color:#c792ea}
+.code-body .prop{color:#82aaff}
+.code-body .val{color:#c3e88d}
+.code-body .fn{color:#82aaff}
+.code-body .cm{color:#546e7a}
+.code-body .hl{background:rgba(0,255,136,.08);display:inline;padding:.1rem .3rem;border-radius:3px;color:var(--accent)}
+
+/* Footer */
+.footer{padding:1rem 2.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.7rem;color:var(--muted)}
+.footer .brand{color:var(--accent);font-weight:700}
+
+@media(max-width:600px){
+  .comparison{grid-template-columns:1fr;gap:.75rem}
+  .comp-vs{display:none}
+  .infographic{border-radius:12px}
+  .header,.section{padding-left:1.5rem;padding-right:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="infographic">
+
+  <div class="header">
+    <div class="num">01</div>
+    <h1><span>Scroll-Driven</span> Animations</h1>
+    <p>La animacion controlada por el scroll del usuario, no por el tiempo</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Comparativa</div>
+    <div class="comparison">
+      <div class="comp-card time">
+        <h3><span class="comp-icon">&#9202;</span> Time-based</h3>
+        <div class="progress-demo"><div class="fill auto"></div></div>
+        <p class="comp-desc">La animacion <strong>se reproduce sola</strong> cuando el elemento es visible. El usuario no tiene control.</p>
+      </div>
+      <div class="comp-vs">VS</div>
+      <div class="comp-card scroll">
+        <h3><span class="comp-icon">&#9995;</span> Scroll-driven</h3>
+        <div class="progress-demo"><div class="fill manual"></div></div>
+        <p class="comp-desc">El <strong>scroll controla el progreso</strong>. Hacia abajo avanza, hacia arriba retrocede. Control total.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Mapeo scroll &rarr; animacion</div>
+    <div class="mapping">
+      <div class="mapping-row">
+        <div class="mapping-label" style="color:var(--accent)">Scroll %</div>
+        <div class="mapping-bar scroll-bar">
+          <div class="tick" style="left:0"><span class="tick-label" style="left:4px">0%</span></div>
+          <div class="tick" style="left:25%"></div>
+          <div class="tick" style="left:50%"><span class="tick-label" style="left:4px">50%</span></div>
+          <div class="tick" style="left:75%"></div>
+          <div class="tick" style="left:calc(100% - 1px)"><span class="tick-label" style="right:4px">100%</span></div>
+        </div>
+      </div>
+      <div class="mapping-arrow">&#8595; &#8595; &#8595;</div>
+      <div class="mapping-row">
+        <div class="mapping-label" style="color:var(--cyan)">Animacion %</div>
+        <div class="mapping-bar anim-bar">
+          <div class="tick" style="left:0"><span class="tick-label" style="left:4px">0%</span></div>
+          <div class="tick" style="left:25%"></div>
+          <div class="tick" style="left:50%"><span class="tick-label" style="left:4px">50%</span></div>
+          <div class="tick" style="left:75%"></div>
+          <div class="tick" style="left:calc(100% - 1px)"><span class="tick-label" style="right:4px">100%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">CSS nativo</div>
+    <div class="code-box">
+      <div class="code-header">
+        <span>Scroll-driven animation</span>
+        <span class="code-lang">CSS</span>
+      </div>
+      <div class="code-body">
+        <span class="kw">@keyframes</span> <span class="fn">reveal</span> {<br>
+        &nbsp;&nbsp;<span class="kw">from</span> { <span class="prop">opacity</span>: <span class="val">0</span>; <span class="prop">transform</span>: <span class="val">translateY(40px)</span>; }<br>
+        &nbsp;&nbsp;<span class="kw">to</span> { <span class="prop">opacity</span>: <span class="val">1</span>; <span class="prop">transform</span>: <span class="val">translateY(0)</span>; }<br>
+        }<br><br>
+        <span class="kw">.section</span> {<br>
+        &nbsp;&nbsp;<span class="prop">animation</span>: <span class="val">reveal linear both</span>;<br>
+        &nbsp;&nbsp;<span class="hl">animation-timeline: scroll();</span><br>
+        &nbsp;&nbsp;<span class="prop">animation-range</span>: <span class="val">entry 0% entry 100%</span>;<br>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Leccion 01 / 12</span>
+    <span class="brand">Rural Makers</span>
+    <span>Superwebs Scroll-Driven</span>
+  </div>
+
+</div>
+</body>
+</html>

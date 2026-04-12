@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitacora — Superwebs Scroll-Driven | Rural Makers</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0a;--surface:#111;--card:#161616;--border:#1e1e1e;
+  --text:#e8e8e8;--muted:#888;--dim:#555;
+  --accent:#00ff88;--cyan:#00d4ff;--purple:#a855f7;--warning:#f59e0b;--danger:#ef4444;
+  --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+  --max-w:900px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
+body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px}
+a{color:var(--accent);text-decoration:none;transition:opacity .2s}
+a:hover{opacity:.8}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-weight:800;font-size:1rem;letter-spacing:-.02em}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:1.25rem;font-size:.8rem}
+.nav-links a{color:var(--muted);font-weight:500}
+.nav-links a:hover{color:var(--accent);opacity:1}
+
+/* HERO */
+.hero{padding:4rem 1.5rem 3rem;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(0,255,136,.04),transparent 60%)}
+.hero h1{font-size:clamp(1.5rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:.95rem;max-width:600px;margin:0 auto}
+.hero-meta{display:flex;gap:1.5rem;justify-content:center;margin-top:1.25rem;font-size:.75rem;color:var(--dim)}
+.hero-meta span{display:flex;align-items:center;gap:.35rem}
+
+/* MAIN */
+.main{max-width:var(--max-w);margin:0 auto;padding:2rem 1.5rem}
+
+/* SECTION TITLE */
+.section-title{font-size:1.2rem;font-weight:700;margin:2.5rem 0 1rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem}
+.section-title .icon{font-size:1rem}
+
+/* CARDS */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:2rem}
+.doc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;transition:border-color .2s,box-shadow .2s}
+.doc-card:hover{border-color:rgba(0,255,136,.15);box-shadow:0 4px 24px rgba(0,255,136,.04)}
+.doc-card__tag{font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;padding:.15rem .45rem;border-radius:4px;font-weight:600;display:inline-block;margin-bottom:.5rem}
+.doc-card__tag--core{background:rgba(0,255,136,.1);color:var(--accent)}
+.doc-card__tag--pedagogy{background:rgba(168,85,247,.1);color:var(--purple)}
+.doc-card__tag--asset{background:rgba(0,212,255,.1);color:var(--cyan)}
+.doc-card__tag--meta{background:rgba(245,158,11,.1);color:var(--warning)}
+.doc-card h3{font-size:.95rem;font-weight:700;margin-bottom:.35rem}
+.doc-card p{font-size:.78rem;color:var(--muted);line-height:1.5}
+.doc-card__link{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:600;margin-top:.75rem;color:var(--accent)}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem;margin-bottom:2rem}
+.timeline::before{content:'';position:absolute;left:.5rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--cyan),var(--purple))}
+.entry{position:relative;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.entry:last-child{border-bottom:none;margin-bottom:0}
+.entry::before{content:'';position:absolute;left:-1.65rem;top:.35rem;width:10px;height:10px;border-radius:50%;border:2px solid var(--accent);background:var(--bg)}
+.entry.current::before{background:var(--accent);box-shadow:0 0 8px rgba(0,255,136,.4)}
+.entry-date{font-size:.7rem;color:var(--dim);font-family:var(--mono);margin-bottom:.25rem}
+.entry-title{font-size:1rem;font-weight:700;margin-bottom:.3rem}
+.entry-body{font-size:.85rem;color:var(--muted);line-height:1.6}
+.entry-body ul{margin:.5rem 0 .5rem 1rem}
+.entry-body li{margin-bottom:.25rem}
+.entry-body code{background:rgba(0,212,255,.08);color:var(--cyan);padding:.1rem .3rem;border-radius:3px;font-size:.78rem;font-family:var(--mono)}
+.entry-tags{display:flex;gap:.4rem;margin-top:.5rem;flex-wrap:wrap}
+.entry-tag{font-size:.6rem;padding:.1rem .4rem;border-radius:3px;background:rgba(255,255,255,.04);color:var(--dim);font-weight:500}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:2rem}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat:nth-child(1)::after{background:var(--accent)}
+.stat:nth-child(2)::after{background:var(--cyan)}
+.stat:nth-child(3)::after{background:var(--purple)}
+.stat:nth-child(4)::after{background:var(--warning)}
+.stat__val{font-size:1.8rem;font-weight:800;line-height:1}
+.stat__label{font-size:.7rem;color:var(--muted);margin-top:.25rem;text-transform:uppercase;letter-spacing:.05em}
+
+/* CONCEPT LIST */
+.concept-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem}
+.concept-row{display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:.82rem;transition:border-color .2s}
+.concept-row:hover{border-color:rgba(0,212,255,.15)}
+.concept-num{width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--cyan));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem;color:var(--bg);flex-shrink:0}
+.concept-name{font-weight:600;flex:1}
+.concept-zone{font-size:.6rem;color:var(--purple);background:rgba(168,85,247,.08);padding:.1rem .4rem;border-radius:3px;text-transform:uppercase;letter-spacing:.06em}
+.concept-type{font-size:.6rem;padding:.1rem .4rem;border-radius:3px}
+.concept-type--teoria{background:rgba(59,130,246,.1);color:#60a5fa}
+.concept-type--practica{background:rgba(16,185,129,.1);color:#34d399}
+
+/* DECISIONS */
+.decision{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin-bottom:.75rem}
+.decision__q{font-weight:700;font-size:.88rem;margin-bottom:.25rem}
+.decision__a{font-size:.82rem;color:var(--muted)}
+.decision__why{font-size:.72rem;color:var(--dim);margin-top:.25rem;font-style:italic}
+
+/* GOTCHAS */
+.gotcha{background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.12);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem}
+.gotcha__title{font-weight:700;font-size:.85rem;color:var(--danger);margin-bottom:.25rem;display:flex;align-items:center;gap:.4rem}
+.gotcha__fix{font-size:.82rem;color:var(--muted)}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;font-size:.75rem;color:var(--dim);background:rgba(0,0,0,.3)}
+.footer a{color:var(--accent)}
+
+@media(max-width:640px){
+  .doc-grid{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .hero-meta{flex-direction:column;gap:.5rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#" class="nav-logo">Rural <span>Makers</span> / Bitacora</a>
+  <div class="nav-links">
+    <a href="landing-superwebs-scroll-driven.html">Landing</a>
+    <a href="curso-superwebs-scroll-driven.html">Curso</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#docs">Docs</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1>Bitacora del <span>Curso Scroll-Driven</span></h1>
+  <p>Registro de decisiones, progreso y aprendizajes del proyecto "Superwebs Scroll-Driven con Video + IA"</p>
+  <div class="hero-meta">
+    <span>v1.0.0</span>
+    <span>Inicio: 2026-04-11</span>
+    <span>12 lecciones</span>
+    <span>Rural Makers</span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat"><div class="stat__val">12</div><div class="stat__label">Conceptos</div></div>
+    <div class="stat"><div class="stat__val">740</div><div class="stat__label">XP Total</div></div>
+    <div class="stat"><div class="stat__val">7</div><div class="stat__label">Badges</div></div>
+    <div class="stat"><div class="stat__val">3</div><div class="stat__label">Entregables</div></div>
+  </div>
+
+  <!-- DOCS CONECTADOS -->
+  <h2 class="section-title" id="docs"><span class="icon">&#128196;</span> Documentacion conectada</h2>
+  <div class="doc-grid">
+    <div class="doc-card">
+      <span class="doc-card__tag doc-card__tag--core">Core</span>
+      <h3>course.json</h3>
+      <p>Fuente de verdad del curso: metadatos, rutas pedagogicas, prerequisitos y estructura completa.</p>
+      <a href="course.json" class="doc-card__link">Ver archivo &rarr;</a>
+    </div>
+    <div class="doc-card">
+      <span class="doc-card__tag doc-card__tag--pedagogy">Pedagogia</span>
+      <h3>COURSE-PEDAGOGY.md</h3>
+      <p>Patrones pedagogicos aplicados: instincts, decisiones de diseno, observables y metricas objetivo.</p>
+      <a href="COURSE-PEDAGOGY.md" class="doc-card__link">Ver archivo &rarr;</a>
+    </div>
+    <div class="doc-card">
+      <span class="doc-card__tag doc-card__tag--asset">Entregable</span>
+      <h3>Landing Page</h3>
+      <p>Embudo de ventas scroll-driven con canvas + GSAP + Lenis. Demo viva de la tecnica del curso.</p>
+      <a href="landing-superwebs-scroll-driven.html" class="doc-card__link">Ver landing &rarr;</a>
+    </div>
+    <div class="doc-card">
+      <span class="doc-card__tag doc-card__tag--asset">Entregable</span>
+      <h3>Curso Interactivo</h3>
+      <p>12 lecciones HTML gamificadas con localStorage, XP, badges, mapa conceptual y retos verificables.</p>
+      <a href="curso-superwebs-scroll-driven.html" class="doc-card__link">Ver curso &rarr;</a>
+    </div>
+    <div class="doc-card">
+      <span class="doc-card__tag doc-card__tag--meta">Meta</span>
+      <h3>CHANGELOG.md</h3>
+      <p>Historial de cambios versionado. Que se anadio, cambio o arreglo en cada version.</p>
+      <a href="CHANGELOG.md" class="doc-card__link">Ver archivo &rarr;</a>
+    </div>
+    <div class="doc-card">
+      <span class="doc-card__tag doc-card__tag--meta">Prompts</span>
+      <h3>Prompts Infografias</h3>
+      <p>12 prompts formateados para NanoBananaPro/Higgsfield listos para generar infografias.</p>
+      <a href="prompts-infografias-nanobananapro.md" class="doc-card__link">Ver prompts &rarr;</a>
+    </div>
+  </div>
+
+  <!-- MAPA DE CONCEPTOS -->
+  <h2 class="section-title"><span class="icon">&#128506;</span> Mapa de conceptos (12 nodos)</h2>
+  <div class="concept-list">
+    <div class="concept-row"><div class="concept-num">01</div><div class="concept-name">Que son las animaciones Scroll-Driven</div><span class="concept-zone">Fundamentos</span><span class="concept-type concept-type--teoria">Teoria</span></div>
+    <div class="concept-row"><div class="concept-num">02</div><div class="concept-name">Generar imagenes de producto con IA</div><span class="concept-zone">Assets</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">03</div><div class="concept-name">De imagenes a video con IA generativa</div><span class="concept-zone">Assets</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">04</div><div class="concept-name">FFmpeg: extraer y optimizar frames</div><span class="concept-zone">Herramientas</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">05</div><div class="concept-name">Canvas como motor de rendering</div><span class="concept-zone">Frontend</span><span class="concept-type concept-type--teoria">Teoria</span></div>
+    <div class="concept-row"><div class="concept-num">06</div><div class="concept-name">Lenis: smooth scroll profesional</div><span class="concept-zone">Frontend</span><span class="concept-type concept-type--teoria">Teoria</span></div>
+    <div class="concept-row"><div class="concept-num">07</div><div class="concept-name">GSAP + ScrollTrigger: el cerebro del scroll</div><span class="concept-zone">Frontend</span><span class="concept-type concept-type--teoria">Teoria</span></div>
+    <div class="concept-row"><div class="concept-num">08</div><div class="concept-name">Vincular scroll a frames del canvas</div><span class="concept-zone">Frontend</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">09</div><div class="concept-name">7 tipos de animacion para secciones</div><span class="concept-zone">Diseno</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">10</div><div class="concept-name">Branding generativo: paleta, tipo, naming</div><span class="concept-zone">Diseno</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">11</div><div class="concept-name">Estructura HTML/CSS/JS y tokens de diseno</div><span class="concept-zone">Integracion</span><span class="concept-type concept-type--practica">Practica</span></div>
+    <div class="concept-row"><div class="concept-num">12</div><div class="concept-name">El skill video2website: automatizar todo</div><span class="concept-zone">Automatizacion</span><span class="concept-type concept-type--practica">Practica</span></div>
+  </div>
+
+  <!-- DECISIONES CLAVE -->
+  <h2 class="section-title"><span class="icon">&#9889;</span> Decisiones clave</h2>
+  <div class="decision">
+    <div class="decision__q">HTML autocontenido sin build tools</div>
+    <div class="decision__a">Todo en un solo HTML con CSS y JS inline. Deploy directo en GitHub Pages con <code>npx serve</code>.</div>
+    <div class="decision__why">Porque: minimiza friccion para el alumno. Cero dependencias, cero configuracion. Copiar, abrir y funciona.</div>
+  </div>
+  <div class="decision">
+    <div class="decision__q">localStorage para gamificacion zero-backend</div>
+    <div class="decision__a">XP, badges, progreso y retos se persisten en localStorage del navegador.</div>
+    <div class="decision__why">Porque: no hay backend ni base de datos. El curso es 100% estatico. El alumno no necesita cuenta.</div>
+  </div>
+  <div class="decision">
+    <div class="decision__q">course.json como unica fuente de verdad</div>
+    <div class="decision__a">Metadatos, rutas, prerequisitos y gamificacion definidos en un solo JSON. Los HTML lo consumen.</div>
+    <div class="decision__why">Porque: facilita validacion cruzada y evita inconsistencias entre landing, curso y conceptos.</div>
+  </div>
+  <div class="decision">
+    <div class="decision__q">2 rutas pedagogicas: lineal + exploratoria</div>
+    <div class="decision__a">Ruta lineal para principiantes (prerequisitos estrictos). Ruta exploratoria para avanzados (solo requiere leccion 1).</div>
+    <div class="decision__why">Porque: diferentes perfiles de alumno necesitan diferentes niveles de estructura.</div>
+  </div>
+
+  <!-- GOTCHAS -->
+  <h2 class="section-title"><span class="icon">&#9888;&#65039;</span> Gotchas detectados</h2>
+  <div class="gotcha">
+    <div class="gotcha__title">HTML tags dentro de inline code se renderizan como elementos reales</div>
+    <div class="gotcha__fix"><strong>Fix:</strong> La funcion <code>mdToHtml()</code> debe escapar HTML (<code>escapeHtml()</code>) dentro de backticks inline y bloques de codigo ANTES de envolverlos en <code>&lt;code&gt;</code>. Sin esto, <code>`&lt;canvas&gt;`</code> se renderiza como un canvas HTML real.</div>
+  </div>
+  <div class="gotcha">
+    <div class="gotcha__title">&lt;/script&gt; dentro de JSON embebido rompe el parser HTML</div>
+    <div class="gotcha__fix"><strong>Fix:</strong> Escapar como <code>&lt;\\/script&gt;</code> en cualquier string JSON que contenga tags de cierre de script.</div>
+  </div>
+  <div class="gotcha">
+    <div class="gotcha__title">Badges no se recalculan al recargar la pagina</div>
+    <div class="gotcha__fix"><strong>Fix:</strong> Llamar <code>checkBadges(true)</code> (modo silencioso) en <code>init()</code> antes de <code>renderBadges()</code>. Sin esto, si el estado pierde badges, no se recuperan hasta completar otra accion.</div>
+  </div>
+  <div class="gotcha">
+    <div class="gotcha__title">IDs de prerequisitos deben validarse contra course.json</div>
+    <div class="gotcha__fix"><strong>Fix:</strong> Antes de generar artefactos, verificar que cada ID de prerequisito en los concept files exista en course.json.</div>
+  </div>
+
+  <!-- TIMELINE -->
+  <h2 class="section-title" id="timeline"><span class="icon">&#128197;</span> Timeline del proyecto</h2>
+  <div class="timeline">
+    <div class="entry">
+      <div class="entry-date">2026-04-11 — Sesion 1</div>
+      <div class="entry-title">Creacion completa del curso</div>
+      <div class="entry-body">
+        <ul>
+          <li>12 conceptos pedagogicos con microlecciones de 6 secciones cada uno</li>
+          <li>Mapa conceptual con 2 rutas (lineal + exploratoria)</li>
+          <li>Sistema de gamificacion: 5 niveles, 7 badges, 440 XP base + 300 extra</li>
+          <li>6 eventos observables para mejora iterativa</li>
+          <li>Landing page scroll-driven con canvas + GSAP + Lenis</li>
+          <li>Curso interactivo HTML gamificado con localStorage</li>
+          <li>12 prompts de infografia</li>
+        </ul>
+      </div>
+      <div class="entry-tags">
+        <span class="entry-tag">v1.0.0</span>
+        <span class="entry-tag">creacion</span>
+        <span class="entry-tag">estructura completa</span>
+      </div>
+    </div>
+    <div class="entry current">
+      <div class="entry-date">2026-04-12 — Sesion 2</div>
+      <div class="entry-title">Pulido visual + bug fixes</div>
+      <div class="entry-body">
+        <ul>
+          <li><strong>Landing:</strong> Hero canvas reescrito con mesh gradient (5 blobs + particulas), emojis reemplazados por SVGs, glassmorphism en cards, noise texture, separadores de seccion, CTAs conectados al curso</li>
+          <li><strong>Curso:</strong> Fix critico de <code>mdToHtml()</code> que renderizaba HTML tags como elementos reales en vez de texto</li>
+          <li><strong>Curso:</strong> <code>checkBadges(true)</code> anadido al init para recalcular badges al cargar</li>
+          <li><strong>Responsive:</strong> Accordion badges reposicionados en mobile, CTA final ajustado</li>
+          <li><strong>Meta:</strong> 12 prompts NanoBananaPro generados, bitacora creada</li>
+        </ul>
+      </div>
+      <div class="entry-tags">
+        <span class="entry-tag">v1.1.0</span>
+        <span class="entry-tag">diseno</span>
+        <span class="entry-tag">bugfix</span>
+        <span class="entry-tag">infografias</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROXIMOS PASOS -->
+  <h2 class="section-title"><span class="icon">&#128640;</span> Proximos pasos</h2>
+  <div class="concept-list">
+    <div class="concept-row"><div class="concept-num" style="background:var(--warning)">!</div><div class="concept-name">Generar infografias con NanoBananaPro (12 imagenes)</div><span class="concept-zone">Contenido</span></div>
+    <div class="concept-row"><div class="concept-num" style="background:var(--warning)">!</div><div class="concept-name">Crear esquemas Excalidraw para cada leccion</div><span class="concept-zone">Contenido</span></div>
+    <div class="concept-row"><div class="concept-num" style="background:var(--purple)">~</div><div class="concept-name">Deploy en GitHub Pages</div><span class="concept-zone">Deploy</span></div>
+    <div class="concept-row"><div class="concept-num" style="background:var(--purple)">~</div><div class="concept-name">Revisar demo superweb en ../demo-superweb/</div><span class="concept-zone">Demo</span></div>
+    <div class="concept-row"><div class="concept-num" style="background:var(--dim)">?</div><div class="concept-name">Mejorar testimonial (quitar auto-cita o anadir reales)</div><span class="concept-zone">UX</span></div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <p>Bitacora del proyecto Superwebs Scroll-Driven con Video + IA</p>
+  <p>Creado por <a href="#">Alipio / Rural Makers</a> &mdash; Powered by <a href="#">Synapis Course Architect</a></p>
+</footer>
+
+</body>
+</html>

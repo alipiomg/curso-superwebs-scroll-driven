@@ -1,0 +1,228 @@
+{
+  "id": "superwebs-scroll-driven",
+  "version": "1.0.0",
+  "title": "Superwebs Scroll-Driven con Video + IA",
+  "subtitle": "Crea landing pages premium con video frame-a-frame sincronizado al scroll",
+  "dominio": "Web Scroll-Driven con Video",
+  "descripcion_corta": "Curso completo para crear webs con animación de video sincronizada al scroll usando IA generativa, FFmpeg, GSAP, Lenis y Claude Code",
+  "duracion_estimada_horas": 8,
+  "nivel_dificultad": "intermedio",
+  "objetivos_pedagogicos": [
+    "Entender cómo funciona la sincronización scroll→frame a nivel técnico",
+    "Generar assets visuales (imágenes + video) con IA generativa",
+    "Dominar FFmpeg para extracción y optimización de frames",
+    "Construir un canvas renderer con Lenis + GSAP + ScrollTrigger",
+    "Automatizar todo el proceso con el skill video2website de Claude Code"
+  ],
+  "nodos": [
+    {
+      "id": "scroll-driven-intro",
+      "numero": 1,
+      "titulo": "Qué son las animaciones Scroll-Driven",
+      "descripcion_corta": "Fundamentos de scroll-driven animations y por qué son el estándar premium",
+      "tipo": "teoria",
+      "prerequisitos": [],
+      "conecta_a": ["generacion-imagenes-ia", "html5-canvas-renderer", "lenis-smooth-scroll", "identidad-marca-generativa"],
+      "xp": 25,
+      "confidence_pedagogica": 0.90,
+      "zona": "fundamentos"
+    },
+    {
+      "id": "generacion-imagenes-ia",
+      "numero": 2,
+      "titulo": "Generar imágenes de producto con IA",
+      "descripcion_corta": "Crear fotogramas de producto con Freepik AI y prompts estratégicos",
+      "tipo": "practica",
+      "prerequisitos": ["scroll-driven-intro"],
+      "conecta_a": ["generacion-video-ia"],
+      "xp": 35,
+      "confidence_pedagogica": 0.85,
+      "zona": "assets"
+    },
+    {
+      "id": "generacion-video-ia",
+      "numero": 3,
+      "titulo": "De imágenes a video con IA generativa",
+      "descripcion_corta": "Convertir imágenes en video fluido con Runway, Kling o Sora",
+      "tipo": "practica",
+      "prerequisitos": ["generacion-imagenes-ia"],
+      "conecta_a": ["ffmpeg-extraccion-frames"],
+      "xp": 35,
+      "confidence_pedagogica": 0.85,
+      "zona": "assets"
+    },
+    {
+      "id": "ffmpeg-extraccion-frames",
+      "numero": 4,
+      "titulo": "FFmpeg: extraer y optimizar frames",
+      "descripcion_corta": "Usar ffprobe y ffmpeg para analizar video y extraer frames .webp",
+      "tipo": "practica",
+      "prerequisitos": ["generacion-video-ia"],
+      "conecta_a": ["binding-scroll-frames"],
+      "xp": 40,
+      "confidence_pedagogica": 0.90,
+      "zona": "herramientas"
+    },
+    {
+      "id": "html5-canvas-renderer",
+      "numero": 5,
+      "titulo": "Canvas como motor de rendering",
+      "descripcion_corta": "El elemento canvas de HTML5 como superficie de rendering para frames",
+      "tipo": "teoria",
+      "prerequisitos": ["scroll-driven-intro"],
+      "conecta_a": ["gsap-scrolltrigger"],
+      "xp": 30,
+      "confidence_pedagogica": 0.90,
+      "zona": "frontend"
+    },
+    {
+      "id": "lenis-smooth-scroll",
+      "numero": 6,
+      "titulo": "Lenis: smooth scroll profesional",
+      "descripcion_corta": "Configurar Lenis para scroll suave de nivel premium",
+      "tipo": "teoria",
+      "prerequisitos": ["scroll-driven-intro"],
+      "conecta_a": ["gsap-scrolltrigger"],
+      "xp": 30,
+      "confidence_pedagogica": 0.85,
+      "zona": "frontend"
+    },
+    {
+      "id": "gsap-scrolltrigger",
+      "numero": 7,
+      "titulo": "GSAP + ScrollTrigger: el cerebro del scroll",
+      "descripcion_corta": "Configurar timelines, scrub y pin con GSAP ScrollTrigger",
+      "tipo": "teoria",
+      "prerequisitos": ["html5-canvas-renderer", "lenis-smooth-scroll"],
+      "conecta_a": ["binding-scroll-frames", "animaciones-por-seccion"],
+      "xp": 40,
+      "confidence_pedagogica": 0.90,
+      "zona": "frontend"
+    },
+    {
+      "id": "binding-scroll-frames",
+      "numero": 8,
+      "titulo": "Vincular scroll → frame del canvas",
+      "descripcion_corta": "Conectar la posición de scroll con el frame correspondiente del canvas",
+      "tipo": "practica",
+      "prerequisitos": ["ffmpeg-extraccion-frames", "gsap-scrolltrigger"],
+      "conecta_a": ["arquitectura-proyecto"],
+      "xp": 45,
+      "confidence_pedagogica": 0.90,
+      "zona": "integracion"
+    },
+    {
+      "id": "animaciones-por-seccion",
+      "numero": 9,
+      "titulo": "7 tipos de animación para secciones",
+      "descripcion_corta": "fade-up, slide-left, scale-up, rotate-in, stagger-up, clip-reveal y más",
+      "tipo": "practica",
+      "prerequisitos": ["gsap-scrolltrigger"],
+      "conecta_a": ["arquitectura-proyecto"],
+      "xp": 40,
+      "confidence_pedagogica": 0.85,
+      "zona": "frontend"
+    },
+    {
+      "id": "identidad-marca-generativa",
+      "numero": 10,
+      "titulo": "Branding generativo: paleta, tipo, naming",
+      "descripcion_corta": "Crear identidad de marca completa con IA: nombre, colores, tipografías",
+      "tipo": "teoria",
+      "prerequisitos": ["scroll-driven-intro"],
+      "conecta_a": ["arquitectura-proyecto"],
+      "xp": 30,
+      "confidence_pedagogica": 0.80,
+      "zona": "diseno"
+    },
+    {
+      "id": "arquitectura-proyecto",
+      "numero": 11,
+      "titulo": "Estructura HTML/CSS/JS y tokens de diseño",
+      "descripcion_corta": "Organizar el proyecto: archivos, CSS tokens, layout side-aligned",
+      "tipo": "practica",
+      "prerequisitos": ["binding-scroll-frames", "animaciones-por-seccion", "identidad-marca-generativa"],
+      "conecta_a": ["skill-video2website"],
+      "xp": 40,
+      "confidence_pedagogica": 0.85,
+      "zona": "integracion"
+    },
+    {
+      "id": "skill-video2website",
+      "numero": 12,
+      "titulo": "El skill video2website: automatizar todo",
+      "descripcion_corta": "Instalar y usar el skill de Claude Code que genera la web completa",
+      "tipo": "practica",
+      "prerequisitos": ["arquitectura-proyecto"],
+      "conecta_a": [],
+      "xp": 50,
+      "confidence_pedagogica": 0.85,
+      "zona": "automatizacion"
+    }
+  ],
+  "rutas_pedagogicas": [
+    {
+      "nombre": "Ruta lineal",
+      "descripcion": "Paso a paso desde los fundamentos hasta la automatización total",
+      "nodos_orden": [
+        "scroll-driven-intro",
+        "generacion-imagenes-ia",
+        "generacion-video-ia",
+        "ffmpeg-extraccion-frames",
+        "html5-canvas-renderer",
+        "lenis-smooth-scroll",
+        "gsap-scrolltrigger",
+        "binding-scroll-frames",
+        "animaciones-por-seccion",
+        "identidad-marca-generativa",
+        "arquitectura-proyecto",
+        "skill-video2website"
+      ],
+      "recomendada": true
+    },
+    {
+      "nombre": "Ruta exploratoria",
+      "descripcion": "Acceso libre a todos los nodos, con prerequisitos como guía",
+      "nodos_orden": [
+        "scroll-driven-intro",
+        "generacion-imagenes-ia",
+        "generacion-video-ia",
+        "ffmpeg-extraccion-frames",
+        "html5-canvas-renderer",
+        "lenis-smooth-scroll",
+        "gsap-scrolltrigger",
+        "binding-scroll-frames",
+        "animaciones-por-seccion",
+        "identidad-marca-generativa",
+        "arquitectura-proyecto",
+        "skill-video2website"
+      ],
+      "recomendada": false
+    }
+  ],
+  "metadata": {
+    "autor": "Alipio / Rural Makers",
+    "fecha_creacion": "2026-04-11",
+    "fecha_actualizacion": "2026-04-11",
+    "tags": [
+      "scroll-driven",
+      "video",
+      "gsap",
+      "lenis",
+      "ffmpeg",
+      "canvas",
+      "ia-generativa",
+      "claude-code",
+      "landing-page"
+    ],
+    "curso_origen": null,
+    "instincts_aplicados": [
+      "inst_ped_microleccion_6_secciones",
+      "inst_ped_mapa_max_15_nodos",
+      "inst_ped_reto_verificable",
+      "inst_ped_metafora_cotidiana",
+      "inst_ped_codigo_real"
+    ],
+    "synapis_version": "3.2"
+  }
+}

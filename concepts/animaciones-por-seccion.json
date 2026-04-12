@@ -1,0 +1,54 @@
+{
+  "id": "animaciones-por-seccion",
+  "curso_id": "superwebs-scroll-driven",
+  "titulo": "7 tipos de animación para secciones",
+  "numero": 9,
+  "contenido": {
+    "explicacion": "## ¿Qué es?\n\nUn sistema de **7 animaciones predefinidas** que se asignan a las secciones de la página mediante atributos `data-animation`. Cada tipo tiene un propósito narrativo y visual distinto: fade-up, slide-left, slide-right, scale-up, rotate-in, stagger-up y clip-reveal.\n\n## ¿Por qué importa?\n\nLa diferencia entre una web amateur y una premium no es tener animaciones, sino tener las **animaciones correctas en el lugar correcto**. Repetir el mismo efecto en todas las secciones aburre. Usar un efecto inadecuado distrae. Este sistema da variedad con coherencia: cada animación cumple un rol narrativo. Regla de oro: **nunca repetir la misma animación en secciones consecutivas**.\n\n## ¿Cómo funciona?\n\n- **fade-up**: contenido sube con fade. Ideal para introducciones.\n- **slide-left**: entra desde la izquierda. Para texto alineado a la izquierda.\n- **slide-right**: entra desde la derecha. Para texto alineado a la derecha.\n- **scale-up**: escala desde pequeño. Secciones de impacto.\n- **rotate-in**: gira al entrar. Rompe la monotonía.\n- **stagger-up**: elementos aparecen en secuencia escalonada. Ideal para stats/grids.\n- **clip-reveal**: revelado con clip-path. Perfecto para el CTA final.\n\nDentro de cada sección, los elementos se revelan en orden: **label → heading → body → CTA**. Esto crea una jerarquía visual natural que guía la lectura del usuario. El stagger entre elementos es de 0.15-0.2 segundos.",
+    "metafora": "Como el set de cuchillos de un chef profesional: cada cuchillo (animación) tiene un propósito específico. El cuchillo de pan (fade-up) no sirve para filetear (clip-reveal), y un buen chef nunca usa el mismo cuchillo para todo. La variedad con propósito es lo que convierte platos simples en alta cocina.",
+    "ejemplo_codigo": {
+      "lenguaje": "javascript",
+      "titulo": "Los 7 tipos de animación con ScrollTrigger y data-attributes",
+      "codigo": "// HTML: <section data-animation=\"fade-up\"> ... </section>\n\nconst ANIMATIONS = {\n  'fade-up': {\n    from: { opacity: 0, y: 60 },\n    to: { opacity: 1, y: 0 }\n  },\n  'slide-left': {\n    from: { opacity: 0, x: -120 },\n    to: { opacity: 1, x: 0 }\n  },\n  'slide-right': {\n    from: { opacity: 0, x: 120 },\n    to: { opacity: 1, x: 0 }\n  },\n  'scale-up': {\n    from: { opacity: 0, scale: 0.7 },\n    to: { opacity: 1, scale: 1 }\n  },\n  'rotate-in': {\n    from: { opacity: 0, rotation: -8, y: 40 },\n    to: { opacity: 1, rotation: 0, y: 0 }\n  },\n  'stagger-up': {\n    from: { opacity: 0, y: 50 },\n    to: { opacity: 1, y: 0 }\n  },\n  'clip-reveal': {\n    from: { clipPath: 'inset(100% 0% 0% 0%)' },\n    to: { clipPath: 'inset(0% 0% 0% 0%)' }\n  }\n};\n\nfunction initSectionAnimations() {\n  document.querySelectorAll('[data-animation]').forEach((section) => {\n    const type = section.dataset.animation;\n    const anim = ANIMATIONS[type];\n    if (!anim) return;\n\n    // Stagger-up: animate children individually\n    if (type === 'stagger-up') {\n      const children = section.querySelectorAll('.stagger-item');\n      gsap.fromTo(children, anim.from, {\n        ...anim.to,\n        duration: 0.8,\n        stagger: 0.15,\n        ease: 'power2.out',\n        scrollTrigger: {\n          trigger: section,\n          start: 'top 75%',\n          end: 'top 25%',\n          toggleActions: 'play none none reverse'\n        }\n      });\n      return;\n    }\n\n    // All other types: staggered reveal of inner elements\n    const elements = section.querySelectorAll(\n      '.section__label, .section__heading, .section__body, .section__cta'\n    );\n\n    if (elements.length > 0) {\n      // Set initial state for the section wrapper\n      gsap.set(section, anim.from);\n\n      const tl = gsap.timeline({\n        scrollTrigger: {\n          trigger: section,\n          start: 'top 75%',\n          end: 'top 25%',\n          toggleActions: 'play none none reverse'\n        }\n      });\n\n      // Reveal the section\n      tl.to(section, {\n        ...anim.to,\n        duration: 0.8,\n        ease: 'power2.out'\n      });\n\n      // Stagger inner elements: label → heading → body → CTA\n      tl.fromTo(elements,\n        { opacity: 0, y: 30 },\n        { opacity: 1, y: 0, duration: 0.6, stagger: 0.18, ease: 'power2.out' },\n        '-=0.4'\n      );\n    } else {\n      // No inner elements: animate section directly\n      gsap.fromTo(section, anim.from, {\n        ...anim.to,\n        duration: 1,\n        ease: 'power2.out',\n        scrollTrigger: {\n          trigger: section,\n          start: 'top 75%',\n          end: 'top 25%',\n          toggleActions: 'play none none reverse'\n        }\n      });\n    }\n  });\n}\n\n// Initialize after DOM ready\ninitSectionAnimations();"
+    }
+  },
+  "mini_reto": {
+    "titulo": "7 secciones, 7 animaciones, revelado escalonado",
+    "descripcion": "Crea una página con 7 secciones, cada una usando un tipo de animación diferente (fade-up, slide-left, slide-right, scale-up, rotate-in, stagger-up, clip-reveal). Cada sección debe tener label, heading y body que se revelan en secuencia escalonada. Nunca repitas la misma animación en secciones consecutivas.",
+    "tipo": "code-editor",
+    "criterios_exito": [
+      "Hay 7 secciones, cada una con un data-animation diferente",
+      "Cada sección contiene label, heading y body",
+      "Los elementos internos se revelan en orden escalonado (label→heading→body)",
+      "No se repite la misma animación en secciones consecutivas",
+      "La sección stagger-up tiene elementos con clase .stagger-item",
+      "La sección clip-reveal usa clipPath animado",
+      "Las animaciones se reversan al scrollear hacia arriba"
+    ],
+    "respuesta_esperada": "Página HTML con 7 sections, cada una con data-animation distinto. JS con objeto ANIMATIONS que define from/to para cada tipo. Función initSectionAnimations() que itera sobre las secciones y aplica la animación correspondiente con ScrollTrigger.",
+    "xp_extra": 30
+  },
+  "glosario": {
+    "stagger": "Propiedad de GSAP que aplica un retardo incremental entre las animaciones de múltiples elementos. Un stagger de 0.15 significa que cada elemento empieza 0.15s después del anterior, creando un efecto de cascada.",
+    "clip-reveal": "Animación que revela contenido animando la propiedad `clip-path`. Típicamente de `inset(100% 0 0 0)` (oculto) a `inset(0% 0 0 0)` (visible). Crea un efecto de cortina o persiana.",
+    "fade-up": "Animación donde el elemento sube (y: 60→0) mientras aparece (opacity: 0→1). Es la animación más versátil y se usa como default para introducciones de contenido.",
+    "data attribute": "Atributo HTML personalizado con prefijo `data-`. `data-animation=\"fade-up\"` permite al JS leer el tipo de animación con `element.dataset.animation` sin contaminar clases CSS.",
+    "reveal sequence": "Orden predefinido en que los elementos de una sección se hacen visibles: primero el label (categoría), luego el heading (título), después el body (texto), y finalmente el CTA (botón). Crea jerarquía visual.",
+    "easing": "Función que controla la aceleración de una animación. `power2.out` empieza rápido y desacelera, creando un movimiento natural. GSAP ofrece ease, power1-4, back, elastic, entre otros."
+  },
+  "prompt_infografia": {
+    "contenido": "Infografía con 7 columnas, una por animación. Cada columna muestra: nombre, icono de dirección del movimiento, cuándo usarla, y un mini-screenshot del efecto. Abajo: diagrama del reveal sequence (label→heading→body→CTA) con tiempos. Regla destacada: nunca repetir animación consecutiva.",
+    "plataforma_recomendada": "Figma",
+    "estilo": "Grid visual de 7 columnas, dark mode, con iconos de flechas indicando dirección de cada animación"
+  },
+  "conexiones": {
+    "prerequisitos": ["gsap-scrolltrigger"],
+    "siguiente_recomendado": ["arquitectura-proyecto", "identidad-marca-generativa"],
+    "conceptos_relacionados": ["binding-scroll-frames", "css-clip-path", "gsap-stagger"]
+  },
+  "metadata_synapis": {
+    "observable_clave": "El alumno aplica los 7 tipos de animación a secciones distintas con data-attributes y reveal escalonado, sin repetir animación consecutiva",
+    "instincts_que_aplican": ["aprender-haciendo", "variedad-con-coherencia", "narrativa-visual"],
+    "confidence_pedagogica": 0.85
+  }
+}
