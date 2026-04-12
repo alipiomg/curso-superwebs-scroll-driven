@@ -196,6 +196,12 @@ img{max-width:100%}
 .prompt-content{max-height:0;overflow:hidden;transition:max-height .3s ease}
 .prompt-content__inner{padding:0 1rem 1rem;font-size:.82rem;color:var(--text-muted);line-height:1.6}
 
+/* Infografia embed */
+.infografia-wrap{border-radius:var(--radius);overflow:hidden;border:1px solid var(--card-border);background:#0a0a0a}
+.infografia-iframe{width:100%;border:none;min-height:700px;display:block;background:#0a0a0a}
+.infografia-link{display:inline-flex;align-items:center;gap:.4rem;margin-top:.75rem;font-size:.75rem;color:var(--accent);font-weight:500;transition:opacity .2s}
+.infografia-link:hover{opacity:.7}
+
 /* Complete button */
 .lesson-complete-btn{display:block;width:100%;background:linear-gradient(135deg,var(--accent),var(--cyan));color:var(--bg);border:none;padding:.7rem;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;margin-top:1rem;transition:all .3s}
 .lesson-complete-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
@@ -504,6 +510,24 @@ function saveState(s) {
 let state = loadState();
 
 // ============================================================
+// INFOGRAFIA MAP — concept ID → file path
+// ============================================================
+const INFOGRAFIA_MAP = {
+  'scroll-driven-intro': 'infografias/01-scroll-driven-intro.html',
+  'generacion-imagenes-ia': 'infografias/02-generacion-imagenes-ia.html',
+  'generacion-video-ia': 'infografias/03-generacion-video-ia.html',
+  'ffmpeg-extraccion-frames': 'infografias/04-ffmpeg-frames.html',
+  'html5-canvas-renderer': 'infografias/05-canvas-rendering.html',
+  'lenis-smooth-scroll': 'infografias/06-lenis-smooth-scroll.html',
+  'gsap-scrolltrigger': 'infografias/07-gsap-scrolltrigger.html',
+  'binding-scroll-frames': 'infografias/08-binding-scroll-frames.html',
+  'animaciones-por-seccion': 'infografias/09-animaciones-por-seccion.html',
+  'identidad-marca-generativa': 'infografias/10-branding-generativo.html',
+  'arquitectura-proyecto': 'infografias/11-arquitectura-proyecto.html',
+  'skill-video2website': 'infografias/12-skill-video2website.html'
+};
+
+// ============================================================
 // HELPERS
 // ============================================================
 function mdToHtml(md) {
@@ -734,6 +758,7 @@ function renderLessons() {
 function buildLessonBody(c) {
   const tabs = [
     { id: 'exp', label: 'Explicacion', content: buildExplicacion(c) },
+    { id: 'inf', label: 'Infografia', content: buildInfografia(c) },
     { id: 'met', label: 'Metafora', content: buildMetafora(c) },
     { id: 'cod', label: 'Codigo', content: buildCodigo(c) },
     { id: 'ret', label: 'Mini-reto', content: buildReto(c) },
@@ -756,6 +781,15 @@ function buildLessonBody(c) {
 
 function buildExplicacion(c) {
   return `<div class="explicacion">${mdToHtml(c.explicacion)}</div>`;
+}
+
+function buildInfografia(c) {
+  const src = INFOGRAFIA_MAP[c.id];
+  if (!src) return '<p style="color:var(--text-muted);font-size:.85rem">Infografia no disponible para esta leccion.</p>';
+  return `<div class="infografia-wrap">
+    <iframe class="infografia-iframe" src="${src}" loading="lazy" onload="this.closest('.lesson-body').style.maxHeight=this.closest('.lesson-body').scrollHeight+'px'"></iframe>
+  </div>
+  <a href="${src}" target="_blank" class="infografia-link">Abrir en pantalla completa &rarr;</a>`;
 }
 
 function buildMetafora(c) {
