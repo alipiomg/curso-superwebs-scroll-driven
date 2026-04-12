@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rural Makers — Desarrollo Web Premium + IA</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       PRELOADER
+       Two-phase loading: critical frames first, then remaining.
+       Shows animated progress bar + percentage counter.
+       ============================================================ -->
+  <div id="preloader" class="preloader">
+    <div class="preloader__inner">
+      <div class="preloader__brand">RURAL<span style="color:#00ff88">MAKERS</span></div>
+      <div class="preloader__bar-track">
+        <div class="preloader__bar-fill" id="preloader-bar"></div>
+      </div>
+      <div class="preloader__percent" id="preloader-percent">0%</div>
+      <div class="preloader__status" id="preloader-status">Loading critical assets...</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CANVAS — Full-viewport, pinned during scroll.
+       Renders frame-by-frame animation synced to scroll position.
+       ============================================================ -->
+  <canvas id="hero-canvas"></canvas>
+
+  <!-- ============================================================
+       HERO SECTION — Pinned scroll area.
+       The canvas plays through 60 frames as the user scrolls
+       through this section's height (300vh).
+       ============================================================ -->
+  <section id="hero" class="hero">
+    <div class="hero__content">
+      <h1 class="hero__title">
+        <span class="hero__title-line">RURAL<br>MAKERS</span>
+      </h1>
+      <p class="hero__tagline">Desarrollo web premium con IA generativa</p>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CONTENT SECTIONS — 6 sections, each with a different
+       scroll-triggered animation type. Educational demos.
+       ============================================================ -->
+
+  <!-- Section 1: fade-up -->
+  <section class="content-section" data-animation="fade-up">
+    <div class="section__inner section__inner--split">
+      <div class="section__text">
+        <span class="section__label">01 / Webs Scroll-Driven</span>
+        <h2 class="section__title" data-animate="fade-up">Landing pages<br>nivel <span class="accent">Awwwards</span></h2>
+        <p class="section__desc" data-animate="fade-up">Creamos webs premium con video sincronizado al scroll. La misma tecnica que usan Apple, Tesla y las mejores agencias del mundo.</p>
+      </div>
+      <div class="section__visual" data-animate="fade-up">
+        <div class="visual-card visual-card--gradient-1">
+          <div class="visual-card__icon">&#9672;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: slide-left -->
+  <section class="content-section" data-animation="slide-left">
+    <div class="section__inner section__inner--split section__inner--reverse">
+      <div class="section__text">
+        <span class="section__label">02 / IA Generativa</span>
+        <h2 class="section__title" data-animate="slide-left">Assets con<br><span class="accent">inteligencia</span></h2>
+        <p class="section__desc" data-animate="slide-left">Generamos imagenes y video de producto con IA. Sin equipo de grabacion, sin sesion de fotos. Del prompt al asset final en minutos.</p>
+      </div>
+      <div class="section__visual" data-animate="slide-left">
+        <div class="visual-card visual-card--gradient-2">
+          <div class="visual-card__icon">&#9674;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: scale-up -->
+  <section class="content-section" data-animation="scale-up">
+    <div class="section__inner section__inner--split">
+      <div class="section__text">
+        <span class="section__label">03 / Cursos Interactivos</span>
+        <h2 class="section__title" data-animate="scale-up">Aprende<br><span class="accent">haciendo</span></h2>
+        <p class="section__desc" data-animate="scale-up">Cursos gamificados con XP, badges y retos verificables. 12 lecciones que te llevan de cero a crear tu propia superweb scroll-driven.</p>
+      </div>
+      <div class="section__visual" data-animate="scale-up">
+        <div class="visual-card visual-card--gradient-3">
+          <div class="visual-card__icon">&#11042;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: rotate-in -->
+  <section class="content-section" data-animation="rotate-in">
+    <div class="section__inner section__inner--split section__inner--reverse">
+      <div class="section__text">
+        <span class="section__label">04 / Automatizacion</span>
+        <h2 class="section__title" data-animate="rotate-in">Claude Code<br><span class="accent">skills</span></h2>
+        <p class="section__desc" data-animate="rotate-in">Skills personalizados que automatizan pipelines completos. De un video a una web premium con una sola instruccion. Zero friction.</p>
+      </div>
+      <div class="section__visual" data-animate="rotate-in">
+        <div class="visual-card visual-card--gradient-4">
+          <div class="visual-card__icon">&#10070;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: stagger-up -->
+  <section class="content-section" data-animation="stagger-up">
+    <div class="section__inner section__inner--center">
+      <span class="section__label">05 / Stack Premium</span>
+      <h2 class="section__title" data-animate="stagger-up">Herramientas <span class="accent">profesionales</span></h2>
+      <div class="stagger-grid" data-animate="stagger-up">
+        <div class="stagger-item">
+          <div class="stagger-item__icon">&#9733;</div>
+          <h3>GSAP</h3>
+          <p>Animaciones de alto rendimiento con ScrollTrigger</p>
+        </div>
+        <div class="stagger-item">
+          <div class="stagger-item__icon">&#9830;</div>
+          <h3>Lenis</h3>
+          <p>Smooth scroll premium sincronizado con GSAP</p>
+        </div>
+        <div class="stagger-item">
+          <div class="stagger-item__icon">&#9827;</div>
+          <h3>Canvas</h3>
+          <p>Rendering GPU-accelerated frame a frame</p>
+        </div>
+        <div class="stagger-item">
+          <div class="stagger-item__icon">&#9829;</div>
+          <h3>FFmpeg</h3>
+          <p>Extraccion y optimizacion de frames WebP</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6: clip-reveal -->
+  <section class="content-section" data-animation="clip-reveal">
+    <div class="section__inner section__inner--split">
+      <div class="section__text">
+        <span class="section__label">06 / Mentoria</span>
+        <h2 class="section__title" data-animate="clip-reveal">Acompanamiento<br><span class="accent">1:1</span></h2>
+        <p class="section__desc" data-animate="clip-reveal">Mentoria personalizada para llevar tu proyecto de cero a produccion. Desde la estrategia hasta el deploy en GitHub Pages.</p>
+      </div>
+      <div class="section__visual" data-animate="clip-reveal">
+        <div class="visual-card visual-card--gradient-5">
+          <div class="visual-card__inner-text">RM</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       BRAND CTA SECTION
+       ============================================================ -->
+  <section class="brand-section">
+    <div class="brand-section__inner">
+      <h2 class="brand-section__title" data-animate="fade-up">RURAL<br>MAKERS</h2>
+      <p class="brand-section__tagline" data-animate="fade-up">Desarrollo web premium con IA generativa</p>
+      <a href="../curso-superwebs-scroll-driven-v1.0/curso-superwebs-scroll-driven.html" class="brand-section__cta" data-animate="fade-up">Empezar el Curso Gratis</a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <span class="footer__brand">Rural <span style="color:#00ff88">Makers</span></span>
+      <span class="footer__sep">|</span>
+      <span class="footer__copy">&copy; 2026 Alipio &mdash; Superwebs Scroll-Driven con Video + IA</span>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       EXTERNAL LIBRARIES (CDN)
+       - GSAP 3 + ScrollTrigger plugin
+       - Lenis smooth scroll
+       ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+
+  <!-- Application scripts (order matters) -->
+  <script src="js/canvas.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

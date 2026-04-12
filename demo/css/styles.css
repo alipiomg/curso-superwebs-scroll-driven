@@ -1,0 +1,515 @@
+/* ============================================================
+   Rural Makers — Design System & Styles
+   Premium dark-theme landing page for scroll-driven demo.
+
+   KEY CONCEPTS:
+   - CSS custom properties for consistent design tokens
+   - Dark theme with neon accent for premium feel
+   - Responsive layout using clamp() and container queries
+   - Smooth transitions and GPU-friendly transforms
+   ============================================================ */
+
+/* ---- Design Tokens ---- */
+:root {
+  --color-bg:       #0a0a0a;
+  --color-bg-alt:   #111111;
+  --color-surface:  #1a1a1a;
+  --color-text:     #f5f5f5;
+  --color-text-dim: #888888;
+  --color-accent:   #00ff88;
+  --color-accent-2: #00ccff;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --space-xs:  0.5rem;
+  --space-sm:  1rem;
+  --space-md:  2rem;
+  --space-lg:  4rem;
+  --space-xl:  8rem;
+  --space-2xl: 12rem;
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.4s ease;
+}
+
+/* ---- Reset ---- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* Lenis will handle smooth scroll behavior */
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img, canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* ============================================================
+   PRELOADER
+   Full-screen overlay with animated loading bar.
+   Fades out once all frames are "loaded".
+   ============================================================ */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.preloader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloader__inner {
+  text-align: center;
+  width: min(320px, 80vw);
+}
+
+.preloader__brand {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: var(--color-text);
+  margin-bottom: var(--space-md);
+}
+
+.preloader__bar-track {
+  width: 100%;
+  height: 3px;
+  background: var(--color-surface);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.preloader__bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+  /* Glow effect on the loading bar */
+  box-shadow: 0 0 12px var(--color-accent), 0 0 4px var(--color-accent);
+}
+
+.preloader__percent {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: var(--space-xs);
+}
+
+.preloader__status {
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   HERO CANVAS
+   Fixed, full-viewport canvas behind all content.
+   Pinned via GSAP ScrollTrigger during the hero section.
+   ============================================================ */
+#hero-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  /* Hidden until preloader finishes — revealed with circle wipe */
+  opacity: 0;
+}
+
+#hero-canvas.is-visible {
+  opacity: 1;
+}
+
+/* ============================================================
+   HERO SECTION
+   Tall section (300vh) that drives the canvas frame scrubbing.
+   The hero content (title/tagline) is centered and pinned.
+   ============================================================ */
+.hero {
+  position: relative;
+  z-index: 1;
+  height: 300vh; /* Long scroll distance = more scroll frames */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.hero__content {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-md);
+  /* Will be animated in by GSAP */
+  opacity: 0;
+}
+
+.hero__title {
+  font-size: clamp(4rem, 12vw, 10rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+  background: linear-gradient(135deg, var(--color-text) 40%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__tagline {
+  font-size: clamp(0.875rem, 2vw, 1.25rem);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+/* ============================================================
+   CONTENT SECTIONS
+   Each section is 100vh minimum, with side-aligned layout.
+   ============================================================ */
+.content-section {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg) var(--space-md);
+  /* Semi-transparent background so canvas shows through slightly */
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 10, 0.95) 0%,
+    rgba(10, 10, 10, 0.98) 50%,
+    rgba(10, 10, 10, 0.95) 100%
+  );
+}
+
+/* Subtle top border for section separation */
+.content-section + .content-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.section__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Split layout: text on one side, visual on the other */
+.section__inner--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+.section__inner--reverse {
+  direction: rtl;
+}
+
+.section__inner--reverse > * {
+  direction: ltr;
+}
+
+.section__inner--center {
+  text-align: center;
+}
+
+/* Section label (small category text) */
+.section__label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-sm);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  padding: 0.3em 0.8em;
+  border-radius: 100px;
+}
+
+.section__title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--space-sm);
+}
+
+.accent {
+  color: var(--color-accent);
+}
+
+.section__desc {
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  color: var(--color-text-dim);
+  max-width: 480px;
+  line-height: 1.7;
+}
+
+/* ---- Visual Cards ---- */
+.section__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.visual-card {
+  width: min(100%, 400px);
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.visual-card__icon {
+  font-size: 4rem;
+  opacity: 0.6;
+  color: var(--color-text);
+}
+
+.visual-card__inner-text {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+/* Different gradient backgrounds for variety */
+.visual-card--gradient-1 {
+  background: linear-gradient(135deg, #0a2a1a 0%, #0a4a2a 50%, #001a0a 100%);
+}
+.visual-card--gradient-2 {
+  background: linear-gradient(135deg, #0a1a2a 0%, #0a2a4a 50%, #000a1a 100%);
+}
+.visual-card--gradient-3 {
+  background: linear-gradient(135deg, #1a0a2a 0%, #2a0a4a 50%, #0a001a 100%);
+}
+.visual-card--gradient-4 {
+  background: linear-gradient(135deg, #2a1a0a 0%, #4a2a0a 50%, #1a0a00 100%);
+}
+.visual-card--gradient-5 {
+  background: linear-gradient(135deg, #0a0a0a 0%, var(--color-accent) 100%);
+}
+
+/* ---- Stagger Grid (Section 5) ---- */
+.stagger-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.stagger-item {
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+  transition: border-color var(--transition-base);
+}
+
+.stagger-item:hover {
+  border-color: rgba(0, 255, 136, 0.2);
+}
+
+.stagger-item__icon {
+  font-size: 2rem;
+  margin-bottom: var(--space-sm);
+  color: var(--color-accent);
+}
+
+.stagger-item h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: var(--space-xs);
+}
+
+.stagger-item p {
+  font-size: 0.8rem;
+  color: var(--color-text-dim);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   BRAND CTA SECTION
+   Large centered call-to-action, premium feel.
+   ============================================================ */
+.brand-section {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--color-bg);
+  padding: var(--space-lg) var(--space-md);
+}
+
+.brand-section__inner {
+  max-width: 800px;
+}
+
+.brand-section__title {
+  font-size: clamp(5rem, 15vw, 12rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+  background: linear-gradient(135deg, var(--color-text) 20%, var(--color-accent) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-section__tagline {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--color-text-dim);
+  margin-bottom: var(--space-lg);
+}
+
+.brand-section__cta {
+  display: inline-block;
+  padding: 1em 3em;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border-radius: 100px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-base);
+  pointer-events: auto;
+}
+
+.brand-section__cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.4), 0 0 60px rgba(0, 255, 136, 0.15);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  position: relative;
+  z-index: 2;
+  padding: var(--space-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-bg);
+}
+
+.footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+}
+
+.footer__brand {
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--color-text);
+}
+
+.footer__sep {
+  opacity: 0.3;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .section__inner--split {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  .section__inner--reverse {
+    direction: ltr;
+  }
+
+  .section__desc {
+    max-width: 100%;
+  }
+
+  .stagger-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .visual-card {
+    width: min(100%, 320px);
+  }
+}
+
+@media (max-width: 500px) {
+  .stagger-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-section {
+    padding: var(--space-md) var(--space-sm);
+  }
+}
+
+/* ============================================================
+   UTILITY: Hidden elements (for GSAP initial states)
+   GSAP will set visibility and transforms via JS,
+   but we set initial CSS states as fallback.
+   ============================================================ */
+[data-animate] {
+  will-change: transform, opacity;
+}
