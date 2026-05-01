@@ -59,3 +59,56 @@
 - 9 infografias NanoBananaPro restantes (4-12)
 - Demo superweb sin frames reales (solo canvas generativo)
 - Testimoniales reales para landing
+
+---
+
+## Sesion 3 — 2026-04-30
+### Sinapsis evolution: ecosistema content production
+
+**Skill enriquecida**
+- `synapis-course-architect` v2.4.0 → **v2.5.0**
+- Integracion Higgsfield MCP en paso 7f (auto-generacion de infografias)
+- Comando nuevo `/course-infografias-auto` para cursos ya generados
+- Manifest tracking (`.manifest.json`) con prompt hash para evitar regen
+- Style prefix automatico desde operator-state
+- Fallbacks robustos: MCP unavailable → texto, MCP error → manifest pending
+
+**Skills nuevas (3)**
+- `landing-iterator` v1.0.0 (700 tokens) — edicion quirurgica, variantes A/B, asset-swap, rollback
+- `social-publisher` v1.0.0 (900 tokens) — Facebook/IG/X via MCP, captions con tono operador, scheduling
+- `content-pipeline` v1.0.0 (1100 tokens) — agente orquestador end-to-end, 8 fases con gates
+
+**Comando nuevo**
+- `/course-deploy-full` (300 tokens) — cierra lanzamiento sobre curso ya hecho
+- 5 pasos: infografias missing + deploy GH Pages + video opcional + publish opcional + bitacora
+
+**Passive rules (4 nuevas)**
+- `higgsfield-prefer-mcp` — sugiere MCP en vez de manual cuando aplique
+- `facebook-publish-flow` — recuerda usar social-publisher
+- `landing-edit-not-rewrite` — fuerza ediciones quirurgicas
+- `mcp-fallback-graceful` — degradacion automatica cuando MCPs fallan
+
+**Catalogo Sinapsis**
+- totalTokens 6715 → 9415 (+2700)
+- Quartet de produccion documentado: course-architect + landing-iterator + social-publisher + content-pipeline
+- Eliminado placeholder `html-course-builder` (consolidado en course-architect)
+
+**Ejecucion del comando /course-deploy-full**
+- Estado: git limpio, repo en sync con remote
+- Paso 1 (infografias Higgsfield): SKIP graceful — MCP no conectado en sesion. 9 imagenes pendientes documentadas.
+- Paso 2 (deploy): SKIP — sin cambios pendientes, ya live en GH Pages
+- Paso 3 (video teaser): SKIP — no especificado
+- Paso 4 (publish FB): SKIP — MCP Facebook no conectado
+- Paso 5 (bitacora): EJECUTADO — Sesion 3 anadida con timeline completo
+
+### Pendientes Sesion 3
+- Conectar Higgsfield MCP y ejecutar `/course-infografias-auto --missing-only`
+- Conectar Facebook/Meta MCP para social-publisher
+- Generar video teaser hero con HyperFrames cuando se necesite
+- Probar `/content-pipeline` con un brief nuevo para validar el flujo completo
+
+### Live URLs (sin cambios desde Sesion 2)
+- Curso: https://alipiomg.github.io/curso-superwebs-scroll-driven/curso-superwebs-scroll-driven.html
+- Landing: https://alipiomg.github.io/curso-superwebs-scroll-driven/landing-superwebs-scroll-driven.html
+- Bitacora: https://alipiomg.github.io/curso-superwebs-scroll-driven/bitacora.html
+- Demo: https://alipiomg.github.io/curso-superwebs-scroll-driven/demo/
